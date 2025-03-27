@@ -14,7 +14,7 @@ class Mantis:
         self.model = LlavaForConditionalGeneration.from_pretrained(f"TIGER-Lab/{pretrained}", device_map=f"cuda:{torch.cuda.current_device()}", torch_dtype=torch.bfloat16, attn_implementation="flash_attention_2")
 
         self.generation_kwargs = {"max_new_tokens": 1024, "num_beams": 1, "do_sample": False}
-    def inference(self, qs, img_files):
+    def inference(self, qs, img_files): # list of pil image
         response, history = chat_mllava(qs, img_files, self.model, self.processor, **self.generation_kwargs)
         
         return response
