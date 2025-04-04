@@ -78,7 +78,7 @@ class CreateDatabase:
 
                 retrieval_vectors = np.load(os.path.join(sample_dir_input, "retrieval.npy"))
                 batch_retrieval_vectors.append(retrieval_vectors)
-                print(len(np.vstack(batch_retrieval_vectors)))
+                print(np.vstack(batch_retrieval_vectors).shape)
                 if len(np.vstack(batch_retrieval_vectors)) >= batch_size or (self.number_vectors - total_vectors_added) < batch_size:
                     print(f"Adding batch to index... {index_id}")
                     batch_retrieval_vectors = np.vstack(batch_retrieval_vectors)
