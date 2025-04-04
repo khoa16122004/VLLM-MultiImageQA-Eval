@@ -125,6 +125,7 @@ class CreateDatabase:
             all_batch_index.append([i]*len(indices))
         
         all_distances = np.hstack(all_distances) # 35,
+        print(all_indices)
         all_indices = np.hstack(all_indices) # 35,
         all_batch_index = np.hstack(all_batch_index) # 35, 
         print(all_batch_index)
