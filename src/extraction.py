@@ -6,7 +6,7 @@ import faiss
 import csv
 
 class CreateDatabase:
-    def __init__(self, model, number_v=10370):
+    def __init__(self, model, number_v=6357):
         '''
             Args: 
                 dir: Folder dir of N samples
