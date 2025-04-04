@@ -4,6 +4,7 @@ from model import MyCLIPWrapper
 from tqdm import tqdm
 import faiss
 import csv
+import pandas as pd
 
 class CreateDatabase:
     def __init__(self, model, number_v=6357):
@@ -97,8 +98,8 @@ class CreateDatabase:
             batch_retrieval_vectors = np.vstack(batch_retrieval_vectors)
             current_index.add(batch_retrieval_vectors.astype('float32'))
             writer.writerow({'index': index_id, 
-                                'sample_id': sample_id,
-                                'batch_idx': index_id})
+                             'sample_id': sample_id,
+                             'batch_idx': index_id})
             faiss.write_index(current_index, os.path.join(output_dir, f"{index_id}.index"))
             total_vectors_added += len(batch_retrieval_vectors) 
 
@@ -106,31 +107,58 @@ class CreateDatabase:
             print(f"Database created successfully with multiple indexes with total {total_vectors_added} vectors")
             
 
-    def search(self, index_file, query_vector, k=5, d=512):
-        '''
-            Search the FAISS index for the top-k closest vectors.
-            Args:
-                index_file (str): Path to the saved FAISS index.
-                query_vector (np.ndarray): Query vector (must be 1-dimensional).
-                k (int): Number of nearest neighbors to return.
-                d (int): Dimension of the vectors (must match the index).
-            Returns:
-                distances (np.ndarray): Distances of the top-k results.
-                indices (np.ndarray): Indices of the top-k results.
-        '''
-        index = faiss.read_index(index_file)
+    def search(self, index_dir, query_vector, k=5, d=512):
+        query_vector = query_vector.astype('float32')  # Đảm bảo vector có kiểu float32
+        all_distances = []
+        all_indices = []
+        all_batch_index = []
+        
+        df = pd.read_csv(os.path.join(index_dir, 'map.csv'))
 
-        query_vector = query_vector.astype('float32').reshape(1, -1)
+        
+        
+        for i in range(os.listdir(index_dir)):
+            index_path = os.path.join(index_dir, f"{i}.index")
+            print(f"Searching in {index_path} ...")
+            
+            index = faiss.read_index(index_path)
 
-        distances, indices = index.search(query_vector, k)
+            distances, indices = index.search(query_vector, k)  
+            all_distances.append(distances)
+            all_indices.append(indices)
+            all_batch_index.append([i]*len(indices))
+        
+        all_distances = np.hstack(all_distances) # 35,
+        all_indices = np.hstack(all_indices) # 35,
+        all_batch_index = np.hstack(all_batch_index) # 35, 
+        best_indices_from_all = np.argsort(all_distances[0])[:k]
+        best_batch_index = all_batch_index[0][best_indices_from_all]
+        best_indices = all_indices[0][best_indices_from_all]
+        query_df = pd.DataFrame({
+            'index': best_indices,
+            'batch_idx': best_batch_index
+            })
+        
+        merged = pd.merge(query_df, df, on=['index', 'batch_idx'], how='inner')
+        sample_indices = merged['sample_id'].to_numpy()
+        return sample_indices
 
-        return distances, indices
     
+    def flow_search(self, index_dir, dataset_dir, image_index, k=5, d=512):
+        img_path = os.path.join(dataset_dir, image_index, "question_img.png")
+        img_vector = self.model.visual_encode(img_path)
+        self.search(index_dir, img_vector, k, d)
+        
 if __name__ == "__main__":
     model = MyCLIPWrapper()
     db = CreateDatabase(model=model)
     
-    # extract_folder = "../dataset/MRAG"
+    dataset_dir = "../dataset/MRAG"
     database_dir = "../database/MRAG"
-    db.create_database(database_dir, output_dir="../database/MRAG/index")
-    # db.extract(extract_folder, output_dir)        
+    # db.create_database(database_dir, output_dir="../database/MRAG/index")
+    # db.extract(extract_folder, output_dir)       
+    
+    index_dir = "../database/MRAG/index"
+    image_index = input("Input sampe index")
+    sample_indices = db.search(index_dir, dataset_dir, image_index)
+    print("Results retreval: ", sample_indices)
