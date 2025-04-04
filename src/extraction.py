@@ -139,6 +139,7 @@ class CreateDatabase:
         print(query_df)
         
         merged = pd.merge(query_df, df, on=['index', 'batch_idx'], how='inner')
+        print(merged)
         sample_indices = merged['sample_id'].to_numpy()
         return sample_indices
 
