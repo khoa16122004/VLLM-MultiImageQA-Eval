@@ -36,10 +36,10 @@ class CreateDatabase:
             for img_name in os.listdir(sample_dir):
                 img_path = os.path.join(sample_dir, img_name)
                 if "gt" in img_name:
-                    vec = self.visual_encode(img_path)
+                    vec = self.model.visual_encode(img_path)
                     retrieved_vectors.append(vec)
                 elif "question" in img_name:
-                    qs_vector = self.visual_encode(img_path)
+                    qs_vector = self.model.visual_encode(img_path)
 
             if qs_vector is not None and len(retrieved_vectors) > 0:
                 np.save(os.path.join(sample_dir_output, "question.npy"), qs_vector)
