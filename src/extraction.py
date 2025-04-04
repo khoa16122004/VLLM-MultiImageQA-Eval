@@ -122,16 +122,13 @@ class CreateDatabase:
             distances, indices = index.search(query_vector.reshape(1, -1), k)  
             all_distances.append(distances)
             all_indices.append(indices)
-            all_batch_index.append([i]*len(indices))
+            all_batch_index.append([i]*len(indices[0]))
         
         all_distances = np.hstack(all_distances) # 35,
-        print(all_batch_index)
         all_indices = np.hstack(all_indices) # 35,
         all_batch_index = np.hstack(all_batch_index) # 35, 
-        print(all_batch_index)
-        print(all_indices)
         best_indices_from_all = np.argsort(all_distances[0])[:k]
-        best_batch_index = all_batch_index[best_indices_from_all]
+        best_batch_index = all_batch_index[0][best_indices_from_all]
   
         best_indices = all_indices[0][best_indices_from_all]
         query_df = pd.DataFrame({
