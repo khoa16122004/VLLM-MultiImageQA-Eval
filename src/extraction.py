@@ -176,9 +176,9 @@ if __name__ == "__main__":
     
     dataset_dir = "../dataset/MRAG"
     database_dir = "../database/MRAG"
-    db.create_database(database_dir, output_dir="../database/MRAG/index")
     db.extract(dataset_dir, database_dir)       
-    
+    db.create_database(database_dir, output_dir="../database/MRAG/index")
+
     index_dir = "../database/MRAG/index"
     while True:
         image_index = int(input("Input sampe index: "))
