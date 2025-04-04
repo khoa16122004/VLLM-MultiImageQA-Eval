@@ -129,7 +129,8 @@ class CreateDatabase:
         all_batch_index = np.hstack(all_batch_index) # 35, 
         best_indices_from_all = np.argsort(all_distances[0])[:k]
         best_batch_index = all_batch_index[best_indices_from_all]
-        best_indices = all_indices[best_indices_from_all]
+        print(all_batch_index)
+        best_indices = all_indices[0][best_indices_from_all]
         query_df = pd.DataFrame({
             'index': best_indices,
             'batch_idx': best_batch_index
