@@ -1,6 +1,7 @@
 import os
 import numpy as np
 from model import MyCLIPWrapper
+from tqdm import tqdm
 class CreateDatabase:
     def __init__(self, model):
         '''
@@ -24,7 +25,7 @@ class CreateDatabase:
         os.makedirs(output_dir, exist_ok=True)
 
         
-        for sample_id in os.listdir(dir):
+        for sample_id in tqdm(os.listdir(dir)):
             sample_dir = os.path.join(dir, sample_id)
             sample_dir_output = os.path.join(output_dir, sample_id)
             os.makedirs(sample_dir_output, exist_ok=True)
