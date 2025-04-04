@@ -167,15 +167,15 @@ if __name__ == "__main__":
     
     dataset_dir = "../dataset/MRAG"
     database_dir = "../database/MRAG"
-    # db.create_database(database_dir, output_dir="../database/MRAG/index")
-    # db.extract(extract_folder, output_dir)       
+    db.create_database(database_dir, output_dir="../database/MRAG/index")
+    # db.extract(dataset_dir, output_dir)       
     
-    index_dir = "../database/MRAG/index"
-    while True:
-        image_index = int(input("Input sampe index: "))
+    # index_dir = "../database/MRAG/index"
+    # while True:
+    #     image_index = int(input("Input sampe index: "))
         
-        if image_index == -1:
-            break
+    #     if image_index == -1:
+    #         break
         
-        sample_indices = db.flow_search(index_dir, dataset_dir, image_index)
-        print("Results retreval: ", sample_indices)
+    #     sample_indices = db.flow_search(index_dir, dataset_dir, image_index)
+    #     print("Results retreval: ", sample_indices)
