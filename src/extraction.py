@@ -145,7 +145,7 @@ class CreateDatabase:
 
     
     def flow_search(self, index_dir, dataset_dir, image_index, k=5, d=512):
-        img_path = os.path.join(dataset_dir, image_index, "question_img.png")
+        img_path = os.path.join(dataset_dir, str(image_index), "question_img.png")
         img_vector = self.model.visual_encode(img_path)
         self.search(index_dir, img_vector, k, d)
         
