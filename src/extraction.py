@@ -160,7 +160,7 @@ if __name__ == "__main__":
     
     index_dir = "../database/MRAG/index"
     while True:
-        image_index = int(input("Input sampe index"))
+        image_index = int(input("Input sampe index: "))
         
         if image_index == -1:
             break
