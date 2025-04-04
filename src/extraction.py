@@ -70,6 +70,9 @@ class CreateDatabase:
             total_vectors_added = 0
 
             for sample_id in tqdm(sorted(os.listdir(database_dir))):
+                if sample_id.endswith(".py"):
+                    continue
+                
                 print(f"Read sample {sample_id} ...")
                 sample_dir_input = os.path.join(database_dir, sample_id)
 
