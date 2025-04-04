@@ -40,16 +40,19 @@ class CreateDatabase:
                 retrieved_vectors = []
                 qs_vector = None
 
+                img_paths = []
                 for img_name in os.listdir(sample_dir):
                     img_path = os.path.join(sample_dir, img_name)
                     if "gt" in img_name:
                         vec = self.model.visual_encode(img_path)
                         retrieved_vectors.append(vec)
+                        img_paths.append(img_path)
                     elif "question" in img_name and img_name.endswith(".png"):
                         qs_vector = self.model.visual_encode(img_path)
 
                 if qs_vector is not None and len(retrieved_vectors) > 0:
                     np.save(os.path.join(sample_dir_output, "question.npy"), qs_vector)
+                    np.save(os.path.join(sample_dir_output, "paths.npy"), img_paths)
                     np.save(os.path.join(sample_dir_output, "retrieval.npy"), np.stack(retrieved_vectors))
                 
         
@@ -59,7 +62,7 @@ class CreateDatabase:
         '''
         os.makedirs(output_dir, exist_ok=True)
         with open(os.path.join(output_dir, csv_file), mode='w', newline='') as csvfile:
-            fieldnames = ['index', 'sample_id', 'batch_idx']
+            fieldnames = ['index', 'sample_id', 'batch_idx', 'img_path']
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
 
@@ -69,8 +72,10 @@ class CreateDatabase:
             print("Estimated total index: ", 1 + self.number_vectors // batch_size)
             batch_retrieval_vectors = []
             batch_sample_ids = []
+            all_paths = []
             total_vectors_added = 0
 
+            
             for k, sample_id in tqdm(enumerate(sorted(os.listdir(database_dir)))):
                 if sample_id.endswith(".py") or sample_id == "index":
                     continue
@@ -78,9 +83,11 @@ class CreateDatabase:
                 print(f"Read sample {k} ...")
                 sample_dir_input = os.path.join(database_dir, sample_id)
                 retrieval_vectors = np.load(os.path.join(sample_dir_input, "retrieval.npy"))
+                paths = np.load(os.path.join(sample_dir_input, "paths.npy"))
+                all_paths.extend(paths)
                 batch_retrieval_vectors.append(retrieval_vectors)
                 batch_sample_ids.extend([sample_id] * retrieval_vectors.shape[0])
-
+                
                 if len(np.vstack(batch_retrieval_vectors)) >= batch_size:
                     print(f"Adding batch to index... {index_id}")
                     batch_vectors = np.vstack(batch_retrieval_vectors)
@@ -90,7 +97,8 @@ class CreateDatabase:
                         writer.writerow({
                             'index': i,
                             'sample_id': sid,
-                            'batch_idx': index_id
+                            'batch_idx': index_id,
+                            'img_path': all_paths[i]
                         })
 
                     faiss.write_index(current_index, os.path.join(output_dir, f"{index_id}.index"))
@@ -100,6 +108,7 @@ class CreateDatabase:
                     total_vectors_added += len(batch_vectors)
                     batch_retrieval_vectors = []
                     batch_sample_ids = []
+                    all_paths = []
 
             if batch_retrieval_vectors:
                 print(f"Adding batch to index... {index_id}")
@@ -110,7 +119,8 @@ class CreateDatabase:
                     writer.writerow({
                         'index': total_vectors_added + i,
                         'sample_id': sid,
-                        'batch_idx': index_id
+                        'batch_idx': index_id,
+                        'img_path': all_paths[i]
                     })
 
                 faiss.write_index(current_index, os.path.join(output_dir, f"{index_id}.index"))
@@ -150,7 +160,7 @@ class CreateDatabase:
         
         
         merged = pd.merge(query_df, df, on=['index', 'batch_idx'], how='inner')
-        sample_indices = merged['sample_id'].to_numpy()
+        sample_indices = merged['img_path'].to_numpy()
         return sample_indices
 
     
