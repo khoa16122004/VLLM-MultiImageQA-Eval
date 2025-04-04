@@ -74,13 +74,13 @@ class CreateDatabase:
                     continue
                 
                 print(f"Read sample {k} ...")
-                input()
                 sample_dir_input = os.path.join(database_dir, sample_id)
 
                 retrieval_vectors = np.load(os.path.join(sample_dir_input, "retrieval.npy"))
                 batch_retrieval_vectors.append(retrieval_vectors)
                 if len(np.vstack(batch_retrieval_vectors)) >= batch_size or (self.number_vectors - total_vectors_added) < batch_size:
                     print(f"Adding batch to index... {index_id}")
+                    input()
                     batch_retrieval_vectors = np.vstack(batch_retrieval_vectors)
                     current_index.add(batch_retrieval_vectors.astype('float32'))
                     writer.writerow({'index': index_id, 
