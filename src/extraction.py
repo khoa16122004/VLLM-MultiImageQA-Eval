@@ -148,10 +148,8 @@ class CreateDatabase:
             'batch_idx': best_batch_index
             })
         
-        print(query_df)
         
         merged = pd.merge(query_df, df, on=['index', 'batch_idx'], how='inner')
-        print(merged)
         sample_indices = merged['sample_id'].to_numpy()
         return sample_indices
 
@@ -159,7 +157,8 @@ class CreateDatabase:
     def flow_search(self, index_dir, dataset_dir, image_index, k=5, d=512):
         img_path = os.path.join(dataset_dir, str(image_index), "question_img.png")
         img_vector = self.model.visual_encode(img_path)
-        self.search(index_dir, img_vector, k, d)
+        sample_indices = self.search(index_dir, img_vector, k, d)
+        return sample_indices
         
 if __name__ == "__main__":
     model = MyCLIPWrapper()
