@@ -120,7 +120,7 @@ class CreateDatabase:
             
             index = faiss.read_index(index_path)
             print("query vector: ", query_vector.shape)
-            distances, indices = index.search(query_vector, k)  
+            distances, indices = index.search(query_vector.reshape(1, -1), k)  
             all_distances.append(distances)
             all_indices.append(indices)
             all_batch_index.append([i]*len(indices))
