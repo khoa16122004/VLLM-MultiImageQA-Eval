@@ -82,8 +82,6 @@ class CreateDatabase:
                     print(f"Adding batch to index... {index_id}")
                     batch_retrieval_vectors = np.vstack(batch_retrieval_vectors)
                     current_index.add(batch_retrieval_vectors.astype('float32'))
-                    print(len(batch_retrieval_vectors))
-                    input("wait")
                     writer.writerow({'index': index_id, 
                                      'sample_id': sample_id,
                                      'batch_idx': index_id})
@@ -95,7 +93,8 @@ class CreateDatabase:
                     batch_retrieval_vectors = [] 
 
                     total_vectors_added += len(batch_retrieval_vectors)
-
+                    print(total_vectors_added)
+                    input()
 
             print(f"Database created successfully with multiple indexes with total {total_vectors_added} vectors")
             
