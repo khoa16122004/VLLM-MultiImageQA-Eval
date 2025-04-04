@@ -26,7 +26,7 @@ class CreateDatabase:
 
         
         for sample_id in tqdm(os.listdir(dir)):
-            if not sample_id.endwith(".py"):
+            if not sample_id.endswith(".py"):
                 
                 sample_dir = os.path.join(dir, sample_id)
                 sample_dir_output = os.path.join(output_dir, sample_id)
