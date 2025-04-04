@@ -1,6 +1,6 @@
 import os
 import numpy as np
-from model import CLIPModel
+from model import MyCLIPWrapper
 class CreateDatabase:
     def __init__(self, dir, output_dir, model):
         '''
@@ -44,12 +44,12 @@ class CreateDatabase:
                 np.save(os.path.join(sample_dir_output, "retrieval.npy"), np.stack(retrieved_vectors))
             
         
-    def create_databae(self):
+    def create_databae(self, output_file):
         pass
     
 if __name__ == "__main__":
     model = CLIPModel()
-    db = CreateDatabase(dir="samples", output_dir="database", model=model).extract()
+    db = MyCLIPWrapper(dir="samples", output_dir="database", model=model).extract()
     
     extract_folder = "../dataset/MRAG"
     output_dir = "../database/MRAG"
