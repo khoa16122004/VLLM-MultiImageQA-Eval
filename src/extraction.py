@@ -52,7 +52,7 @@ class CreateDatabase:
                     np.save(os.path.join(sample_dir_output, "retrieval.npy"), np.stack(retrieved_vectors))
                 
         
-    def create_database(self, database_dir, output_dir, csv_file='map.csv', batch_size=1000):
+    def create_database(self, database_dir, output_dir, d=512, csv_file='map.csv', batch_size=1000):
         '''
         Create the FAISS index by adding vectors from saved numpy files in batches and split into multiple index files.
         '''
@@ -63,7 +63,7 @@ class CreateDatabase:
             writer.writeheader()
 
             index_id = 0 
-            current_index = faiss.IndexFlatL2(self.d)  # Create a fresh index
+            current_index = faiss.IndexFlatL2(d)  # Create a fresh index
             print("Starting to create database...")
             print("Estimated total index: ", 1 + self.number_vectors // batch_size)
             batch_retrieval_vectors = []
@@ -88,7 +88,7 @@ class CreateDatabase:
                     faiss.write_index(current_index, os.path.join(output_dir, f"{index_id}.index"))
                     
                     index_id += 1
-                    current_index = faiss.IndexFlatL2(self.d) 
+                    current_index = faiss.IndexFlatL2(d) 
                     batch_retrieval_vectors = [] 
 
                     total_vectors_added += len(batch_retrieval_vectors)
