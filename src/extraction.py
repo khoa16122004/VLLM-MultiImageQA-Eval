@@ -78,10 +78,9 @@ class CreateDatabase:
 
                 retrieval_vectors = np.load(os.path.join(sample_dir_input, "retrieval.npy"))
                 batch_retrieval_vectors.append(retrieval_vectors)
-                if len(np.vstack(batch_retrieval_vectors)) >= batch_size or (self.number_vectors - total_vectors_added) < batch_size:
+                if len(np.vstack(batch_retrieval_vectors)) >= batch_size:
                     print(f"Adding batch to index... {index_id}")
                     batch_retrieval_vectors = np.vstack(batch_retrieval_vectors)
-                    input(f"len(batch_retrieval_vectors): {len(batch_retrieval_vectors)}")
                     current_index.add(batch_retrieval_vectors.astype('float32'))
                     writer.writerow({'index': index_id, 
                                      'sample_id': sample_id,
@@ -93,6 +92,16 @@ class CreateDatabase:
                     current_index = faiss.IndexFlatL2(d)
                     total_vectors_added += len(batch_retrieval_vectors) 
                     batch_retrieval_vectors = [] 
+                    
+            print(f"Adding batch to index... {index_id}")
+            batch_retrieval_vectors = np.vstack(batch_retrieval_vectors)
+            current_index.add(batch_retrieval_vectors.astype('float32'))
+            writer.writerow({'index': index_id, 
+                                'sample_id': sample_id,
+                                'batch_idx': index_id})
+            faiss.write_index(current_index, os.path.join(output_dir, f"{index_id}.index"))
+            total_vectors_added += len(batch_retrieval_vectors) 
+
 
             print(f"Database created successfully with multiple indexes with total {total_vectors_added} vectors")
             
