@@ -38,7 +38,7 @@ class CreateDatabase:
                 if "gt" in img_name:
                     vec = self.model.visual_encode(img_path)
                     retrieved_vectors.append(vec)
-                elif "question" in img_name:
+                elif "question" in img_name and img_name.endswith(".png"):
                     qs_vector = self.model.visual_encode(img_path)
 
             if qs_vector is not None and len(retrieved_vectors) > 0:
