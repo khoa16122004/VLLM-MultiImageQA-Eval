@@ -89,12 +89,9 @@ class CreateDatabase:
                     faiss.write_index(current_index, os.path.join(output_dir, f"{index_id}.index"))
                     
                     index_id += 1
-                    current_index = faiss.IndexFlatL2(d) 
+                    current_index = faiss.IndexFlatL2(d)
+                    total_vectors_added += len(batch_retrieval_vectors) 
                     batch_retrieval_vectors = [] 
-
-                    total_vectors_added += len(batch_retrieval_vectors)
-                    print(total_vectors_added)
-                    input()
 
             print(f"Database created successfully with multiple indexes with total {total_vectors_added} vectors")
             
