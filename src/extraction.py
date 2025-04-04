@@ -159,6 +159,11 @@ if __name__ == "__main__":
     # db.extract(extract_folder, output_dir)       
     
     index_dir = "../database/MRAG/index"
-    image_index = input("Input sampe index")
-    sample_indices = db.search(index_dir, dataset_dir, image_index)
-    print("Results retreval: ", sample_indices)
+    while True:
+        image_index = int(input("Input sampe index"))
+        
+        if image_index == -1:
+            break
+        
+        sample_indices = db.flow_search(index_dir, dataset_dir, image_index)
+        print("Results retreval: ", sample_indices)
