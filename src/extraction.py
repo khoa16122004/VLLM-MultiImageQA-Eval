@@ -2,7 +2,7 @@ import os
 import numpy as np
 from model import MyCLIPWrapper
 class CreateDatabase:
-    def __init__(self, dir, output_dir, model):
+    def __init__(self, model):
         '''
             Args: 
                 dir: Folder dir of N samples
@@ -50,7 +50,7 @@ class CreateDatabase:
     
 if __name__ == "__main__":
     model = MyCLIPWrapper()
-    db = CreateDatabase(model=model).extract()
+    db = CreateDatabase(model=model)
     
     extract_folder = "../dataset/MRAG"
     output_dir = "../database/MRAG"
