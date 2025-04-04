@@ -70,7 +70,7 @@ class CreateDatabase:
             total_vectors_added = 0
 
             for sample_id in tqdm(sorted(os.listdir(database_dir))):
-                if sample_id.endswith(".py"):
+                if sample_id.endswith(".py") or sample_id == "index":
                     continue
                 
                 print(f"Read sample {sample_id} ...")
