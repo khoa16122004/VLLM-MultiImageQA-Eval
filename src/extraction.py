@@ -114,7 +114,7 @@ class CreateDatabase:
         all_batch_index = []
         
         df = pd.read_csv(os.path.join(index_dir, 'map.csv'))
-        for i in range(len(os.listdir(index_dir) - 1)):
+        for i in range(len(os.listdir(index_dir)) - 1):
             index_path = os.path.join(index_dir, f"{i}.index")
             print(f"Searching in {index_path} ...")
             
