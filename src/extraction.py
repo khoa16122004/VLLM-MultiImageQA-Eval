@@ -69,11 +69,11 @@ class CreateDatabase:
             batch_retrieval_vectors = []
             total_vectors_added = 0
 
-            for sample_id in tqdm(sorted(os.listdir(database_dir))):
+            for k, sample_id in tqdm(enumerate(sorted(os.listdir(database_dir)))):
                 if sample_id.endswith(".py") or sample_id == "index":
                     continue
                 
-                print(f"Read sample {sample_id} ...")
+                print(f"Read sample {k} ...")
                 sample_dir_input = os.path.join(database_dir, sample_id)
 
                 retrieval_vectors = np.load(os.path.join(sample_dir_input, "retrieval.npy"))
