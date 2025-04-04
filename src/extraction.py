@@ -119,7 +119,7 @@ class CreateDatabase:
             print(f"Searching in {index_path} ...")
             
             index = faiss.read_index(index_path)
-
+            print("query vector: ", query_vector.shape)
             distances, indices = index.search(query_vector, k)  
             all_distances.append(distances)
             all_indices.append(indices)
