@@ -48,8 +48,8 @@ class CreateDatabase:
         pass
     
 if __name__ == "__main__":
-    model = CLIPModel()
-    db = MyCLIPWrapper(dir="samples", output_dir="database", model=model).extract()
+    model = MyCLIPWrapper()
+    db = CreateDatabase(dir="samples", output_dir="database", model=model).extract()
     
     extract_folder = "../dataset/MRAG"
     output_dir = "../database/MRAG"
