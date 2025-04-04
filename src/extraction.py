@@ -74,6 +74,7 @@ class CreateDatabase:
                     continue
                 
                 print(f"Read sample {k} ...")
+                input()
                 sample_dir_input = os.path.join(database_dir, sample_id)
 
                 retrieval_vectors = np.load(os.path.join(sample_dir_input, "retrieval.npy"))
