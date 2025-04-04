@@ -13,19 +13,20 @@ class CreateDatabase:
                 model: Visual Feature extraction model
         '''
         
-        os.makedirs(output_dir, exist_ok=True)
-        self.dir = dir
-        self.output_dir = output_dir
+
         self.model = model
         
         
-    def extract(self):
+    def extract(self, dir, output_dir):
         '''
             Extracts features from all N samples, and save in output_dir folder 
         '''
-        for sample_id in os.listdir(self.dir):
-            sample_dir = os.path.join(self.dir, sample_id)
-            sample_dir_output = os.path.join(self.output_dir, sample_id)
+        os.makedirs(output_dir, exist_ok=True)
+
+        
+        for sample_id in os.listdir(dir):
+            sample_dir = os.path.join(dir, sample_id)
+            sample_dir_output = os.path.join(output_dir, sample_id)
             os.makedirs(sample_dir_output, exist_ok=True)
 
             retrieved_vectors = []
@@ -44,15 +45,14 @@ class CreateDatabase:
                 np.save(os.path.join(sample_dir_output, "retrieval.npy"), np.stack(retrieved_vectors))
             
         
-    def create_databae(self, output_file):
+    def create_database(self, output_file):
         pass
     
 if __name__ == "__main__":
     model = MyCLIPWrapper()
-    db = CreateDatabase(dir="samples", output_dir="database", model=model).extract()
+    db = CreateDatabase(model=model).extract()
     
     extract_folder = "../dataset/MRAG"
     output_dir = "../database/MRAG"
     
-    db = CreateDatabase(dir=extract_folder, output_dir=output_dir, model=model).extract()
-        
+    db.extract(extract_folder, output_dir)        
