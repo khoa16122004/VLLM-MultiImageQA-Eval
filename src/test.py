@@ -1,7 +1,7 @@
 import os
 
 dataset_dir = "../dataset/MRAG"
-
+count = 0
 for sample_id in os.listdir(dataset_dir):
     if sample_id.endswith(".py") or sample_id == "index":
         continue
