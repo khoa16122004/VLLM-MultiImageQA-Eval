@@ -53,7 +53,9 @@ def main(args):
                                              topk_rerank=args.topk_rerank)
             retrieved_files = [Image.open(path).convert("RGB") for path in retrieved_paths]
             output = lvlm.inference(full_question, [question_img, *retrieved_files])[0]
-            print(output)
+            
+            print("GT: ", gt_ans)
+            print("Output: ", output)
             break   
             
 if __name__ == "__main__":
