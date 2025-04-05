@@ -129,7 +129,7 @@ class CreateDatabase:
             print(f"Database created successfully with multiple indexes with total {total_vectors_added} vectors")
                     
     def search_with_reranking(self, index_dir, query_vector, k=5, top_rerank=50, d=512):
-        top_indices, top_batches, top_vectors, df = self.search(index_dir, query_vector, top_rerank, d) # 50 vector
+        top_indices, top_batches, top_vectors, df, sample_indices = self.search(index_dir, query_vector, top_rerank, d) # 50 vector
 
         expanded_query = np.mean(top_vectors, axis=0).astype('float32')
         all_distances = np.linalg.norm(top_vectors - expanded_query.reshape(1, -1), axis=1)  # Euclidean
@@ -185,21 +185,22 @@ class CreateDatabase:
         top_vectors = all_vectors[top_idx]
 
         
-        # query_df = pd.DataFrame({
-        #     'index': best_indices,
-        #     'batch_idx': best_batch_index
-        #     })
+        query_df = pd.DataFrame({
+            'index': top_indices,
+            'batch_idx': top_batches
+            })
         
-        # merged = pd.merge(query_df, df, on=['index', 'batch_idx'], how='inner')
-        # sample_indices = merged['img_path'].to_numpy()
+        merged = pd.merge(query_df, df, on=['index', 'batch_idx'], how='inner')
+        sample_indices = merged['img_path'].to_numpy()
         
-        
-        return top_indices, top_batches, top_vectors, df
+        print("Before reranking: ", sample_indices)
+        return top_indices, top_batches, top_vectors, df, sample_indices
     
     def flow_search(self, index_dir, dataset_dir, image_index, k=5, topk_rerank=10, d=512):
         img_path = os.path.join(dataset_dir, str(image_index), "question_img.png")
         img_vector = self.model.visual_encode(img_path)
-        sample_indices = self.search_with_reranking(index_dir, img_vector, k, topk_rerank, d)
+        sample_indices = self.search(index_dir, img_vector, k, d)
+        
         return sample_indices
         
 if __name__ == "__main__":
