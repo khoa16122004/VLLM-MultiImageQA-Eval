@@ -31,6 +31,7 @@ def extract_question(sample_dir):
                 
             
 
+
 def main(args):
     model = MyCLIPWrapper()
     db = CreateDatabase(model=model)
@@ -39,10 +40,12 @@ def main(args):
     database_dir = "../database/MRAG/index"
     
     lvlm = LLava(args.pretrained, args.model_name)
-    prefix_question = "You will be given one question concerning several images. The first image is the input image, others are retrieved examples to help you. Answer with the option's letter from the given choices directly."
+    retrieved_prefix_question = "You will be given one question concerning several images. The first image is the input image, others are retrieved examples to help you. Answer with the option's letter from the given choices directly."
+    no_retrieved_prefix_question = "You will be given one question concerning one image. Answer with the option's letter from the given choices directly."
     image_token = "<image>"
     # retrieval
     is_contain_retrieval = 0
+    retrieved_acc = 0
     acc = 0
     num_samples = 0
     for sample_id in tqdm(os.listdir(dataset_dir)):
@@ -50,9 +53,11 @@ def main(args):
             num_samples += 1
             sample_dir = os.path.join(dataset_dir, sample_id)
             question, question_img, gt_files, choices, gt_ans = extract_question(sample_dir)
+            
+            # retrieved output
             num_input_images = len(gt_files) + 1
             choice_join = "\n".join(choices)
-            full_question = f"{prefix_question}{num_input_images * image_token}\n{question}\n{choice_join}"
+            full_question = f"{retrieved_prefix_question}{num_input_images * image_token}\n{question}\n{choice_join}"
             retrieved_paths, retrieved_sample_ids = db.flow_search(index_dir=database_dir, dataset_dir=dataset_dir, 
                                                                    image_index=int(sample_id), k=args.topk, 
                                                                    topk_rerank=args.topk_rerank)
@@ -61,15 +66,24 @@ def main(args):
             if np.any([int(sample_id) == retrieved_sample_id for retrieved_sample_id in retrieved_sample_ids]):
                 is_contain_retrieval = 1
             if gt_ans == output:
-                acc += 1    
+                retrieved_acc += 1    
+                
+                
+            # without retrieval
+            num_input_images = 1
+            full_question = f"{no_retrieved_prefix_question}{num_input_images * image_token}\n{question}\n{choice_join}"
+            output = lvlm.inference(full_question, [question_img])[0]
+            if gt_ans == output:
+                acc += 1
+                
+    print(f"Accuracy without retrieval: {acc / num_samples * 100}%, Accuracy with retrieval: {retrieved_acc / num_samples * 100}%, Contain retrieval: {is_contain_retrieval}%, Total samples: {num_samples}")            
 
-    print(f"Accuracy: {acc / num_samples * 100}%, Contain retrieval: {is_contain_retrieval}%, Total samples: {num_samples}")            
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--pretrained", type=str, default="llava-onevision-qwen2-7b-ov")
     parser.add_argument("--model_name", type=str, default="llava_qwen")
     parser.add_argument("--topk_rerank", type=int, default=50)
-    parser.add_argument("--topk", type=int, default=5)
+    parser.add_argument("--topk", type=int, default=10)
     args = parser.parse_args()
     
     main(args)
