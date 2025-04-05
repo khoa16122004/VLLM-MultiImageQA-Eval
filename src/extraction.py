@@ -128,8 +128,8 @@ class CreateDatabase:
 
             print(f"Database created successfully with multiple indexes with total {total_vectors_added} vectors")
                     
-    def search_with_reranking(self, index_dir, query_vector, k=5, top_rerank=10, d=512):
-        top_indices, top_batches, top_vectors, df = self.search(index_dir, query_vector, top_rerank, d)
+    def search_with_reranking(self, index_dir, query_vector, k=5, top_rerank=50, d=512):
+        top_indices, top_batches, top_vectors, df = self.search(index_dir, query_vector, top_rerank, d) # 50 vector
 
         expanded_query = np.mean(top_vectors, axis=0).astype('float32')
         all_distances = np.linalg.norm(top_vectors - expanded_query.reshape(1, -1), axis=1)  # Euclidean
@@ -148,7 +148,7 @@ class CreateDatabase:
         return sample_paths                
             
     
-    def search(self, index_dir, query_vector, top_rerank=10, d=512):
+    def search(self, index_dir, query_vector, top_rerank=50, d=512):
         query_vector = query_vector.astype('float32') 
         all_distances = []
         all_indices = []
@@ -160,7 +160,7 @@ class CreateDatabase:
             print(f"Searching in {index_path} ...")
             
             index = faiss.read_index(index_path)
-            distances, indices = index.search(query_vector.reshape(1, -1), k)  
+            distances, indices = index.search(query_vector.reshape(1, -1), top_rerank)  
             all_distances.append(distances)
             all_indices.append(indices)
             all_batch_index.append([i]*len(indices[0]))
