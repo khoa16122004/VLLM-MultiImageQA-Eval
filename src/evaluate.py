@@ -3,7 +3,7 @@ from model import MyCLIPWrapper
 from PIL import Image
 import os
 import argparse
-
+import numpy as np
 from models.llava_ import LLava
 
 def extract_question(sample_dir):
@@ -25,7 +25,7 @@ def extract_question(sample_dir):
                     choices.append(f.readline().strip())
                 
                 f.readline()
-                gt_ans = f.readline().strip().split("Anwers: ")
+                gt_ans = f.readline().strip().split("Anwers: ")[1]
     return question, question_img, gt_files, choices, gt_ans
                 
             
@@ -48,12 +48,12 @@ def main(args):
             num_input_images = len(gt_files) + 1
             choice_join = "\n".join(choices)
             full_question = f"{prefix_question}{num_input_images * image_token}\n{question}\n{choice_join}"
-            retrieved_paths = db.flow_search(index_dir=database_dir, dataset_dir=dataset_dir, 
-                                             image_index=int(sample_id), k=args.topk, 
-                                             topk_rerank=args.topk_rerank)
+            retrieved_paths, retrieved_sample_ids = db.flow_search(index_dir=database_dir, dataset_dir=dataset_dir, 
+                                                                   image_index=int(sample_id), k=args.topk, 
+                                                                   topk_rerank=args.topk_rerank)
             retrieved_files = [Image.open(path).convert("RGB") for path in retrieved_paths]
             output = lvlm.inference(full_question, [question_img, *retrieved_files])[0]
-            
+            print("Contain GT in retrieval: ",  np.isany([int(sample_id) == retrieved_sample_id for retrieved_sample_id in retrieved_sample_ids]))
             print("GT: ", gt_ans)
             print("Output: ", output)
             break   
