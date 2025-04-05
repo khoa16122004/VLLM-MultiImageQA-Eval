@@ -5,7 +5,7 @@ from tqdm import tqdm
 import faiss
 import csv
 import pandas as pd
-
+from evaluate import extract_question
 class CreateDatabase:
     def __init__(self, model, number_v=6357):
         '''
@@ -204,7 +204,42 @@ class CreateDatabase:
         sample_indices = self.search_with_reranking(index_dir, img_vector, k, topk_rerank, d)
         
         return sample_indices
+
+    def combined_search(self, index_dir, dataset_dir, image_index, k=10, topk_rerank=10, d=512, image_weight=0.7, text_weight=0.3):
+        question, question_img, gt_files, choices, gt_ans = extract_question(os.path.join(dataset_dir, str(image_index)))
+        full_question = "".join([question, "".join(choices)])
         
+        img_vector = self.model.visual_encode(question_img)
+        text_vector = self.model.text_encode(full_question)
+        
+        image_indices, image_batches, image_vectors, _, _ = self.search(index_dir, img_vector, top_rerank=topk_rerank, d=d, k=k)
+        text_indices, text_batches, text_vectors, _, _ = self.search(index_dir, text_vector, top_rerank=topk_rerank, d=d, k=k)
+        
+        image_distances = np.linalg.norm(image_vectors - img_vector.reshape(1, -1), axis=1)
+        text_distances = np.linalg.norm(text_vectors - text_vector.reshape(1, -1), axis=1)
+        
+        weighted_distances = image_weight * image_distances + text_weight * text_distances
+        
+        combined_indices = np.argsort(weighted_distances)[:k]
+        
+        final_image_indices = np.array(image_indices)[combined_indices]
+        final_image_batches = np.array(image_batches)[combined_indices]
+        
+        query_df = pd.DataFrame({
+            'index': final_image_indices,
+            'batch_idx': final_image_batches
+        })
+        
+        df = pd.read_csv(os.path.join(index_dir, 'map.csv'))
+        merged = pd.merge(query_df, df, on=['index', 'batch_idx'], how='inner')
+        
+        sample_paths = merged['img_path'].to_numpy()
+        sample_indices = merged['sample_id'].to_numpy()
+
+        return sample_paths, sample_indices
+
+
+    
 if __name__ == "__main__":
     model = MyCLIPWrapper()
     db = CreateDatabase(model=model)
