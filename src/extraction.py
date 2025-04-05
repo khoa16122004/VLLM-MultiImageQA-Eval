@@ -148,7 +148,7 @@ class CreateDatabase:
         return sample_paths                
             
     
-    def search(self, index_dir, query_vector, top_rerank=50, d=512):
+    def search(self, index_dir, query_vector, top_rerank=50, d=512, k=5):
         query_vector = query_vector.astype('float32') 
         all_distances = []
         all_indices = []
@@ -186,8 +186,8 @@ class CreateDatabase:
 
         
         query_df = pd.DataFrame({
-            'index': top_indices,
-            'batch_idx': top_batches
+            'index': top_indices[:k],
+            'batch_idx': top_batches[:k]
             })
         
         merged = pd.merge(query_df, df, on=['index', 'batch_idx'], how='inner')
@@ -199,7 +199,7 @@ class CreateDatabase:
     def flow_search(self, index_dir, dataset_dir, image_index, k=5, topk_rerank=10, d=512):
         img_path = os.path.join(dataset_dir, str(image_index), "question_img.png")
         img_vector = self.model.visual_encode(img_path)
-        sample_indices = self.search_with_reranking(index_dir, img_vector, k, d)
+        sample_indices = self.search_with_reranking(index_dir, img_vector, k, topk_rerank, d)
         
         return sample_indices
         
