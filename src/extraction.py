@@ -5,7 +5,30 @@ from tqdm import tqdm
 import faiss
 import csv
 import pandas as pd
-from evaluate import extract_question
+from PIL import Image
+
+def extract_question(sample_dir):
+    gt_files = []
+    for img_name in os.listdir(sample_dir):
+        if "question" in img_name and img_name.endswith(".png"):
+            question_img = Image.open(os.path.join(sample_dir, img_name)).convert('RGB')
+            
+        elif "gt" in img_name:
+            gt_files.append(os.path.join(sample_dir, img_name))
+        
+        else:
+            with open(os.path.join(sample_dir, img_name), "r") as f:
+                question = f.readline().strip()
+                choices = []
+                
+                f.readline()
+                for i in range(4):
+                    choices.append(f.readline().strip())
+                
+                f.readline()
+                gt_ans = f.readline().strip().split("Anwers: ")[1]
+    return question, question_img, gt_files, choices, gt_ans
+
 class CreateDatabase:
     def __init__(self, model, number_v=6357):
         '''
