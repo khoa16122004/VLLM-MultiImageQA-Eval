@@ -3,7 +3,7 @@ import os
 from PIL import Image
 
 def load_sample(sample_id):
-    folder_path = f"dataset/MRAG/{sample_id}"
+    folder_path = f"../dataset/MRAG/{sample_id}"
     if not os.path.exists(folder_path):
         return "Không tìm thấy thư mục", None, []
 
@@ -30,8 +30,8 @@ demo = gr.Interface(
     inputs=gr.Textbox(label="Nhập Sample ID (VD: 0, 1, 2...)"),
     outputs=[
         gr.Textbox(label="Câu hỏi"),
-        gr.Image(label="question_img"),
-        gr.Gallery(label="Ground Truth Images")
+        gr.Image(label="question_img", scale=0.5),
+        gr.Gallery(label="Ground Truth Images", columns=5, height=200)
     ],
     title="MRAG Sample Viewer",
     description="Nhập sample ID để xem ảnh và câu hỏi tương ứng."
