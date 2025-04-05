@@ -41,8 +41,12 @@ def main(args):
     prefix_question = "You will be given one question concerning several images. The first image is the input image, others are retrieved examples to help you. Answer with the option's letter from the given choices directly."
     image_token = "<image>"
     # retrieval
+    is_contain_retrieval = 0
+    acc = 0
+    num_samples = 0
     for sample_id in os.listdir(dataset_dir):
         if sample_id != "index" and not sample_id.endswith(".py"):
+            num_samples += 1
             sample_dir = os.path.join(dataset_dir, sample_id)
             question, question_img, gt_files, choices, gt_ans = extract_question(sample_dir)
             num_input_images = len(gt_files) + 1
@@ -53,11 +57,12 @@ def main(args):
                                                                    topk_rerank=args.topk_rerank)
             retrieved_files = [Image.open(path).convert("RGB") for path in retrieved_paths]
             output = lvlm.inference(full_question, [question_img, *retrieved_files])[0]
-            print("Contain GT in retrieval: ",  np.any([int(sample_id) == retrieved_sample_id for retrieved_sample_id in retrieved_sample_ids]))
-            print("GT: ", gt_ans)
-            print("Output: ", output)
-            break   
-            
+            if np.any([int(sample_id) == retrieved_sample_id for retrieved_sample_id in retrieved_sample_ids]):
+                is_contain_retrieval = 1
+            if gt_ans == output:
+                acc += 1    
+
+    print(f"Accuracy: {acc / num_samples * 100}%, Contain retrieval: {is_contain_retrieval}%, Total samples: {num_samples}")            
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--pretrained", type=str, default="llava-onevision-qwen2-7b-ov")
