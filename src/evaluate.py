@@ -80,7 +80,7 @@ def main(args):
     db = CreateDatabase(model=model)
     
     
-    dataset_dir = "../dataset/MRAG_CLIP"
+    dataset_dir = "../dataset/MRAG"
     database_dir = "../database/MRAG_CLIP/index"
     
     lvlm, image_token, special_token = init_model(args)
