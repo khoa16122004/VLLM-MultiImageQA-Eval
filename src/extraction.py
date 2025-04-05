@@ -150,9 +150,9 @@ class CreateDatabase:
         all_indices = np.hstack(all_indices) # 35,
         all_batch_index = np.hstack(all_batch_index) # 35, 
         
-        print("Len All distance: ", all_distances.shape[0].shape)
-        print("Len All indices: ", all_indices.shape[0].shape)
-        print("Len All batch index: ", all_batch_index.shape[0].shape)
+        print("Len All distance: ", all_distances[0].shape)
+        print("Len All indices: ", all_indices[0].shape)
+        print("Len All batch index: ", all_batch_index[0].shape)
         
         best_indices_from_all = np.argsort(all_distances[0])[:k]
         best_batch_index = all_batch_index[best_indices_from_all]
