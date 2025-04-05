@@ -35,7 +35,7 @@ def main(args):
     db = CreateDatabase(model=model)
     
     dataset_dir = "../dataset/MRAG"
-    database_dir = "../database/MRAG"
+    database_dir = "../database/MRAG/index"
     
     lvlm = LLava(args.pretrained, args.model_name)
     prefix_question = "You will be given one question concerning several images. The first image is the input image, others are retrieved examples to help you. Answer with the option's letter from the given choices directly."
