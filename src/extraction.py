@@ -164,14 +164,21 @@ class CreateDatabase:
             
             index = faiss.read_index(index_path)
             distances, indices = index.search(query_vector.reshape(1, -1), top_rerank)  
-            all_distances.append(distances)
-            all_indices.append(indices)
-            all_batch_index.append([i]*len(indices[0]))
-            # add to all_vectors
-            for j in range(len(indices[0])):
-                vector = index.reconstruct(int(indices[0][j]))
-                all_vectors.append(vector)
-            # ...
+            
+            filtered_idx = [indices[0][0]]
+            filtered_dist = [distances[0][0]]
+            filtered_vectors = [index.reconstruct(int(indices[0][0]))]
+
+            for j in range(1, top_rerank):
+                if not np.isclose(distances[0][j], filtered_dist[-1], atol=1e-4):
+                    filtered_idx.append(indices[0][j])
+                    filtered_dist.append(distances[0][j])
+                    filtered_vectors.append(index.reconstruct(int(indices[0][j])))
+
+            all_distances.append(np.array(filtered_dist).reshape(1, -1))
+            all_indices.append(np.array(filtered_idx).reshape(1, -1))
+            all_batch_index.append([i] * len(filtered_idx))
+            all_vectors.extend(filtered_vectors)
             
         
         all_distances = np.hstack(all_distances) # 150,
