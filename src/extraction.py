@@ -213,7 +213,7 @@ if __name__ == "__main__":
     # db.extract(dataset_dir, database_dir)       
     # db.create_database(database_dir, output_dir="../database/MRAG/index")
 
-    index_dir = "../database/MRAG/index"
+    index_dir = "../database/MRAG_CLIP/index"
     while True:
         image_index = int(input("Input sampe index: "))
         
