@@ -159,7 +159,7 @@ class CreateDatabase:
         df = pd.read_csv(os.path.join(index_dir, 'map.csv'))
         for i in range(len(os.listdir(index_dir)) - 1):
             index_path = os.path.join(index_dir, f"{i}.index")
-            print(f"Searching in {index_path} ...")
+            # print(f"Searching in {index_path} ...")
             
             index = faiss.read_index(index_path)
             distances, indices = index.search(query_vector.reshape(1, -1), top_rerank)  
@@ -193,7 +193,7 @@ class CreateDatabase:
         merged = pd.merge(query_df, df, on=['index', 'batch_idx'], how='inner')
         sample_indices = merged['img_path'].to_numpy()
         
-        print("Before reranking: ", sample_indices)
+        # print("Before reranking: ", sample_indices)
         return top_indices, top_batches, top_vectors, df, sample_indices
     
     def flow_search(self, index_dir, dataset_dir, image_index, k=10, topk_rerank=10, d=512):

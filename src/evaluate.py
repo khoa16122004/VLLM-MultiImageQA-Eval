@@ -48,7 +48,12 @@ def main(args):
             num_input_images = len(gt_files) + 1
             choice_join = "\n".join(choices)
             full_question = f"{prefix_question}{num_input_images * image_token}\n{question}\n{choice_join}"
-            print(full_question)
+            retrieved_paths = db.flow_search(index_dir=database_dir, dataset_dir=dataset_dir, 
+                                             image_index=int(sample_id), k=args.topk, 
+                                             topk_rerank=args.topk_rerank)
+            retrieved_files = [Image.open(path).convert("RGB") for path in retrieved_paths]
+            output = lvlm.inference(full_question, [question_img, *retrieved_files])[0]
+            print(output)
             break   
             
 if __name__ == "__main__":
