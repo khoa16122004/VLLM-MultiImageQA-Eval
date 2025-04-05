@@ -4,6 +4,8 @@ from llava.constants import IMAGE_TOKEN_INDEX, DEFAULT_IMAGE_TOKEN, DEFAULT_IM_S
 from llava.conversation import conv_templates, SeparatorStyle
 import copy
 import torch
+import warnings
+warnings.filterwarnings("ignore")
 
 class LLava:
     def __init__(self, pretrained, model_name):

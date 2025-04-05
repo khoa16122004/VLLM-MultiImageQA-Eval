@@ -5,6 +5,7 @@ import os
 import argparse
 import numpy as np
 from models.llava_ import LLava
+from tqdm import tqdm
 
 def extract_question(sample_dir):
     gt_files = []
@@ -44,7 +45,7 @@ def main(args):
     is_contain_retrieval = 0
     acc = 0
     num_samples = 0
-    for sample_id in os.listdir(dataset_dir):
+    for sample_id in tqdm(os.listdir(dataset_dir)):
         if sample_id != "index" and not sample_id.endswith(".py"):
             num_samples += 1
             sample_dir = os.path.join(dataset_dir, sample_id)
