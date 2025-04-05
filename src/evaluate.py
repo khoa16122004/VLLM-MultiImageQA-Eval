@@ -17,13 +17,15 @@ def extract_question(sample_dir):
         
         else:
             with open(os.path.join(sample_dir, img_name), "r") as f:
-                question = f.read().strip()
+                question = f.readline().strip()
                 choices = []
                 
-                f.read()
+                f.readline()
                 for i in range(4):
-                    choices.append(f.read().strip())
-                gt_ans = f.read().strip().split("Anwers: ")
+                    choices.append(f.readline().strip())
+                
+                f.readline()
+                gt_ans = f.readline().strip().split("Anwers: ")
                 print("Choices: ", choices)
     return question, question_img, gt_files, choices, gt_ans
                 
