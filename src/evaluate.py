@@ -2,7 +2,10 @@ from extraction import CreateDatabase
 from model import MyCLIPWrapper
 from PIL import Image
 import os
+import argparse
+
 from models.llava_ import LLava
+
 def extract_question(sample_dir):
     gt_files = []
     for img_name in os.listdir(sample_dir):
@@ -26,7 +29,7 @@ def extract_question(sample_dir):
                 
             
 
-def main():
+def main(args):
     model = MyCLIPWrapper()
     db = CreateDatabase(model=model)
     
@@ -45,3 +48,13 @@ def main():
             choice_join = choices.join("\n")
             full_question = f"{prefix_question}{num_input_images * image_token}\n{question}\n{choice_join}"
             print(full_question)
+            
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--pretrained", type=str, default="llava-onevision-qwen2-7b-ov")
+    parser.add_argument("--model_name", type=str, default="llava_qwen")
+    parser.add_argument("--topk_rerank", type=int, default=50)
+    parser.add_argument("--topk", type=int, default=5)
+    args = parser.parse_args()
+    
+    main(args)
