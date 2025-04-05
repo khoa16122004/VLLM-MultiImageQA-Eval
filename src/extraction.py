@@ -168,8 +168,7 @@ class CreateDatabase:
             all_batch_index.append([i]*len(indices[0]))
             # add to all_vectors
             for j in range(len(indices[0])):
-                print(indices[0][j])
-                vector = index.reconstruct(indices[0][j])
+                vector = index.reconstruct(int(indices[0][j]))
                 all_vectors.append(vector)
             # ...
             
