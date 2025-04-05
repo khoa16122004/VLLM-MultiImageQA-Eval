@@ -128,8 +128,8 @@ class CreateDatabase:
 
             print(f"Database created successfully with multiple indexes with total {total_vectors_added} vectors")
                     
-    def search_with_reranking(self, index_dir, query_vector, k=5, top_rerank=50, d=512):
-        top_indices, top_batches, top_vectors, df = self.search(index_dir, query_vector, k, top_rerank, d)
+    def search_with_reranking(self, index_dir, query_vector, k=5, top_rerank=10, d=512):
+        top_indices, top_batches, top_vectors, df = self.search(index_dir, query_vector, top_rerank, d)
 
         expanded_query = np.mean(top_vectors, axis=0).astype('float32')
         all_distances = np.linalg.norm(top_vectors - expanded_query.reshape(1, -1), axis=1)  # Euclidean
@@ -148,7 +148,7 @@ class CreateDatabase:
         return sample_paths                
             
     
-    def search(self, index_dir, query_vector, k=5, top_rerank=10, d=512):
+    def search(self, index_dir, query_vector, top_rerank=10, d=512):
         query_vector = query_vector.astype('float32') 
         all_distances = []
         all_indices = []
@@ -194,10 +194,10 @@ class CreateDatabase:
         
         return top_indices, top_batches, top_vectors, df
     
-    def flow_search(self, index_dir, dataset_dir, image_index, k=5, d=512):
+    def flow_search(self, index_dir, dataset_dir, image_index, k=5, topk_rerank=10, d=512):
         img_path = os.path.join(dataset_dir, str(image_index), "question_img.png")
         img_vector = self.model.visual_encode(img_path)
-        sample_indices = self.search(index_dir, img_vector, k, d)
+        sample_indices = self.search_with_reranking(index_dir, img_vector, k, topk_rerank, d)
         return sample_indices
         
 if __name__ == "__main__":
@@ -207,7 +207,7 @@ if __name__ == "__main__":
     dataset_dir = "../dataset/MRAG"
     database_dir = "../database/MRAG"
     # db.extract(dataset_dir, database_dir)       
-    db.create_database(database_dir, output_dir="../database/MRAG/index")
+    # db.create_database(database_dir, output_dir="../database/MRAG/index")
 
     index_dir = "../database/MRAG/index"
     while True:
