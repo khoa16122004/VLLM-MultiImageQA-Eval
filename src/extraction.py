@@ -117,7 +117,7 @@ class CreateDatabase:
 
                 for i, sid in enumerate(batch_sample_ids):
                     writer.writerow({
-                        'index': total_vectors_added + i,
+                        'index':  i,
                         'sample_id': sid,
                         'batch_idx': index_id,
                         'img_path': all_paths[i]
