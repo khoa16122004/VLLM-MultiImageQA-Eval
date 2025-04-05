@@ -185,7 +185,7 @@ if __name__ == "__main__":
     dataset_dir = "../dataset/MRAG"
     database_dir = "../database/MRAG"
     # db.extract(dataset_dir, database_dir)       
-    # db.create_database(database_dir, output_dir="../database/MRAG/index")
+    db.create_database(database_dir, output_dir="../database/MRAG/index")
 
     index_dir = "../database/MRAG/index"
     while True:
