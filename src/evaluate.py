@@ -53,7 +53,7 @@ def main(args):
                                                                    topk_rerank=args.topk_rerank)
             retrieved_files = [Image.open(path).convert("RGB") for path in retrieved_paths]
             output = lvlm.inference(full_question, [question_img, *retrieved_files])[0]
-            print("Contain GT in retrieval: ",  np.isany([int(sample_id) == retrieved_sample_id for retrieved_sample_id in retrieved_sample_ids]))
+            print("Contain GT in retrieval: ",  np.any([int(sample_id) == retrieved_sample_id for retrieved_sample_id in retrieved_sample_ids]))
             print("GT: ", gt_ans)
             print("Output: ", output)
             break   
