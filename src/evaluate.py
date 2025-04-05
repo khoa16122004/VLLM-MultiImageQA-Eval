@@ -46,9 +46,9 @@ def main(args):
             question, question_img, gt_files, choices, gt_ans = extract_question(sample_dir)
             num_input_images = len(gt_files) + 1
             choice_join = "\n".join(choices)
-            full_question = f"{prefix_question}{num_input_images * image_token}\n{question}\n{choice_join}"
+            full_question = f"{prefix_question}{num_input_images * image_token}\n{question}{choice_join}"
             print(full_question)
-            break
+            break   
             
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
