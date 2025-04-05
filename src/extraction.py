@@ -256,5 +256,5 @@ if __name__ == "__main__":
         if image_index == -1:
             break
         
-        sample_indices = db.flow_search(index_dir, dataset_dir, image_index)
+        sample_indices = db.combined_search(index_dir, dataset_dir, image_index)
         print("Results retreval: ", sample_indices)
