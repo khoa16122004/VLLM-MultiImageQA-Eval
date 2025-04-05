@@ -144,8 +144,7 @@ class CreateDatabase:
             distances, indices = index.search(query_vector.reshape(1, -1), k)  
             all_distances.append(distances)
             all_indices.append(indices)
-            print(len(indices[0]))
-            all_batch_index.append([i]*len(indices))
+            all_batch_index.append([i]*len(indices[0]))
         
         all_distances = np.hstack(all_distances) # 35,
         all_indices = np.hstack(all_indices) # 35,
