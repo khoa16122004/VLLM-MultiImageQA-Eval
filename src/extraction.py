@@ -127,10 +127,29 @@ class CreateDatabase:
                 total_vectors_added += len(batch_vectors)
 
             print(f"Database created successfully with multiple indexes with total {total_vectors_added} vectors")
-            
+                    
+    def search_with_reranking(self, index_dir, query_vector, k=5, top_rerank=50, d=512):
+        top_indices, top_batches, top_vectors, df = self.search(index_dir, query_vector, k, top_rerank, d)
 
-    def search(self, index_dir, query_vector, k=5, d=512):
-        query_vector = query_vector.astype('float32')  # Đảm bảo vector có kiểu float32
+        expanded_query = np.mean(top_vectors, axis=0).astype('float32')
+        all_distances = np.linalg.norm(top_vectors - expanded_query.reshape(1, -1), axis=1)  # Euclidean
+
+        reranked_idx = np.argsort(all_distances)[:k]
+
+        final_indices = top_indices[reranked_idx]
+        final_batches = top_batches[reranked_idx]
+
+        query_df = pd.DataFrame({
+            'index': final_indices,
+            'batch_idx': final_batches
+        })
+        merged = pd.merge(query_df, df, on=['index', 'batch_idx'], how='inner')
+        sample_paths = merged['img_path'].to_numpy()
+        return sample_paths                
+            
+    
+    def search(self, index_dir, query_vector, k=5, top_rerank=10, d=512):
+        query_vector = query_vector.astype('float32') 
         all_distances = []
         all_indices = []
         all_batch_index = []
@@ -146,31 +165,34 @@ class CreateDatabase:
             all_indices.append(indices)
             all_batch_index.append([i]*len(indices[0]))
         
-        all_distances = np.hstack(all_distances) # 35,
-        all_indices = np.hstack(all_indices) # 35,
-        all_batch_index = np.hstack(all_batch_index) # 35, 
+        all_distances = np.hstack(all_distances) # 150,
+        all_indices = np.hstack(all_indices) # 150,
+        all_batch_index = np.hstack(all_batch_index) # 150, 
         
         
-        # print("Len All distance: ", all_distances[0].shape)
-        # print("Len All indices: ", all_indices[0].shape)
+        top_idx = np.argsort(all_distances[0])[:top_rerank]
+        top_distances = all_distances[0][top_idx]
+        top_indices = all_indices[0][top_idx]
+        top_batches = all_batch_index[top_idx]
         
-        best_indices_from_all = np.argsort(all_distances[0])[:k]
-        best_batch_index = all_batch_index[best_indices_from_all]
-        best_indices = all_indices[0][best_indices_from_all]
-        print("Indices from batch: ", best_indices)
-        print("Batch index: ", best_batch_index)
+        top_vectors = []
+        for b, idx in zip(top_batches, top_indices):
+            index_path = os.path.join(index_dir, f"{b}.index")
+            index = faiss.read_index(index_path)
+            top_vectors.append(index.reconstruct(idx))
         
-        query_df = pd.DataFrame({
-            'index': best_indices,
-            'batch_idx': best_batch_index
-            })
+        top_vectors = np.stack(top_vectors)
+        
+        # query_df = pd.DataFrame({
+        #     'index': best_indices,
+        #     'batch_idx': best_batch_index
+        #     })
+        
+        # merged = pd.merge(query_df, df, on=['index', 'batch_idx'], how='inner')
+        # sample_indices = merged['img_path'].to_numpy()
         
         
-        
-        merged = pd.merge(query_df, df, on=['index', 'batch_idx'], how='inner')
-        sample_indices = merged['img_path'].to_numpy()
-        return sample_indices
-
+        return top_indices, top_batches, top_vectors, df
     
     def flow_search(self, index_dir, dataset_dir, image_index, k=5, d=512):
         img_path = os.path.join(dataset_dir, str(image_index), "question_img.png")
