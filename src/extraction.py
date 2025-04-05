@@ -145,6 +145,7 @@ class CreateDatabase:
             all_distances.append(distances)
             all_indices.append(indices)
             all_batch_index.append([i]*len(indices[0]))
+            print(len(indices[0]))
         
         all_distances = np.hstack(all_distances) # 35,
         all_indices = np.hstack(all_indices) # 35,
