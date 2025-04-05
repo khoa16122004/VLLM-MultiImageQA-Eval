@@ -155,53 +155,47 @@ class CreateDatabase:
         all_indices = []
         all_batch_index = []
         all_vectors = []
-        
-        
+
         df = pd.read_csv(os.path.join(index_dir, 'map.csv'))
+
         for i in range(len(os.listdir(index_dir)) - 1):
             index_path = os.path.join(index_dir, f"{i}.index")
-            # print(f"Searching in {index_path} ...")
-            
             index = faiss.read_index(index_path)
-            distances, indices = index.search(query_vector.reshape(1, -1), top_rerank)  
-            
-            filtered_idx = [indices[0][0]]
-            filtered_dist = [distances[0][0]]
-            filtered_vectors = [index.reconstruct(int(indices[0][0]))]
+            distances, indices = index.search(query_vector.reshape(1, -1), top_rerank)
 
-            for j in range(1, top_rerank):
-                if not np.isclose(distances[0][j], filtered_dist[-1], atol=1e-4):
-                    filtered_idx.append(indices[0][j])
-                    filtered_dist.append(distances[0][j])
-                    filtered_vectors.append(index.reconstruct(int(indices[0][j])))
+            for j in range(len(indices[0])):
+                vector = index.reconstruct(int(indices[0][j]))
+                all_distances.append(distances[0][j])
+                all_indices.append(indices[0][j])
+                all_batch_index.append(i)
+                all_vectors.append(vector)
 
-            all_distances.append(np.array(filtered_dist).reshape(1, -1))
-            all_indices.append(np.array(filtered_idx).reshape(1, -1))
-            all_batch_index.append([i] * len(filtered_idx))
-            all_vectors.extend(filtered_vectors)
-            
-        
-        all_distances = np.hstack(all_distances) # 150,
-        all_indices = np.hstack(all_indices) # 150,
-        all_batch_index = np.hstack(all_batch_index) # 150, 
-        all_vectors = np.vstack(all_vectors)
-        
-        top_idx = np.argsort(all_distances[0])[:top_rerank]
-        top_distances = all_distances[0][top_idx]
-        top_indices = all_indices[0][top_idx]
-        top_batches = all_batch_index[top_idx]
-        top_vectors = all_vectors[top_idx]
+        all_distances = np.array(all_distances)
+        all_indices = np.array(all_indices)
+        all_batch_index = np.array(all_batch_index)
+        all_vectors = np.array(all_vectors)
 
+        sorted_idx = np.argsort(all_distances)
         
+        filtered_idx = [sorted_idx[0]]
+        for i in sorted_idx[1:]:
+            if not np.isclose(all_distances[i], all_distances[filtered_idx[-1]], atol=1e-4):
+                filtered_idx.append(i)
+            if len(filtered_idx) >= top_rerank:
+                break
+
+        top_indices = all_indices[filtered_idx]
+        top_batches = all_batch_index[filtered_idx]
+        top_vectors = all_vectors[filtered_idx]
+
         query_df = pd.DataFrame({
             'index': top_indices[:k],
             'batch_idx': top_batches[:k]
-            })
-        
+        })
+
         merged = pd.merge(query_df, df, on=['index', 'batch_idx'], how='inner')
         sample_indices = merged['img_path'].to_numpy()
-        
-        # print("Before reranking: ", sample_indices)
+
         return top_indices, top_batches, top_vectors, df, sample_indices
     
     def flow_search(self, index_dir, dataset_dir, image_index, k=10, topk_rerank=10, d=512):
