@@ -42,5 +42,6 @@ def main():
             sample_dir = os.path.join(dataset_dir, sample_id)
             question, question_img, gt_files, choices, gt_ans = extract_question(sample_dir)
             num_input_images = len(gt_files) + 1
-            full_question = f"{prefix_question}{num_input_images * image_token}\n{question}\n{choices.join('\n')}"
+            choice_join = choices.join("\n")
+            full_question = f"{prefix_question}{num_input_images * image_token}\n{question}\n{choice_join}"
             print(full_question)
