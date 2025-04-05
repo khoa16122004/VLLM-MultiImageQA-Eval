@@ -128,7 +128,7 @@ class CreateDatabase:
 
             print(f"Database created successfully with multiple indexes with total {total_vectors_added} vectors")
                     
-    def search_with_reranking(self, index_dir, query_vector, k=5, top_rerank=50, d=512):
+    def search_with_reranking(self, index_dir, query_vector, k=10, top_rerank=50, d=512):
         top_indices, top_batches, top_vectors, df, sample_indices = self.search(index_dir, query_vector, top_rerank, d) # 50 vector
 
         expanded_query = np.mean(top_vectors, axis=0).astype('float32')
@@ -196,7 +196,7 @@ class CreateDatabase:
         print("Before reranking: ", sample_indices)
         return top_indices, top_batches, top_vectors, df, sample_indices
     
-    def flow_search(self, index_dir, dataset_dir, image_index, k=5, topk_rerank=10, d=512):
+    def flow_search(self, index_dir, dataset_dir, image_index, k=10, topk_rerank=10, d=512):
         img_path = os.path.join(dataset_dir, str(image_index), "question_img.png")
         img_vector = self.model.visual_encode(img_path)
         sample_indices = self.search_with_reranking(index_dir, img_vector, k, topk_rerank, d)
