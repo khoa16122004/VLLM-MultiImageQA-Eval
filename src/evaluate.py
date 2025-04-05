@@ -24,7 +24,7 @@ def extract_question(sample_dir):
                 for i in range(4):
                     choices.append(f.read().strip())
                 gt_ans = f.read().strip().split("Anwers: ")
-    
+                print("Choices")
     return question, question_img, gt_files, choices, gt_ans
                 
             
