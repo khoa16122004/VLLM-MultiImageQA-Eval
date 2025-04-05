@@ -153,6 +153,8 @@ class CreateDatabase:
         all_distances = []
         all_indices = []
         all_batch_index = []
+        all_vectors = []
+        
         
         df = pd.read_csv(os.path.join(index_dir, 'map.csv'))
         for i in range(len(os.listdir(index_dir)) - 1):
@@ -164,24 +166,24 @@ class CreateDatabase:
             all_distances.append(distances)
             all_indices.append(indices)
             all_batch_index.append([i]*len(indices[0]))
+            # add to all_vectors
+            for j in range(len(indices[0])):
+                vector = index.reconstruct(indices[0][j])
+                all_vectors.append(vector)
+            # ...
+            
         
         all_distances = np.hstack(all_distances) # 150,
         all_indices = np.hstack(all_indices) # 150,
         all_batch_index = np.hstack(all_batch_index) # 150, 
-        
+        all_vectors = np.vstack(all_vectors)
         
         top_idx = np.argsort(all_distances[0])[:top_rerank]
         top_distances = all_distances[0][top_idx]
         top_indices = all_indices[0][top_idx]
         top_batches = all_batch_index[top_idx]
-        
-        top_vectors = []
-        for b, idx in zip(top_batches, top_indices):
-            index_path = os.path.join(index_dir, f"{b}.index")
-            index = faiss.read_index(index_path)
-            top_vectors.append(index.reconstruct(idx))
-        
-        top_vectors = np.stack(top_vectors)
+        top_vectors = all_vectors[top_idx]
+
         
         # query_df = pd.DataFrame({
         #     'index': best_indices,
