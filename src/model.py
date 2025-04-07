@@ -47,7 +47,7 @@ class ReTWrapper:
         self.query: RetModel = retrieval.get_passage_model()
         self.query.init_tokenizer_and_image_processor()
     
-    def encode(self, img, txt=""): # img: path, txt: str
+    def encode_multimodal(self, img, txt=""): # img: path, txt: str
         print("encode")
         if txt:
             ret_feats = self.query.get_ret_features([[txt, img]]).squeeze(0)

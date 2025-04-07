@@ -54,11 +54,10 @@ class CreateDatabase:
         
         for file_name in tqdm(os.listdir(dir)):
             file_path = os.path.join(dir, file_name)
-            print(file_path)
             if self.model_name == "CLIP":
                 vec = self.model.visual_encode(file_path)
             elif self.model_name == "ReT":
-                vec = self.model.encode(file_path)
+                vec = self.model.encode_multimodal(file_path)
             
             np.save(os.path.join(output_dir, f"{file_name}.npy"), vec)
                 
@@ -238,8 +237,8 @@ class CreateDatabase:
     
 if __name__ == "__main__":
     # model = MyCLIPWrapper()
-    model = ReTWrapper()
-    db = CreateDatabase(model=model, model_name="ReT")
+    model_encode = ReTWrapper()
+    db = CreateDatabase(model=model_encode, model_name="ReT")
     
     question_dir = "../dataset/MRAG"
     dataset_dir = "../dataset/MRAG_corpus"
