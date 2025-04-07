@@ -173,4 +173,5 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 database/MRAG/*
-dataset/MRAG/*
+dataset/*
+

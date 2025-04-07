@@ -30,7 +30,7 @@ def extract_question(sample_dir):
     return question, question_img, gt_files, choices, gt_ans
 
 class CreateDatabase:
-    def __init__(self, model, number_v=6357):
+    def __init__(self, model, number_v):
         '''
             Args: 
                 dir: Folder dir of N samples
@@ -53,33 +53,41 @@ class CreateDatabase:
         os.makedirs(output_dir, exist_ok=True)
 
         
-        for sample_id in tqdm(os.listdir(dir)):
-            if not sample_id.endswith(".py"):
+        # for sample_id in tqdm(os.listdir(dir)):
+        #     if not sample_id.endswith(".py"):
                 
-                sample_dir = os.path.join(dir, sample_id)
-                sample_dir_output = os.path.join(output_dir, sample_id)
-                os.makedirs(sample_dir_output, exist_ok=True)
+        #         sample_dir = os.path.join(dir, sample_id)
+        #         sample_dir_output = os.path.join(output_dir, sample_id)
+        #         os.makedirs(sample_dir_output, exist_ok=True)
 
-                retrieved_vectors = []
-                qs_vector = None
+        #         retrieved_vectors = []
+        #         qs_vector = None
 
-                img_paths = []
-                for img_name in os.listdir(sample_dir):
-                    img_path = os.path.join(sample_dir, img_name)
-                    if "gt" in img_name:
-                        vec = self.model.visual_encode(img_path)
-                        retrieved_vectors.append(vec)
-                        img_paths.append(img_path)
-                    elif "question" in img_name and img_name.endswith(".png"):
-                        qs_vector = self.model.visual_encode(img_path)
+        #         img_paths = []
+        #         for img_name in os.listdir(sample_dir):
+        #             img_path = os.path.join(sample_dir, img_name)
+        #             if "gt" in img_name:
+        #                 vec = self.model.visual_encode(img_path)
+        #                 retrieved_vectors.append(vec)
+        #                 img_paths.append(img_path)
+        #             elif "question" in img_name and img_name.endswith(".png"):
+        #                 qs_vector = self.model.visual_encode(img_path)
 
-                if qs_vector is not None and len(retrieved_vectors) > 0:
-                    np.save(os.path.join(sample_dir_output, "question.npy"), qs_vector)
-                    np.save(os.path.join(sample_dir_output, "paths.npy"), img_paths)
-                    np.save(os.path.join(sample_dir_output, "retrieval.npy"), np.stack(retrieved_vectors))
+        #         if qs_vector is not None and len(retrieved_vectors) > 0:
+        #             np.save(os.path.join(sample_dir_output, "question.npy"), qs_vector)
+        #             np.save(os.path.join(sample_dir_output, "paths.npy"), img_paths)
+        #             np.save(os.path.join(sample_dir_output, "retrieval.npy"), np.stack(retrieved_vectors))
+        
+        
+        for file_name in tqdm(os.listdir(dir)):
+            file_path = os.path.join(dir, file_name)
+            vec = self.model.visual_encode(file_path)
+            
+            base_name = file_name.split(".")[0]
+            np.save(os.path.join(output_dir, f"{base_name}.npy"), vec)
                 
         
-    def create_database(self, database_dir, output_dir, d=512, csv_file='map.csv', batch_size=1000):
+    def create_database(self, database_dir, output_dir, d=512, csv_file='map.csv', batch_size=2000):
         '''
         Create the FAISS index by adding vectors from saved numpy files in batches and split into multiple index files.
         '''
@@ -267,17 +275,17 @@ if __name__ == "__main__":
     model = MyCLIPWrapper()
     db = CreateDatabase(model=model)
     
-    dataset_dir = "../dataset/MRAG"
-    database_dir = "../database/MRAG_CLIP"
-    # db.extract(dataset_dir, database_dir)       
+    dataset_dir = "../dataset/MRAG_corpus"
+    database_dir = "../database/MRAG_corpus"
+    db.extract(dataset_dir, database_dir)       
     # db.create_database(database_dir, output_dir="../database/MRAG/index")
 
-    index_dir = "../database/MRAG_CLIP/index"
-    while True:
-        image_index = int(input("Input sampe index: "))
+    # index_dir = "../database/MRAG_CLIP/index"
+    # while True:
+    #     image_index = int(input("Input sampe index: "))
         
-        if image_index == -1:
-            break
+    #     if image_index == -1:
+    #         break
         
-        sample_indices = db.combined_search(index_dir, dataset_dir, image_index)
-        print("Results retreval: ", sample_indices)
+    #     sample_indices = db.combined_search(index_dir, dataset_dir, image_index)
+    #     print("Results retreval: ", sample_indices)
