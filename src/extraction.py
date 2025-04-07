@@ -1,6 +1,6 @@
 import os
 import numpy as np
-from model import MyCLIPWrapper
+from model import MyCLIPWrapper, ReTWrapper
 from tqdm import tqdm
 import faiss
 import csv
@@ -236,7 +236,8 @@ class CreateDatabase:
 
     
 if __name__ == "__main__":
-    model = MyCLIPWrapper()
+    # model = MyCLIPWrapper()
+    model = ReTWrapper()
     db = CreateDatabase(model=model, model_name="ReT")
     
     question_dir = "../dataset/MRAG"
