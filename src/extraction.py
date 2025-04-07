@@ -86,6 +86,9 @@ class CreateDatabase:
                 if not npy_file.endswith(".npy"):
                     continue
                 retrieval_vectors = np.load(os.path.join(database_dir, npy_file))
+                if self.model_name == "ReT":
+                    retrieval_vectors = retrieval_vectors.flatten()
+                
                 all_paths.append(npy_file.split(".npy")[0])
                 batch_retrieval_vectors.append(retrieval_vectors)
                 
@@ -243,10 +246,10 @@ if __name__ == "__main__":
     question_dir = "../dataset/MRAG"
     dataset_dir = "../dataset/MRAG_corpus"
     database_dir = "../database/MRAG_corpus_ReT"
-    index_dir = "../database/MRAG_corpus/index"
+    index_dir = "../database/MRAG_corpus_ReT/index"
     
     db.extract(dataset_dir, database_dir)       
-    # db.create_database(database_dir, output_dir=index_dir)
+    db.create_database(database_dir, output_dir=index_dir)
     # while True:
     #     image_index = int(input("Input sampe index: "))
         
