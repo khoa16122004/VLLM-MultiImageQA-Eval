@@ -99,7 +99,7 @@ class CreateDatabase:
             index_id = 0 
             current_index = faiss.IndexFlatL2(d)
             print("Starting to create database...")
-            print("Estimated total index: ", 1 + self.number_vectors // batch_size)
+            # print("Estimated total index: ", 1 + self.number_vectors // batch_size)
             batch_retrieval_vectors = []
             all_paths = []
             total_vectors_added = 0
