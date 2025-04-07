@@ -35,7 +35,7 @@ class MyCLIPWrapper:
 
 class ReTWrapper:
     def __init__(self):
-        from src.models import RetrieverModel, RetModel
+        from ReT.src.models import RetrieverModel, RetModel
         retrieval = RetrieverModel.from_pretrained('aimagelab/ReT-CLIP-ViT-L-14', device_map="cuda") # E_Qs
         self.encode: RetModel = retrieval.get_query_model()
         self.encode.init_tokenizer_and_image_processor()
