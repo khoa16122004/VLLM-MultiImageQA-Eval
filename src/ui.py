@@ -14,7 +14,7 @@ def load_sample(sample_id, retrivels_names):
     question_img = None
     gt_files = []
 
-    retrivels_names = [name.strip() for name in retrivels_names.split(",") if name.strip()]
+    retrivels_names = [name.strip() + ".png" for name in retrivels_names.split(",") if name.strip()]
     retrivels_files = []
     for file_name in retrivels_names:
         try:
