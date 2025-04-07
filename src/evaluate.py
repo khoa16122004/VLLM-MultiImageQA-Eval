@@ -93,11 +93,14 @@ def main(args):
     acc = 0
     num_samples = 0
     for sample_id in tqdm(os.listdir(question_dir)):
+        if args.sample_id_eval >= 0:
+            if int(sample_id) != args.sample_id_eval:
+                continue
         if sample_id != "index" and not sample_id.endswith(".py"):
             num_samples += 1
             sample_dir = os.path.join(question_dir, sample_id)
             question, question_img, gt_files, choices, gt_ans = extract_question(sample_dir)
-            
+            print("Question: 0", question)
             # retrieved output
             num_input_images = len(gt_files) + 1
             choice_join = "\n".join(choices)
@@ -105,10 +108,13 @@ def main(args):
             retrieved_paths = db.flow_search(index_dir=index_dir, dataset_dir=question_dir, 
                                                                    image_index=int(sample_id), k=args.topk, 
                                                                    topk_rerank=args.topk_rerank)
+            print("Retrieved files: ", retrieved_paths)
             retrieved_files = [Image.open(os.path.join(dataset_dir, path)).convert("RGB") for path in retrieved_paths]
 
             output = lvlm.inference(full_question, [question_img, *retrieved_files])[0]
             output = extract_output(output, question)
+            print("output with retrieval: ", output, "gt:", gt_ans)
+
             # if np.any([int(sample_id) == retrieved_sample_id for retrieved_sample_id in retrieved_sample_ids]):
             #     is_contain_retrieval = 1
             if gt_ans == output:
@@ -122,6 +128,8 @@ def main(args):
             output = extract_output(output, question)
             if gt_ans == output:
                 acc += 1
+            
+            print("output with out retrieval: ", output, "gt:", gt_ans)
                 
     print(f"Accuracy without retrieval: {acc / num_samples * 100}%, Accuracy with retrieval: {retrieved_acc / num_samples * 100}%, Total samples: {num_samples}")            
 
@@ -131,6 +139,7 @@ if __name__ == "__main__":
     parser.add_argument("--model_name", type=str, default="llava_qwen")
     parser.add_argument("--topk_rerank", type=int, default=50)
     parser.add_argument("--topk", type=int, default=10)
+    parser.add_argument("--sample_id_eval", type=int, default=-1)
     args = parser.parse_args()
     
     main(args)
