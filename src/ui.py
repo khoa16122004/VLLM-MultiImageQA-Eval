@@ -14,11 +14,11 @@ def load_sample(sample_id, retrivels_names):
     question_img = None
     gt_files = []
 
-    retrivels_names = [os.path.join(dataset_dir, name.strip()) for name in retrivels_names.split(",") if name.strip()]
+    retrivels_names = [name.strip() for name in retrivels_names.split(",") if name.strip()]
     retrivels_files = []
     for file_name in retrivels_names:
+        img_path = os.path.join(dataset_dir, file_name)
         try:
-            img_path = os.path.join(dataset_dir, file_name)
             retrivels_files.append(Image.open(img_path).convert("RGB"))
         except:
             print(f"Không thể load ảnh: {file_name}")
