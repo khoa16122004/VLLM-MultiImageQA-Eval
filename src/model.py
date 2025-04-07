@@ -4,7 +4,7 @@ from transformers import CLIPProcessor, CLIPModel as HFCLIPModel
 import sys
 import os
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../ReT")))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "ReT/src")))
 from src.models import RetrieverModel, RetModel
 
 class MyCLIPWrapper:
