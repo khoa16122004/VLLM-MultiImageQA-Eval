@@ -110,7 +110,7 @@ class CreateDatabase:
                 if not npy_file.endswith(".npy"):
                     continue
                 retrieval_vectors = np.load(os.path.join(database_dir, npy_file))
-                all_paths.append(npy_file.split(".")[0])
+                all_paths.append(npy_file.split(".")[0] + ".png")
                 batch_retrieval_vectors.append(retrieval_vectors)
                 
                 if len(np.vstack(batch_retrieval_vectors)) >= batch_size:
@@ -262,7 +262,7 @@ if __name__ == "__main__":
     index_dir = "../database/MRAG_corpus/index"
     
     # db.extract(dataset_dir, database_dir)       
-    # db.create_database(database_dir, output_dir=index_dir)
+    db.create_database(database_dir, output_dir=index_dir)
 
     while True:
         image_index = int(input("Input sampe index: "))
