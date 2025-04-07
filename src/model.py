@@ -40,7 +40,7 @@ class MyCLIPWrapper:
 
 class ReTWrapper:
     def __init__(self):
-        retrieval = RetrieverModel.from_pretrained('aimagelab/ReT-CLIP-ViT-L-14', device_map="cuda:6") # E_Qs
+        retrieval = RetrieverModel.from_pretrained('aimagelab/ReT-CLIP-ViT-L-14', device_map="cuda") # E_Qs
         self.encode: RetModel = retrieval.get_query_model()
         self.encode.init_tokenizer_and_image_processor()
         
