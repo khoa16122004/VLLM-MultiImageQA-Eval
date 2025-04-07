@@ -1,7 +1,10 @@
 import torch
 from PIL import Image
 from transformers import CLIPProcessor, CLIPModel as HFCLIPModel
+import sys
+import os
 
+sys.path.append(os.path.join(os.path.join(__file__, "../ReT/src")))
 class MyCLIPWrapper:
     def __init__(self, model_name='openai/clip-vit-base-patch32', device=None):
         self.device = device or ('cuda' if torch.cuda.is_available() else 'cpu')
@@ -35,7 +38,7 @@ class MyCLIPWrapper:
 
 class ReTWrapper:
     def __init__(self):
-        from ReT.src.models import RetrieverModel, RetModel
+        from src.models import RetrieverModel, RetModel
         retrieval = RetrieverModel.from_pretrained('aimagelab/ReT-CLIP-ViT-L-14', device_map="cuda") # E_Qs
         self.encode: RetModel = retrieval.get_query_model()
         self.encode.init_tokenizer_and_image_processor()
