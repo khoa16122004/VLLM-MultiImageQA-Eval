@@ -106,8 +106,7 @@ def main(args):
                                                                    image_index=int(sample_id), k=args.topk, 
                                                                    topk_rerank=args.topk_rerank)
             retrieved_files = [Image.open(os.path.join(dataset_dir, path)).convert("RGB") for path in retrieved_paths]
-            print("retrieved_files", retrieved_files)
-            input()
+
             output = lvlm.inference(full_question, [question_img, *retrieved_files])[0]
             output = extract_output(output, question)
             # if np.any([int(sample_id) == retrieved_sample_id for retrieved_sample_id in retrieved_sample_ids]):
