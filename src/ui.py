@@ -2,7 +2,7 @@ import gradio as gr
 import os
 from PIL import Image
 
-def load_sample(sample_id, question_dir, retrivels_path, dataset_dir):
+def load_sample(sample_id, question_dir, retrivels_names, dataset_dir):
     folder_path = os.path.join(question_dir, sample_id)    
     if not os.path.exists(question_dir):
         return "Không tìm thấy thư mục", None, []
@@ -10,6 +10,7 @@ def load_sample(sample_id, question_dir, retrivels_path, dataset_dir):
     question = "Không tìm thấy câu hỏi."
     question_img = None
     gt_files = []
+    retrivels_files = [Image.open(os.path.join(dataset_dir, file_name)).convert("RGB") for file_name in retrivels_names]
 
     for filename in os.listdir(folder_path):
         file_path = os.path.join(folder_path, filename)
@@ -23,7 +24,7 @@ def load_sample(sample_id, question_dir, retrivels_path, dataset_dir):
             with open(file_path, "r", encoding="utf-8") as f:
                 question = f.read()
 
-    return question, question_img, gt_files
+    return question, question_img, gt_files, retrivels_files
 
 demo = gr.Interface(
     fn=load_sample,
@@ -32,6 +33,7 @@ demo = gr.Interface(
         gr.Textbox(label="Câu hỏi"),
         gr.Image(label="question_img", scale=0.5),
         gr.Gallery(label="Ground Truth Images", columns=5, height=200)
+        gr.Gallery(label="Retrieved Images", columns=5, height=200)
     ],
     title="MRAG Sample Viewer",
     description="Nhập sample ID để xem ảnh và câu hỏi tương ứng."
