@@ -4,7 +4,6 @@ from PIL import Image
 import os
 import argparse
 import numpy as np
-from models.llava_ import LLava
 from tqdm import tqdm
 import random
 import torch
