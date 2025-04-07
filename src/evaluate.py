@@ -108,14 +108,11 @@ def main(args):
             retrieved_paths = db.combined_search(index_dir=index_dir, dataset_dir=question_dir, 
                                                                    image_index=int(sample_id), k=args.topk, 
                                                                    topk_rerank=args.topk_rerank)
-            print("Retrieved files: ", retrieved_paths)
             retrieved_files = [Image.open(os.path.join(dataset_dir, path)).convert("RGB") for path in retrieved_paths]
             num_input_images = len(retrieved_files) + 1
             full_question = f"{retrieved_prefix_question}{num_input_images * image_token}\n{question}\n{choice_join}"
-            print("Question: ", full_question)
             output = lvlm.inference(full_question, [question_img, *retrieved_files])[0]
             output = extract_output(output, question)
-            print("output with retrieval: ", output, "gt:", gt_ans)
 
             # if np.any([int(sample_id) == retrieved_sample_id for retrieved_sample_id in retrieved_sample_ids]):
             #     is_contain_retrieval = 1
@@ -123,13 +120,13 @@ def main(args):
                 retrieved_acc += 1    
                 
                 
-            # without retrieval
-            num_input_images = 1
-            full_question = f"{no_retrieved_prefix_question}{num_input_images * image_token}\n{question}\n{choice_join}"
-            output = lvlm.inference(full_question, [question_img])[0]
-            output = extract_output(output, question)
-            if gt_ans == output:
-                acc += 1
+            # # without retrieval
+            # num_input_images = 1
+            # full_question = f"{no_retrieved_prefix_question}{num_input_images * image_token}\n{question}\n{choice_join}"
+            # output = lvlm.inference(full_question, [question_img])[0]
+            # output = extract_output(output, question)
+            # if gt_ans == output:
+            #     acc += 1
             
             print("output with out retrieval: ", output, "gt:", gt_ans)
                 
