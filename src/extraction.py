@@ -191,7 +191,11 @@ class CreateDatabase:
     
     def flow_search(self, index_dir, dataset_dir, image_index, k=10, topk_rerank=10, d=512):
         img_path = os.path.join(dataset_dir, str(image_index), "question_img.png")
-        img_vector = self.model.visual_encode(img_path)
+        if self.model_name == "CLIP":
+            img_vector = self.model.visual_encode(img_path)
+        elif self.model_name == "ReT":
+            img_vector = self.model.encode_multimodal(img_path).flatten()
+            
         sample_indices = self.search_with_reranking(index_dir, img_vector, k, topk_rerank, d)
         
         return sample_indices
