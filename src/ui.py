@@ -2,9 +2,9 @@ import gradio as gr
 import os
 from PIL import Image
 
-def load_sample(sample_id):
-    folder_path = f"../dataset/MRAG/{sample_id}"
-    if not os.path.exists(folder_path):
+def load_sample(sample_id, question_dir, retrivels_path, dataset_dir):
+    folder_path = os.path.join(question_dir, sample_id)    
+    if not os.path.exists(question_dir):
         return "Không tìm thấy thư mục", None, []
 
     question = "Không tìm thấy câu hỏi."

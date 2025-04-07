@@ -110,15 +110,13 @@ class CreateDatabase:
                 if not npy_file.endswith(".npy"):
                     continue
                 retrieval_vectors = np.load(os.path.join(database_dir, npy_file))
-                all_paths.append(npy_file)
+                all_paths.append(npy_file.split(".")[0])
                 batch_retrieval_vectors.append(retrieval_vectors)
                 
                 if len(np.vstack(batch_retrieval_vectors)) >= batch_size:
                     print(f"Adding batch to index... {index_id}")
                     batch_vectors = np.vstack(batch_retrieval_vectors)
-                    print("batch_vector shape: ", batch_vectors.shape)
                     current_index.add(batch_vectors.astype('float32'))
-                    input("Wait test batch")
                     for i in range(len(batch_retrieval_vectors)):
                         writer.writerow({
                             'index': i,
@@ -269,10 +267,11 @@ if __name__ == "__main__":
     
     dataset_dir = "../dataset/MRAG_corpus"
     database_dir = "../database/MRAG_corpus"
-    db.extract(dataset_dir, database_dir)       
-    db.create_database(database_dir, output_dir="../database/MRAG_corpus/index")
+    index_dir = "../database/MRAG_corpus/index"
+    
+    # db.extract(dataset_dir, database_dir)       
+    db.create_database(database_dir, output_dir=index_dir)
 
-    # index_dir = "../database/MRAG_CLIP/index"
     # while True:
     #     image_index = int(input("Input sampe index: "))
         
