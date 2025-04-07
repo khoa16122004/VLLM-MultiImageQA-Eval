@@ -32,3 +32,31 @@ class MyCLIPWrapper:
             text_features = self.model.get_text_features(**inputs)
 
         return text_features.squeeze().cpu().numpy()
+
+class ReTWrapper:
+    def __init__(self):
+        from src.models import RetrieverModel, RetModel
+        retrieval = RetrieverModel.from_pretrained('aimagelab/ReT-CLIP-ViT-L-14', device_map="cuda") # E_Qs
+        self.encode: RetModel = retrieval.get_query_model()
+        self.encode.init_tokenizer_and_image_processor()
+        
+        self.query: RetModel = retrieval.get_passage_model()
+        self.query.init_tokenizer_and_image_processor()
+    
+    def encode(self, img, txt=""): # img: path, txt: str
+        if txt:
+            ret_feats = self.query.get_ret_features([[txt, img]]).squeeze(0)
+        else: # txt = ""
+            ret_feats = self.encode.get_ret_features([[txt, img]]).squueze(0)
+        
+        return ret_feats.cpu().numpy()
+    
+    def sim(self, q1, q2): # q1: ret_feats, q2: ret_feats
+        # q1: 32 x d
+        # q2: 32 x d
+        # sim = sigma_i -> 32 (max(sigma_j -> 32 (q1_i * q2_j)))
+        
+        return (torch.matmul(q1, q2.T)).max(dim=1).values.sum()
+
+            
+        

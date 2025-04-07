@@ -30,7 +30,7 @@ def extract_question(sample_dir):
     return question, question_img, gt_files, choices, gt_ans
 
 class CreateDatabase:
-    def __init__(self, model):
+    def __init__(self, model, model_name):
         '''
             Args: 
                 dir: Folder dir of N samples
@@ -43,6 +43,7 @@ class CreateDatabase:
         
 
         self.model = model
+        self.model_name = model_name
         
         
     def extract(self, dir, output_dir):
@@ -50,37 +51,13 @@ class CreateDatabase:
             Extracts features from all N samples, and save in output_dir folder 
         '''
         os.makedirs(output_dir, exist_ok=True)
-
-        
-        # for sample_id in tqdm(os.listdir(dir)):
-        #     if not sample_id.endswith(".py"):
-                
-        #         sample_dir = os.path.join(dir, sample_id)
-        #         sample_dir_output = os.path.join(output_dir, sample_id)
-        #         os.makedirs(sample_dir_output, exist_ok=True)
-
-        #         retrieved_vectors = []
-        #         qs_vector = None
-
-        #         img_paths = []
-        #         for img_name in os.listdir(sample_dir):
-        #             img_path = os.path.join(sample_dir, img_name)
-        #             if "gt" in img_name:
-        #                 vec = self.model.visual_encode(img_path)
-        #                 retrieved_vectors.append(vec)
-        #                 img_paths.append(img_path)
-        #             elif "question" in img_name and img_name.endswith(".png"):
-        #                 qs_vector = self.model.visual_encode(img_path)
-
-        #         if qs_vector is not None and len(retrieved_vectors) > 0:
-        #             np.save(os.path.join(sample_dir_output, "question.npy"), qs_vector)
-        #             np.save(os.path.join(sample_dir_output, "paths.npy"), img_paths)
-        #             np.save(os.path.join(sample_dir_output, "retrieval.npy"), np.stack(retrieved_vectors))
-        
         
         for file_name in tqdm(os.listdir(dir)):
             file_path = os.path.join(dir, file_name)
-            vec = self.model.visual_encode(file_path)
+            if self.model_name == "CLIP":
+                vec = self.model.visual_encode(file_path)
+            elif self.model_name == "RET":
+                vec = self.model.encode(file_path)
             
             np.save(os.path.join(output_dir, f"{file_name}.npy"), vec)
                 
@@ -226,7 +203,6 @@ class CreateDatabase:
         img_top_indices, img_top_batches, img_top_vectors, _ = self.search(index_dir, img_vector, top_rerank=topk_rerank, d=d, k=k)
         txt_top_indices, txt_top_batches, txt_top_vectors, _ = self.search(index_dir, text_vector, top_rerank=topk_rerank, d=d, k=k)
 
-        # Gộp kết quả search từ cả hai nguồn
         combined = {}
         for i, (idx, batch, vec) in enumerate(zip(img_top_indices, img_top_batches, img_top_vectors)):
             combined[(idx, batch)] = {'img_vec': vec}
@@ -265,16 +241,16 @@ if __name__ == "__main__":
     
     question_dir = "../dataset/MRAG"
     dataset_dir = "../dataset/MRAG_corpus"
-    database_dir = "../database/MRAG_corpus"
+    database_dir = "../database/MRAG_corpus_ReT"
     index_dir = "../database/MRAG_corpus/index"
     
-    # db.extract(dataset_dir, database_dir)       
+    db.extract(dataset_dir, database_dir)       
     # db.create_database(database_dir, output_dir=index_dir)
-    while True:
-        image_index = int(input("Input sampe index: "))
+    # while True:
+    #     image_index = int(input("Input sampe index: "))
         
-        if image_index == -1:
-            break
+    #     if image_index == -1:
+    #         break
         
-        sample_indices = db.combined_search(index_dir, question_dir, image_index)
-        print("Results retreval: ", sample_indices)
+    #     sample_indices = db.combined_search(index_dir, question_dir, image_index)
+    #     print("Results retreval: ", sample_indices)
