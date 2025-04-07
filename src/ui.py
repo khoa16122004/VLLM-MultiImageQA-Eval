@@ -21,7 +21,7 @@ def load_sample(sample_id, retrivels_names):
         try:
             retrivels_files.append(Image.open(img_path).convert("RGB"))
         except:
-            print(f"Không thể load ảnh: {file_name}")
+            print(f"Không thể load ảnh: {img_path}")
 
     for filename in os.listdir(folder_path):
         file_path = os.path.join(folder_path, filename)
