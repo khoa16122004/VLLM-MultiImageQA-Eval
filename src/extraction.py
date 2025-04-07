@@ -260,14 +260,14 @@ if __name__ == "__main__":
     database_dir = "../database/MRAG_corpus"
     index_dir = "../database/MRAG_corpus/index"
     
-    db.extract(dataset_dir, database_dir)       
-    db.create_database(database_dir, output_dir=index_dir)
+    # db.extract(dataset_dir, database_dir)       
+    # db.create_database(database_dir, output_dir=index_dir)
 
-    # while True:
-    #     image_index = int(input("Input sampe index: "))
+    while True:
+        image_index = int(input("Input sampe index: "))
         
-    #     if image_index == -1:
-    #         break
+        if image_index == -1:
+            break
         
-    #     sample_indices = db.flow_search(index_dir, question_dir, image_index)
-    #     print("Results retreval: ", sample_indices)
+        sample_indices = db.flow_search(index_dir, question_dir, image_index)
+        print("Results retreval: ", sample_indices)
