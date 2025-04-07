@@ -151,7 +151,6 @@ class CreateDatabase:
                     
     def search_with_reranking(self, index_dir, query_vector, k=10, top_rerank=50, d=512):
         top_indices, top_batches, top_vectors, df = self.search(index_dir, query_vector, top_rerank, d) # 50 vector
-
         expanded_query = np.mean(top_vectors, axis=0).astype('float32')
         all_distances = np.linalg.norm(top_vectors - expanded_query.reshape(1, -1), axis=1)  # Euclidean
 
@@ -270,5 +269,5 @@ if __name__ == "__main__":
         if image_index == -1:
             break
         
-        sample_indices = db.search_with_reranking(index_dir, question_dir, image_index)
+        sample_indices = db.flow_search(index_dir, question_dir, image_index)
         print("Results retreval: ", sample_indices)
