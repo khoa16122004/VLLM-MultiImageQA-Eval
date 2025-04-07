@@ -150,7 +150,7 @@ class CreateDatabase:
             print(f"Database created successfully with multiple indexes with total {total_vectors_added} vectors")
                     
     def search_with_reranking(self, index_dir, query_vector, k=10, top_rerank=50, d=512):
-        top_indices, top_batches, top_vectors, df, sample_indices = self.search(index_dir, query_vector, top_rerank, d) # 50 vector
+        top_indices, top_batches, top_vectors, df = self.search(index_dir, query_vector, top_rerank, d) # 50 vector
 
         expanded_query = np.mean(top_vectors, axis=0).astype('float32')
         all_distances = np.linalg.norm(top_vectors - expanded_query.reshape(1, -1), axis=1)  # Euclidean
@@ -196,27 +196,20 @@ class CreateDatabase:
         all_vectors = np.array(all_vectors)
 
         sorted_idx = np.argsort(all_distances)
-        
-        filtered_idx = [sorted_idx[0]]
-        for i in sorted_idx[1:]:
-            if not np.isclose(all_distances[i], all_distances[filtered_idx[-1]], atol=1e-4):
-                filtered_idx.append(i)
-            if len(filtered_idx) >= top_rerank:
-                break
+        sorted_idx = sorted_idx[:k]
 
-        top_indices = all_indices[filtered_idx]
-        top_batches = all_batch_index[filtered_idx]
-        top_vectors = all_vectors[filtered_idx]
+        top_indices = all_indices[sorted_idx]
+        top_batches = all_batch_index[sorted_idx]
+        top_vectors = all_vectors[sorted_idx]
 
-        query_df = pd.DataFrame({
-            'index': top_indices[:k],
-            'batch_idx': top_batches[:k]
-        })
+        # query_df = pd.DataFrame({
+        #     'index': top_indices,
+        #     'batch_idx': top_batches
+        # })
 
-        merged = pd.merge(query_df, df, on=['index', 'batch_idx'], how='inner')
-        sample_indices = merged['img_path'].to_numpy()
+        # merged = pd.merge(query_df, df, on=['index', 'batch_idx'], how='inner')
 
-        return top_indices, top_batches, top_vectors, df, sample_indices
+        return top_indices, top_batches, top_vectors, df 
     
     def flow_search(self, index_dir, dataset_dir, image_index, k=10, topk_rerank=10, d=512):
         img_path = os.path.join(dataset_dir, str(image_index), "question_img.png")
