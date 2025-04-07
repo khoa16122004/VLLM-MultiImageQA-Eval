@@ -4,7 +4,7 @@ from PIL import Image
 
 def load_sample(sample_id, retrivels_names):
     question_dir = "../dataset/MRAG"
-    dataset_dir = os.path.join("../dataset", "mrag_bench_image_corpus", "image_corpus")
+    dataset_dir = os.path.join(r"D:\VLLM-MultiImageQA-Eval\dataset\mrag_bench_image_corpus\image_corpus")
     folder_path = os.path.join(question_dir, sample_id)
 
     if not os.path.exists(folder_path):
