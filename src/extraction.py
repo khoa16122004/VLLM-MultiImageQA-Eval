@@ -147,7 +147,7 @@ class CreateDatabase:
         return sample_paths
             
     
-    def search(self, index_dir, query_vector, top_rerank=50, d=512, k=5):
+    def search(self, index_dir, query_vector, top_rerank=50, d=4096, k=5):
         query_vector = query_vector.astype('float32') 
         all_distances = []
         all_indices = []
