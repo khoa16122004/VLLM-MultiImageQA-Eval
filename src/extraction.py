@@ -223,18 +223,18 @@ class CreateDatabase:
         img_vector = self.model.visual_encode(question_img)
         text_vector = self.model.text_encode(full_question)
         
-        image_indices, image_batches, image_vectors, _, _ = self.search(index_dir, img_vector, top_rerank=topk_rerank, d=d, k=k)
-        text_indices, text_batches, text_vectors, _, _ = self.search(index_dir, text_vector, top_rerank=topk_rerank, d=d, k=k)
+        img_top_indices, img_top_batches, img_top_vectors, img_df  = self.search(index_dir, img_vector, top_rerank=topk_rerank, d=d, k=k)
+        txt_top_indices, txt_top_batches, txt_top_vectors, txt_df  = self.search(index_dir, text_vector, top_rerank=topk_rerank, d=d, k=k)
         
-        image_distances = np.linalg.norm(image_vectors - img_vector.reshape(1, -1), axis=1)
-        text_distances = np.linalg.norm(text_vectors - text_vector.reshape(1, -1), axis=1)
+        image_distances = np.linalg.norm(img_top_vectors - img_vector.reshape(1, -1), axis=1)
+        text_distances = np.linalg.norm(txt_top_vectors - text_vector.reshape(1, -1), axis=1)
         
         weighted_distances = image_weight * image_distances + text_weight * text_distances
         
         combined_indices = np.argsort(weighted_distances)[:k]
         
-        final_image_indices = np.array(image_indices)[combined_indices]
-        final_image_batches = np.array(image_batches)[combined_indices]
+        final_image_indices = np.array(img_top_indices)[combined_indices]
+        final_image_batches = np.array(img_top_batches)[combined_indices]
         
         query_df = pd.DataFrame({
             'index': final_image_indices,
@@ -261,12 +261,11 @@ if __name__ == "__main__":
     
     # db.extract(dataset_dir, database_dir)       
     # db.create_database(database_dir, output_dir=index_dir)
-
     while True:
         image_index = int(input("Input sampe index: "))
         
         if image_index == -1:
             break
         
-        sample_indices = db.flow_search(index_dir, question_dir, image_index)
+        sample_indices = db.combined_search(index_dir, question_dir, image_index)
         print("Results retreval: ", sample_indices)
