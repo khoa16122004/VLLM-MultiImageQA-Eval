@@ -95,7 +95,7 @@ def main(args):
     for sample_id in tqdm(os.listdir(question_dir)):
         if sample_id != "index" and not sample_id.endswith(".py"):
             num_samples += 1
-            sample_dir = os.path.join(dataset_dir, sample_id)
+            sample_dir = os.path.join(question_dir, sample_id)
             question, question_img, gt_files, choices, gt_ans = extract_question(sample_dir)
             
             # retrieved output
