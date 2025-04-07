@@ -56,7 +56,7 @@ class CreateDatabase:
             file_path = os.path.join(dir, file_name)
             if self.model_name == "CLIP":
                 vec = self.model.visual_encode(file_path)
-            elif self.model_name == "RET":
+            elif self.model_name == "ReT":
                 vec = self.model.encode(file_path)
             
             np.save(os.path.join(output_dir, f"{file_name}.npy"), vec)
@@ -237,7 +237,7 @@ class CreateDatabase:
     
 if __name__ == "__main__":
     model = MyCLIPWrapper()
-    db = CreateDatabase(model=model)
+    db = CreateDatabase(model=model, model_name="ReT")
     
     question_dir = "../dataset/MRAG"
     dataset_dir = "../dataset/MRAG_corpus"
