@@ -10,6 +10,7 @@ from PIL import Image
 def extract_question(sample_dir):
     gt_files = []
     for img_name in os.listdir(sample_dir):
+        
         if "question" in img_name and img_name.endswith(".png"):
             question_img = Image.open(os.path.join(sample_dir, img_name)).convert('RGB')
             
@@ -53,6 +54,9 @@ class CreateDatabase:
         os.makedirs(output_dir, exist_ok=True)
         
         for file_name in tqdm(os.listdir(dir)):
+            if "input" in file_name:
+                continue
+            
             file_path = os.path.join(dir, file_name)
             if self.model_name == "CLIP":
                 vec = self.model.visual_encode(file_path)

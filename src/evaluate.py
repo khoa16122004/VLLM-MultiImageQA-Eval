@@ -120,8 +120,8 @@ def main(args):
                 
             
             print("output with retrieval: ", output, "gt:", gt_ans)
-                
-    print(f"Accuracy without retrieval: {acc / num_samples * 100}%, Accuracy with retrieval: {retrieved_acc / num_samples * 100}%, Total samples: {num_samples}")            
+    with open(f"result_{args.model_name}_{args.pretrained}_{args.topk}_{args.topk_rerank}.txt", "a") as f:          
+        f.write(f"Accuracy without retrieval: {acc / num_samples * 100}%, Accuracy with retrieval: {retrieved_acc / num_samples * 100}%, Total samples: {num_samples}\n")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
