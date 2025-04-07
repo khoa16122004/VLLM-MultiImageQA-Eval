@@ -2,7 +2,9 @@ import gradio as gr
 import os
 from PIL import Image
 
-def load_sample(sample_id, question_dir, retrivels_names, dataset_dir):
+def load_sample(sample_id, retrivels_names):
+    question_dir = "dataset/MRAG"
+    dataset_dir = "dataset/mrag_bench_image_corpus\image_corpus"
     folder_path = os.path.join(question_dir, sample_id)    
     if not os.path.exists(question_dir):
         return "Không tìm thấy thư mục", None, []
@@ -32,7 +34,7 @@ demo = gr.Interface(
     outputs=[
         gr.Textbox(label="Câu hỏi"),
         gr.Image(label="question_img", scale=0.5),
-        gr.Gallery(label="Ground Truth Images", columns=5, height=200)
+        gr.Gallery(label="Ground Truth Images", columns=5, height=200),
         gr.Gallery(label="Retrieved Images", columns=5, height=200)
     ],
     title="MRAG Sample Viewer",
