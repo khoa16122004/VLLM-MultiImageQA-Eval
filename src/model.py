@@ -48,11 +48,10 @@ class ReTWrapper:
         self.query.init_tokenizer_and_image_processor()
     
     def encode_multimodal(self, img, txt=""): # img: path, txt: str
-        print("encode")
         if txt:
             ret_feats = self.query.get_ret_features([[txt, img]]).squeeze(0)
         else: # txt = ""
-            ret_feats = self.encode.get_ret_features([[txt, img]]).squueze(0)
+            ret_feats = self.encode.get_ret_features([[txt, img]]).squeeze(0)
         
         return ret_feats.cpu().numpy()
     
