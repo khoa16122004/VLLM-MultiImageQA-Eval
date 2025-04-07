@@ -248,7 +248,7 @@ if __name__ == "__main__":
     database_dir = "../database/MRAG_corpus_ReT"
     index_dir = "../database/MRAG_corpus_ReT/index"
     
-    db.extract(dataset_dir, database_dir)       
+    # db.extract(dataset_dir, database_dir)       
     db.create_database(database_dir, output_dir=index_dir)
     # while True:
     #     image_index = int(input("Input sampe index: "))
