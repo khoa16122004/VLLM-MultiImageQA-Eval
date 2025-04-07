@@ -80,18 +80,19 @@ def main(args):
     db = CreateDatabase(model=model)
     
     
-    dataset_dir = "../dataset/MRAG"
-    database_dir = "../database/MRAG_CLIP/index"
+    question_dir = "../dataset/MRAG"
+    dataset_dir = "../dataset/MRAG_corpus"
+    index_dir = "../database/MRAG_corpus/index"
     
     lvlm, image_token, special_token = init_model(args)
     retrieved_prefix_question = "You will be given one question concerning several images. The first image is the input image, others are retrieved examples to help you. Answer with the option's letter from the given choices directly."
     no_retrieved_prefix_question = "You will be given one question concerning one image. Answer with the option's letter from the given choices directly."
     # retrieval
-    is_contain_retrieval = 0
+    # is_contain_retrieval = 0
     retrieved_acc = 0
     acc = 0
     num_samples = 0
-    for sample_id in tqdm(os.listdir(dataset_dir)):
+    for sample_id in tqdm(os.listdir(question_dir)):
         if sample_id != "index" and not sample_id.endswith(".py"):
             num_samples += 1
             sample_dir = os.path.join(dataset_dir, sample_id)
@@ -101,14 +102,16 @@ def main(args):
             num_input_images = len(gt_files) + 1
             choice_join = "\n".join(choices)
             full_question = f"{retrieved_prefix_question}{num_input_images * image_token}\n{question}\n{choice_join}"
-            retrieved_paths, retrieved_sample_ids = db.combined_search(index_dir=database_dir, dataset_dir=dataset_dir, 
+            retrieved_paths = db.flow_search(index_dir=index_dir, dataset_dir=question_dir, 
                                                                    image_index=int(sample_id), k=args.topk, 
                                                                    topk_rerank=args.topk_rerank)
-            retrieved_files = [Image.open(path).convert("RGB") for path in retrieved_paths]
+            retrieved_files = [Image.open(os.path.join(dataset_dir, path)).convert("RGB") for path in retrieved_paths]
+            print("retrieved_files", retrieved_files)
+            input()
             output = lvlm.inference(full_question, [question_img, *retrieved_files])[0]
             output = extract_output(output, question)
-            if np.any([int(sample_id) == retrieved_sample_id for retrieved_sample_id in retrieved_sample_ids]):
-                is_contain_retrieval = 1
+            # if np.any([int(sample_id) == retrieved_sample_id for retrieved_sample_id in retrieved_sample_ids]):
+            #     is_contain_retrieval = 1
             if gt_ans == output:
                 retrieved_acc += 1    
                 
@@ -121,7 +124,7 @@ def main(args):
             if gt_ans == output:
                 acc += 1
                 
-    print(f"Accuracy without retrieval: {acc / num_samples * 100}%, Accuracy with retrieval: {retrieved_acc / num_samples * 100}%, Contain retrieval: {is_contain_retrieval}%, Total samples: {num_samples}")            
+    print(f"Accuracy without retrieval: {acc / num_samples * 100}%, Accuracy with retrieval: {retrieved_acc / num_samples * 100}%, Total samples: {num_samples}")            
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
