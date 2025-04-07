@@ -166,8 +166,7 @@ class CreateDatabase:
         })
         merged = pd.merge(query_df, df, on=['index', 'batch_idx'], how='inner')
         sample_paths = merged['img_path'].to_numpy()
-        sample_indices = merged['sample_id'].to_numpy()
-        return sample_paths, sample_indices
+        return sample_paths
             
     
     def search(self, index_dir, query_vector, top_rerank=50, d=512, k=5):
@@ -255,9 +254,8 @@ class CreateDatabase:
         merged = pd.merge(query_df, df, on=['index', 'batch_idx'], how='inner')
         
         sample_paths = merged['img_path'].to_numpy()
-        sample_indices = merged['sample_id'].to_numpy()
 
-        return sample_paths, sample_indices
+        return sample_paths
 
 
     
