@@ -104,7 +104,7 @@ def main(args):
             # retrieved output
             choice_join = "\n".join(choices)
 
-            retrieved_paths = db.combined_search(index_dir=index_dir, dataset_dir=question_dir, 
+            retrieved_paths = db.flow_search(index_dir=index_dir, dataset_dir=question_dir, 
                                                                    image_index=int(sample_id), k=args.topk, 
                                                                    topk_rerank=args.topk_rerank)
             retrieved_files = [Image.open(os.path.join(dataset_dir, path)).convert("RGB") for path in retrieved_paths]
