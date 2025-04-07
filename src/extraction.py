@@ -82,8 +82,7 @@ class CreateDatabase:
             file_path = os.path.join(dir, file_name)
             vec = self.model.visual_encode(file_path)
             
-            base_name = file_name.split(".")
-            np.save(os.path.join(output_dir, f"{base_name}.npy"), vec)
+            np.save(os.path.join(output_dir, f"{file_name}.npy"), vec)
                 
         
     def create_database(self, database_dir, output_dir, d=512, csv_file='map.csv', batch_size=2000):
