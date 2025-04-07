@@ -22,8 +22,13 @@ class MyCLIPWrapper:
         return image_features.squeeze().cpu().numpy()
 
     def text_encode(self, text):
-        inputs = self.processor(text=text, return_tensors="pt", padding=True).to(self.device)
+        # Giới hạn số lượng token
+        max_length = 77  # Giới hạn chiều dài chuỗi
+
+        # Cắt ngắn văn bản nếu cần
+        inputs = self.processor(text=text, return_tensors="pt", padding=True, truncation=True, max_length=max_length).to(self.device)
+
         with torch.no_grad():
             text_features = self.model.get_text_features(**inputs)
-        return text_features.squeeze().cpu().numpy()
 
+        return text_features.squeeze().cpu().numpy()

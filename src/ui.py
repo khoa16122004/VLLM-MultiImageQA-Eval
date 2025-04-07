@@ -1,6 +1,7 @@
 import gradio as gr
 import os
 from PIL import Image
+import re
 
 def load_sample(sample_id, retrivels_names):
     question_dir = "../dataset/MRAG"
@@ -14,7 +15,7 @@ def load_sample(sample_id, retrivels_names):
     question_img = None
     gt_files = []
 
-    retrivels_names = [name.strip() for name in retrivels_names.split(",") if name.strip()]
+    retrivels_names = re.findall(r"'([^']+)'", retrivels_names)
     retrivels_files = []
     for file_name in retrivels_names:
         img_path = os.path.join(dataset_dir, file_name)
