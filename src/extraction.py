@@ -92,7 +92,7 @@ class CreateDatabase:
         '''
         os.makedirs(output_dir, exist_ok=True)
         with open(os.path.join(output_dir, csv_file), mode='w', newline='') as csvfile:
-            fieldnames = ['index', 'sample_id', 'batch_idx', 'img_path']
+            fieldnames = ['index', 'batch_idx', 'img_path']
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
 
@@ -101,32 +101,27 @@ class CreateDatabase:
             print("Starting to create database...")
             print("Estimated total index: ", 1 + self.number_vectors // batch_size)
             batch_retrieval_vectors = []
-            batch_sample_ids = []
             all_paths = []
             total_vectors_added = 0
 
             
-            for k, sample_id in tqdm(enumerate(sorted(os.listdir(database_dir)))):
-                if sample_id.endswith(".py") or sample_id == "index":
+            # for k, sample_id in tqdm(enumerate(sorted(os.listdir(database_dir)))):
+            for npy_file in tqdm(sorted(os.listdir(database_dir))):
+                if not npy_file.endswith(".npy"):
                     continue
-
-                print(f"Read sample {k} ...")
-                sample_dir_input = os.path.join(database_dir, sample_id)
-                retrieval_vectors = np.load(os.path.join(sample_dir_input, "retrieval.npy"))
-                paths = np.load(os.path.join(sample_dir_input, "paths.npy"))
-                all_paths.extend(paths)
+                retrieval_vectors = np.load(os.path.join(database_dir, npy_file))
+                all_paths.append(npy_file)
                 batch_retrieval_vectors.append(retrieval_vectors)
-                batch_sample_ids.extend([sample_id] * retrieval_vectors.shape[0])
                 
                 if len(np.vstack(batch_retrieval_vectors)) >= batch_size:
                     print(f"Adding batch to index... {index_id}")
                     batch_vectors = np.vstack(batch_retrieval_vectors)
+                    print("batch_vector shape: ". batch_vectors.shape)
                     current_index.add(batch_vectors.astype('float32'))
-
-                    for i, sid in enumerate(batch_sample_ids):
+                    input("Wait test batch")
+                    for i in range(len(batch_retrieval_vectors)):
                         writer.writerow({
                             'index': i,
-                            'sample_id': sid,
                             'batch_idx': index_id,
                             'img_path': all_paths[i]
                         })
@@ -137,7 +132,6 @@ class CreateDatabase:
                     current_index = faiss.IndexFlatL2(d)
                     total_vectors_added += len(batch_vectors)
                     batch_retrieval_vectors = []
-                    batch_sample_ids = []
                     all_paths = []
 
             if batch_retrieval_vectors:
@@ -145,10 +139,9 @@ class CreateDatabase:
                 batch_vectors = np.vstack(batch_retrieval_vectors)
                 current_index.add(batch_vectors.astype('float32'))
 
-                for i, sid in enumerate(batch_sample_ids):
+                for i in range(len(batch_retrieval_vectors)):
                     writer.writerow({
                         'index':  i,
-                        'sample_id': sid,
                         'batch_idx': index_id,
                         'img_path': all_paths[i]
                     })
@@ -277,7 +270,7 @@ if __name__ == "__main__":
     dataset_dir = "../dataset/MRAG_corpus"
     database_dir = "../database/MRAG_corpus"
     db.extract(dataset_dir, database_dir)       
-    # db.create_database(database_dir, output_dir="../database/MRAG/index")
+    db.create_database(database_dir, output_dir="../database/MRAG_corpus/index")
 
     # index_dir = "../database/MRAG_CLIP/index"
     # while True:
