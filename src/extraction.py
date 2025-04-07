@@ -216,46 +216,46 @@ class CreateDatabase:
         
         return sample_indices
 
-    def combined_search(self, index_dir, dataset_dir, image_index, k=10, topk_rerank=100, d=512, image_weight=0.7, text_weight=0.3):
+    def combined_search(self, index_dir, dataset_dir, image_index, k=10, topk_rerank=10, d=512, image_weight=0.7, text_weight=0.3):
         question, question_img, gt_files, choices, gt_ans = extract_question(os.path.join(dataset_dir, str(image_index)))
         full_question = "".join([question, "".join(choices)])
         
         img_vector = self.model.visual_encode(question_img)
         text_vector = self.model.text_encode(full_question)
         
-        img_top_indices, img_top_batches, img_top_vectors, _ = self.search(index_dir, img_vector, top_rerank=topk_rerank, d=d, k=topk_rerank)
-        txt_top_indices, txt_top_batches, txt_top_vectors, _ = self.search(index_dir, text_vector, top_rerank=topk_rerank, d=d, k=topk_rerank)
-        
-        # Gộp kết quả từ cả 2 nguồn
+        img_top_indices, img_top_batches, img_top_vectors, _ = self.search(index_dir, img_vector, top_rerank=topk_rerank, d=d, k=k)
+        txt_top_indices, txt_top_batches, txt_top_vectors, _ = self.search(index_dir, text_vector, top_rerank=topk_rerank, d=d, k=k)
+
+        # Gộp kết quả search từ cả hai nguồn
         combined = {}
-        for idx, batch, vec in zip(img_top_indices, img_top_batches, img_top_vectors):
-            combined[(idx, batch)] = {'img_vec': vec, 'txt_vec': None}
-        for idx, batch, vec in zip(txt_top_indices, txt_top_batches, txt_top_vectors):
+        for i, (idx, batch, vec) in enumerate(zip(img_top_indices, img_top_batches, img_top_vectors)):
+            combined[(idx, batch)] = {'img_vec': vec}
+
+        for i, (idx, batch, vec) in enumerate(zip(txt_top_indices, txt_top_batches, txt_top_vectors)):
             if (idx, batch) not in combined:
-                combined[(idx, batch)] = {'img_vec': None, 'txt_vec': vec}
-            else:
-                combined[(idx, batch)]['txt_vec'] = vec
-        
-        # Tính khoảng cách kết hợp
-        scores = []
-        keys = []
-        for (idx, batch), entry in combined.items():
-            img_dist = np.linalg.norm(entry['img_vec'] - img_vector) if entry['img_vec'] is not None else np.inf
-            txt_dist = np.linalg.norm(entry['txt_vec'] - text_vector) if entry['txt_vec'] is not None else np.inf
-            weighted = image_weight * img_dist + text_weight * txt_dist
-            scores.append(weighted)
-            keys.append((idx, batch))
-        
-        # Sắp xếp và chọn top-k
-        topk = np.argsort(scores)[:k]
-        selected = [keys[i] for i in topk]
-        
-        query_df = pd.DataFrame(selected, columns=['index', 'batch_idx'])
-        
+                combined[(idx, batch)] = {}
+            combined[(idx, batch)]['txt_vec'] = vec
+
+        rerank_list = []
+        for (idx, batch), vecs in combined.items():
+            img_vec = vecs.get('img_vec')
+            txt_vec = vecs.get('txt_vec')
+
+            img_dist = np.linalg.norm(img_vec - img_vector) if img_vec is not None else 1e6
+            txt_dist = np.linalg.norm(txt_vec - text_vector) if txt_vec is not None else 1e6
+            weighted_dist = image_weight * img_dist + text_weight * txt_dist
+            rerank_list.append((weighted_dist, idx, batch))
+
+        rerank_list.sort()
+        top_results = rerank_list[:k]
+
+        query_df = pd.DataFrame(top_results, columns=['dist', 'index', 'batch_idx'])
+
         df = pd.read_csv(os.path.join(index_dir, 'map.csv'))
         merged = pd.merge(query_df, df, on=['index', 'batch_idx'], how='inner')
-        
-        return merged['img_path'].to_numpy()
+
+        sample_paths = merged['img_path'].to_numpy()
+        return sample_paths
 
 
     
