@@ -93,10 +93,12 @@ def main(args):
     acc = 0
     num_samples = 0
     for sample_id in tqdm(os.listdir(question_dir)):
-        if args.sample_id_eval >= 0:
-            if int(sample_id) != args.sample_id_eval:
-                continue
+
         if sample_id != "index" and not sample_id.endswith(".py"):
+            if args.sample_id_eval >= 0:
+                if int(sample_id) != args.sample_id_eval:
+                    continue
+            
             num_samples += 1
             sample_dir = os.path.join(question_dir, sample_id)
             question, question_img, gt_files, choices, gt_ans = extract_question(sample_dir)
