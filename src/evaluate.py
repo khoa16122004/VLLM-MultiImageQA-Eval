@@ -104,14 +104,15 @@ def main(args):
             question, question_img, gt_files, choices, gt_ans = extract_question(sample_dir)
             # retrieved output
             choice_join = "\n".join(choices)
-            full_question = f"{retrieved_prefix_question}{num_input_images * image_token}\n{question}\n{choice_join}"
-            print("Question: ", full_question)
+
             retrieved_paths = db.flow_search(index_dir=index_dir, dataset_dir=question_dir, 
                                                                    image_index=int(sample_id), k=args.topk, 
                                                                    topk_rerank=args.topk_rerank)
             print("Retrieved files: ", retrieved_paths)
             retrieved_files = [Image.open(os.path.join(dataset_dir, path)).convert("RGB") for path in retrieved_paths]
             num_input_images = len(retrieved_files) + 1
+            full_question = f"{retrieved_prefix_question}{num_input_images * image_token}\n{question}\n{choice_join}"
+            print("Question: ", full_question)
             output = lvlm.inference(full_question, [question_img, *retrieved_files])[0]
             output = extract_output(output, question)
             print("output with retrieval: ", output, "gt:", gt_ans)
