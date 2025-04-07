@@ -75,13 +75,13 @@ def init_model(args):
 
 def main(args):
     seed_everything(22520691)
-    model = MyCLIPWrapper()
-    db = CreateDatabase(model=model)
-    
+    model_encode = ReTWrapper()
+    db = CreateDatabase(model=model_encode, model_name="ReT")
     
     question_dir = "../dataset/MRAG"
     dataset_dir = "../dataset/MRAG_corpus"
-    index_dir = "../database/MRAG_corpus/index"
+    database_dir = "../database/MRAG_corpus_ReT"
+    index_dir = "../database/MRAG_corpus_ReT/index"
     
     lvlm, image_token, special_token = init_model(args)
     retrieved_prefix_question = "You will be given one question concerning several images. The first image is the input image. The remaining images are retrieved examples that may help you, but please select only the relevant ones carefully. The retrieved images are ordered by their similarity to the input image, from most to least similar. Answer with the option's letter from the given choices directly."
