@@ -30,7 +30,7 @@ def extract_question(sample_dir):
     return question, question_img, gt_files, choices, gt_ans
 
 class CreateDatabase:
-    def __init__(self, model, number_v):
+    def __init__(self, model):
         '''
             Args: 
                 dir: Folder dir of N samples
@@ -43,7 +43,6 @@ class CreateDatabase:
         
 
         self.model = model
-        self.number_vectors = number_v
         
         
     def extract(self, dir, output_dir):
