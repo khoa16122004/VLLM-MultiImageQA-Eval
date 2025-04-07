@@ -102,11 +102,11 @@ def main(args):
             num_samples += 1
             sample_dir = os.path.join(question_dir, sample_id)
             question, question_img, gt_files, choices, gt_ans = extract_question(sample_dir)
-            print("Question: 0", question)
             # retrieved output
             num_input_images = len(gt_files) + 1
             choice_join = "\n".join(choices)
             full_question = f"{retrieved_prefix_question}{num_input_images * image_token}\n{question}\n{choice_join}"
+            print("Question: ", full_question)
             retrieved_paths = db.flow_search(index_dir=index_dir, dataset_dir=question_dir, 
                                                                    image_index=int(sample_id), k=args.topk, 
                                                                    topk_rerank=args.topk_rerank)
