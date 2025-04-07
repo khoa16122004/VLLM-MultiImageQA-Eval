@@ -4,7 +4,7 @@ from transformers import CLIPProcessor, CLIPModel as HFCLIPModel
 import sys
 import os
 
-sys.path.append(os.path.join(os.path.join(__file__, "../ReT/src")))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../RET/src")))
 class MyCLIPWrapper:
     def __init__(self, model_name='openai/clip-vit-base-patch32', device=None):
         self.device = device or ('cuda' if torch.cuda.is_available() else 'cpu')
