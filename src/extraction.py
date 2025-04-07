@@ -54,6 +54,7 @@ class CreateDatabase:
         
         for file_name in tqdm(os.listdir(dir)):
             file_path = os.path.join(dir, file_name)
+            print(file_path)
             if self.model_name == "CLIP":
                 vec = self.model.visual_encode(file_path)
             elif self.model_name == "ReT":
