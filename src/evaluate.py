@@ -103,7 +103,6 @@ def main(args):
             sample_dir = os.path.join(question_dir, sample_id)
             question, question_img, gt_files, choices, gt_ans = extract_question(sample_dir)
             # retrieved output
-            num_input_images = len(gt_files) + 1
             choice_join = "\n".join(choices)
             full_question = f"{retrieved_prefix_question}{num_input_images * image_token}\n{question}\n{choice_join}"
             print("Question: ", full_question)
@@ -112,7 +111,7 @@ def main(args):
                                                                    topk_rerank=args.topk_rerank)
             print("Retrieved files: ", retrieved_paths)
             retrieved_files = [Image.open(os.path.join(dataset_dir, path)).convert("RGB") for path in retrieved_paths]
-
+            num_input_images = len(retrieved_files) + 1
             output = lvlm.inference(full_question, [question_img, *retrieved_files])[0]
             output = extract_output(output, question)
             print("output with retrieval: ", output, "gt:", gt_ans)
