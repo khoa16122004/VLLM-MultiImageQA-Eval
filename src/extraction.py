@@ -276,7 +276,6 @@ if __name__ == "__main__":
     parser.add_argument("--model_name_caption", type=str, default="llava_qwen")
     parser.add_argument("--model_name_encode", type=str, default="ReT")
     parser.add_argument("--topk_rerank", type=int, default=10)
-    parser.add_argument("--retriever", type=str, default="ReT")
     parser.add_argument("--topk", type=int, default=5)
     parser.add_argument("--sample_id_eval", type=int, default=-1)
     parser.add_argument("--using_retrieval", type=int, default=1)
