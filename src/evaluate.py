@@ -88,7 +88,6 @@ def main(args):
     no_retrieved_prefix_question = "You will be given one question concerning one image. Answer with the option's letter from the given choices directly."
     # retrieval
     # is_contain_retrieval = 0
-    retrieved_acc = 0
     acc = 0
     num_samples = 0
     for sample_id in tqdm(os.listdir(question_dir)):
@@ -104,24 +103,39 @@ def main(args):
             # retrieved output
             choice_join = "\n".join(choices)
 
-            retrieved_paths = db.flow_search(index_dir=index_dir, dataset_dir=question_dir, 
-                                                                   image_index=int(sample_id), k=args.topk, 
-                                                                   topk_rerank=args.topk_rerank)
-            retrieved_files = [Image.open(os.path.join(dataset_dir, path)).convert("RGB") for path in retrieved_paths]
-            num_input_images = len(retrieved_files) + 1
-            full_question = f"{retrieved_prefix_question}{num_input_images * image_token}\n{question}\n{choice_join}"
-            output = lvlm.inference(full_question, [question_img, *retrieved_files])[0]
-            output = extract_output(output, question)
-
-            # if np.any([int(sample_id) == retrieved_sample_id for retrieved_sample_id in retrieved_sample_ids]):
-            #     is_contain_retrieval = 1
-            if gt_ans == output:
-                retrieved_acc += 1    
-                
             
-            print("output with retrieval: ", output, "gt:", gt_ans)
+            if args.using_retrieval == True:
+                retrieved_paths = db.flow_search(index_dir=index_dir, dataset_dir=question_dir, 
+                                                                    image_index=int(sample_id), k=args.topk, 
+                                                                    topk_rerank=args.topk_rerank)
+                retrieved_files = [Image.open(os.path.join(dataset_dir, path)).convert("RGB") for path in retrieved_paths]
+                num_input_images = len(retrieved_files) + 1
+                full_question = f"{retrieved_prefix_question}{num_input_images * image_token}\n{question}\n{choice_join}"
+                output = lvlm.inference(full_question, [question_img, *retrieved_files])[0]
+                output = extract_output(output, question)
+
+
+                if gt_ans == output:
+                    acc += 1    
+
+            else:   
+                num_input_images = 1
+                full_question = f"{retrieved_prefix_question}{num_input_images * image_token}\n{question}\n{choice_join}"
+                output = lvlm.inference(full_question, [question_img])[0]
+                output = extract_output(output, question)
+                if gt_ans == output:
+                    acc += 1    
+
+
+
+
     with open(f"result_{args.model_name}_{args.pretrained}_{args.topk}_{args.topk_rerank}.txt", "a") as f:          
-        f.write(f"Accuracy without retrieval: {acc / num_samples * 100}%, Accuracy with retrieval: {retrieved_acc / num_samples * 100}%, Total samples: {num_samples}\n")
+        if args.using_retrieval == True:
+            line = f"Accuracy with retrieval: {acc / num_samples * 100}%, Total samples: {num_samples}\n"
+        else:
+            line = f"Accuracy without retrieval: {acc / num_samples * 100}%, Total samples: {num_samples}\n"
+        
+        f.write(line)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -130,6 +144,7 @@ if __name__ == "__main__":
     parser.add_argument("--topk_rerank", type=int, default=50)
     parser.add_argument("--topk", type=int, default=5)
     parser.add_argument("--sample_id_eval", type=int, default=-1)
+    parser.add_argument("--using_retrieval", type=bool, default=True)
     args = parser.parse_args()
     
     main(args)
