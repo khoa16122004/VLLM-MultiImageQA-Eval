@@ -116,8 +116,8 @@ def main(args):
                 output = lvlm.inference(full_question, [question_img, *retrieved_files])[0]
                 # print("Output: ", output)
                 # output = extract_output(output, question)
-                # print("Output: ", output)
-                # print("Ground truth:", gt_ans)
+                print("Output: ", output)
+                print("Ground truth:", gt_ans)
 
                 if gt_ans == output:
                     acc += 1    
