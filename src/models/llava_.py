@@ -28,7 +28,6 @@ class LLava:
     
     
     def inference(self, qs, img_files):
-        
         conv = copy.deepcopy(conv_templates["qwen_1_5"])
         conv.append_message(conv.roles[0], qs)
         conv.append_message(conv.roles[1], None)

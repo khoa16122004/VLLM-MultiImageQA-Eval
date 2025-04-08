@@ -154,6 +154,7 @@ if __name__ == "__main__":
     parser.add_argument("--topk", type=int, default=5)
     parser.add_argument("--sample_id_eval", type=int, default=-1)
     parser.add_argument("--using_retrieval", type=int, default=1)
+    
     args = parser.parse_args()
     
     main(args)

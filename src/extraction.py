@@ -6,6 +6,7 @@ import faiss
 import csv
 import pandas as pd
 from PIL import Image
+import argparse
 
 def extract_question(sample_dir):
     gt_files = []
@@ -31,7 +32,7 @@ def extract_question(sample_dir):
     return question, question_img, gt_files, choices, gt_ans
 
 class CreateDatabase:
-    def __init__(self, model, model_name):
+    def __init__(self, model, model_name, caption_model=None):
         '''
             Args: 
                 dir: Folder dir of N samples
@@ -45,6 +46,7 @@ class CreateDatabase:
 
         self.model = model
         self.model_name = model_name
+        self.caption_model = caption_model
         if model_name == "ReT":
             self.d = 4096
         if model_name == "CLIP":
@@ -60,12 +62,17 @@ class CreateDatabase:
         for file_name in tqdm(os.listdir(dir)):
             if "input" in file_name:
                 continue
-            
             file_path = os.path.join(dir, file_name)
+            caption = None
+            caption_prompt = "Describe the image in great detail, mentioning every visible element, their appearance, location, and how they interact in the scene."
+            if self.caption_model is not None:
+                caption = self.caption_model.inference(caption_prompt, [file_path])[0]
+                
+                
             if self.model_name == "CLIP":
                 vec = self.model.visual_encode(file_path)
             elif self.model_name == "ReT":
-                vec = self.model.encode_multimodal(file_path)
+                vec = self.model.encode_multimodal(file_path, caption)
             
             np.save(os.path.join(output_dir, f"{file_name}.npy"), vec)
                 
@@ -221,18 +228,18 @@ class MultiModelSearch:
 
 
     
-if __name__ == "__main__":
+def main():
     # model = MyCLIPWrapper()
     model_encode = ReTWrapper()
     db = CreateDatabase(model=model_encode, model_name="ReT")
     
     question_dir = "../dataset/MRAG"
     dataset_dir = "../dataset/MRAG_corpus"
-    database_dir = "../database/MRAG_corpus_ReT_new"
-    index_dir = "../database/MRAG_corpus_ReT_new/index"
+    database_dir = "../database/MRAG_corpus_ReT_caption"
+    index_dir = "../database/MRAG_corpus_ReT_caption/index"
     
-    # db.extract(dataset_dir, database_dir)       
-    # db.create_database(database_dir, output_dir=index_dir)
+    db.extract(dataset_dir, database_dir)       
+    db.create_database(database_dir, output_dir=index_dir)
     while True:
         image_index = int(input("Input sampe index: "))
         
@@ -241,3 +248,18 @@ if __name__ == "__main__":
         
         sample_indices = db.flow_search(index_dir, question_dir, image_index)
         print("Results retreval: ", sample_indices)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--pretrained_caption", type=str, default="llava-onevision-qwen2-7b-ov")
+    parser.add_argument("--model_name_caption", type=str, default="llava_qwen")
+    parser.add_argument("--topk_rerank", type=int, default=10)
+    parser.add_argument("--retriever", type=str, default="ReT")
+    parser.add_argument("--topk", type=int, default=5)
+    parser.add_argument("--sample_id_eval", type=int, default=-1)
+    parser.add_argument("--using_retrieval", type=int, default=1)
+    
+    args = parser.parse_args()
+    
+    main(args)
