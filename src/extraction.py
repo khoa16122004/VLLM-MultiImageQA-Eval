@@ -215,51 +215,75 @@ class CreateDatabase:
         
         return sample_indices
 
+def init_caption_model(args):
+    special_token = None
+    if "llava" in args.model_name_caption:
+        from models.llava_ import LLava
+        image_token = "<image>"
+        model = LLava(args.pretrained_caption, args.model_name_caption)
 
-class MultiModelSearch:
-    def __init__(self, dbs): # list of db
-        self.dbs = dbs
-        self.weights = [1/len(dbs)] * len(dbs)
+    elif "openflamingo" in args.model_name_caption:
+        from models.openflamingo_ import OpenFlamingo
+        image_token = "<image>"
+        special_token = "<|endofchunk|>"
+
+        model = OpenFlamingo(args.pretrained_caption)
+    
+    elif "mantis" in args.model_name_caption:
+        from models.mantis_ import Mantis
+        image_token = "<image>"
+        model = Mantis(args.pretrained_caption)
         
-    def search_with_reranking(self, index_dir, query_vector, k=10, top_rerank=50):
-        for db in dbs:
-            sample_paths = db.search_with_reranking(index_dir, query_vector, k, top_rerank)
-            return sample_paths
+    elif "deepseek" in args.model_name_caption:
+        from models.deepseek_ import DeepSeek
+        image_token = "<image_placeholder>"
+        model = DeepSeek(args.pretrained_caption)
+    
+    return model, image_token, special_token
 
 
     
-def main():
-    # model = MyCLIPWrapper()
-    model_encode = ReTWrapper()
-    db = CreateDatabase(model=model_encode, model_name="ReT")
-    
-    question_dir = "../dataset/MRAG"
-    dataset_dir = "../dataset/MRAG_corpus"
-    database_dir = "../database/MRAG_corpus_ReT_caption"
-    index_dir = "../database/MRAG_corpus_ReT_caption/index"
-    
-    db.extract(dataset_dir, database_dir)       
-    db.create_database(database_dir, output_dir=index_dir)
-    while True:
-        image_index = int(input("Input sampe index: "))
+def main(args):
+    if args.model_name_encode == "ReT":
+        model_encode = ReTWrapper()
+    elif args.model_name_encode == "CLIP":
+        model_encode = MyCLIPWrapper()
         
-        if image_index == -1:
-            break
-        
-        sample_indices = db.flow_search(index_dir, question_dir, image_index)
-        print("Results retreval: ", sample_indices)
+    caption_model = init_caption_model(args)
+    
+    db = CreateDatabase(model=model_encode, 
+                        model_name=args.model_name_encode,
+                        caption_model=caption_model)
+    
+    if args.action == "indexing":
+        db.extract(args.dataset_dir, args.database_dir)       
+        db.create_database(args.database_dir, output_dir=args.index_dir)
+    elif args.action == "search": 
+        while True:
+            image_index = int(input("Input sampe index: "))
+            
+            if image_index == -1:
+                break
+            
+            sample_indices = db.flow_search(args.index_dir, args.question_dir, image_index)
+            print("Results retreval: ", sample_indices)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--pretrained_caption", type=str, default="llava-onevision-qwen2-7b-ov")
     parser.add_argument("--model_name_caption", type=str, default="llava_qwen")
+    parser.add_argument("--model_name_encode", type=str, default="ReT")
     parser.add_argument("--topk_rerank", type=int, default=10)
     parser.add_argument("--retriever", type=str, default="ReT")
     parser.add_argument("--topk", type=int, default=5)
     parser.add_argument("--sample_id_eval", type=int, default=-1)
     parser.add_argument("--using_retrieval", type=int, default=1)
-    
+    parser.add_argument("--question_dir", type=str, default="../dataset/MRAG")
+    parser.add_argument("--dataset_dir", type=str, default="../dataset/MRAG_corpus")
+    parser.add_argument("--database_dir", type=str, default="../database/MRAG_corpus_ReT_caption")
+    parser.add_argument("--index_dir", type=str, default="../database/MRAG_corpus_ReT_caption/index")
+    parser.add_argument("--action", type='str')
     args = parser.parse_args()
     
     main(args)
