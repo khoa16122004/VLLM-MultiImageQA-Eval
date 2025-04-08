@@ -104,7 +104,7 @@ def main(args):
             choice_join = "\n".join(choices)
 
             print("args.using_retrieval", args.using_retrieval)
-            if args.using_retrieval == True:
+            if args.using_retrieval == 1:
                 print("Using retrieval")
                 retrieved_paths = db.flow_search(index_dir=index_dir, dataset_dir=question_dir, 
                                                                     image_index=int(sample_id), k=args.topk, 
@@ -114,7 +114,7 @@ def main(args):
                 full_question = f"{retrieved_prefix_question}{num_input_images * image_token}\n{question}\n{choice_join}"
                 output = lvlm.inference(full_question, [question_img, *retrieved_files])[0]
                 output = extract_output(output, question)
-
+                print("Ouput:", output, " Ground truth:", gt_ans)
 
                 if gt_ans == output:
                     acc += 1    
@@ -147,7 +147,7 @@ if __name__ == "__main__":
     parser.add_argument("--topk_rerank", type=int, default=50)
     parser.add_argument("--topk", type=int, default=5)
     parser.add_argument("--sample_id_eval", type=int, default=-1)
-    parser.add_argument("--using_retrieval", type=bool, default=True)
+    parser.add_argument("--using_retrieval", type=int, default=1)
     args = parser.parse_args()
     
     main(args)
