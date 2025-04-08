@@ -120,7 +120,7 @@ def main(args):
 
             else:   
                 num_input_images = 1
-                full_question = f"{retrieved_prefix_question}{num_input_images * image_token}\n{question}\n{choice_join}"
+                full_question = f"{no_retrieved_prefix_question}{num_input_images * image_token}\n{question}\n{choice_join}"
                 output = lvlm.inference(full_question, [question_img])[0]
                 output = extract_output(output, question)
                 if gt_ans == output:
@@ -132,9 +132,10 @@ def main(args):
     with open(f"result_{args.model_name}_{args.pretrained}_{args.topk}_{args.topk_rerank}.txt", "a") as f:          
         if args.using_retrieval == True:
             line = f"Accuracy with retrieval: {acc / num_samples * 100}%, Total samples: {num_samples}\n"
+            print(line)
         else:
             line = f"Accuracy without retrieval: {acc / num_samples * 100}%, Total samples: {num_samples}\n"
-        
+            print(line)
         f.write(line)
 
 if __name__ == "__main__":
