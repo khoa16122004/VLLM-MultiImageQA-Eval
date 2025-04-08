@@ -228,8 +228,8 @@ if __name__ == "__main__":
     
     question_dir = "../dataset/MRAG"
     dataset_dir = "../dataset/MRAG_corpus"
-    database_dir = "../database/MRAG_corpus_ReT"
-    index_dir = "../database/MRAG_corpus_ReT/index"
+    database_dir = "../database/MRAG_corpus_ReT_new"
+    index_dir = "../database/MRAG_corpus_ReT_new/index"
     
     db.extract(dataset_dir, database_dir)       
     # db.create_database(database_dir, output_dir=index_dir, d=4096)
