@@ -66,7 +66,7 @@ class CreateDatabase:
             caption = None
             caption_prompt = "Describe the image in great detail, mentioning every visible element, their appearance, location, and how they interact in the scene. <image>"
             if self.caption_model is not None:
-                caption = self.caption_model.inference(caption_prompt, [file_path])[0]
+                caption = self.caption_model.inference(caption_prompt, [Image.open(file_path).convert("RGB")])[0]
                 
                 
             if self.model_name == "CLIP":
