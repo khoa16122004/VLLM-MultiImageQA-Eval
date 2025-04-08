@@ -258,6 +258,7 @@ def main(args):
     if args.action == "indexing":
         db.extract(args.dataset_dir, args.database_dir)       
         db.create_database(args.database_dir, output_dir=args.index_dir)
+    
     elif args.action == "search": 
         while True:
             image_index = int(input("Input sampe index: "))
