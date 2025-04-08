@@ -112,6 +112,7 @@ def main(args):
                 retrieved_files = [Image.open(os.path.join(dataset_dir, path)).convert("RGB") for path in retrieved_paths]
                 num_input_images = len(retrieved_files) + 1
                 full_question = f"{retrieved_prefix_question}{num_input_images * image_token}\n{question}\n{choice_join}"
+                print("Question: ", full_question)
                 output = lvlm.inference(full_question, [question_img, *retrieved_files])[0]
                 # print("Output: ", output)
                 output = extract_output(output, question)
