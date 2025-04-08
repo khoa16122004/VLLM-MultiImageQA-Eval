@@ -108,7 +108,7 @@ def main(args):
                                                                     image_index=int(sample_id), k=args.topk, 
                                                                     topk_rerank=args.topk_rerank)
                 
-                print(retrieved_paths)
+                print("Retrieval paths: ", retrieved_paths)
                 retrieved_files = [Image.open(os.path.join(dataset_dir, path)).convert("RGB") for path in retrieved_paths]
                 num_input_images = len(retrieved_files) + 1
                 full_question = f"{retrieved_prefix_question}{num_input_images * image_token}\n{question}\n{choice_join}"
