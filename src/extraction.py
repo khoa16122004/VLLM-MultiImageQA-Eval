@@ -64,7 +64,7 @@ class CreateDatabase:
                 continue
             file_path = os.path.join(dir, file_name)
             caption = None
-            caption_prompt = "Describe the image in great detail, mentioning every visible element, their appearance, location, and how they interact in the scene."
+            caption_prompt = "Describe the image in great detail, mentioning every visible element, their appearance, location, and how they interact in the scene. <image>"
             if self.caption_model is not None:
                 caption = self.caption_model.inference(caption_prompt, [file_path])[0]
                 
@@ -249,7 +249,7 @@ def main(args):
     elif args.model_name_encode == "CLIP":
         model_encode = MyCLIPWrapper()
         
-    caption_model = init_caption_model(args)
+    caption_model, image_token, special_token = init_caption_model(args)
     
     db = CreateDatabase(model=model_encode, 
                         model_name=args.model_name_encode,
