@@ -148,7 +148,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--pretrained", type=str, default="llava-onevision-qwen2-7b-ov")
     parser.add_argument("--model_name", type=str, default="llava_qwen")
-    parser.add_argument("--topk_rerank", type=int, default=50)
+    parser.add_argument("--topk_rerank", type=int, default=10)
     parser.add_argument("--topk", type=int, default=5)
     parser.add_argument("--sample_id_eval", type=int, default=-1)
     parser.add_argument("--using_retrieval", type=int, default=1)
