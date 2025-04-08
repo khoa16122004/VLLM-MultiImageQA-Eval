@@ -42,9 +42,9 @@ class ReTWrapper:
     def __init__(self):
         retrieval = RetrieverModel.from_pretrained('aimagelab/ReT-CLIP-ViT-L-14') # E_Qs
         self.encode: RetModel = retrieval.get_query_model().cuda()
-        self.encode.init_tokenizer_and_image_processor().cuda()
+        self.encode.init_tokenizer_and_image_processor()
         
-        self.query: RetModel = retrieval.get_passage_model()
+        self.query: RetModel = retrieval.get_passage_model().cuda()
         self.query.init_tokenizer_and_image_processor()
     
     def encode_multimodal(self, img, txt=""): # img: path, txt: str
