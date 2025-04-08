@@ -105,6 +105,7 @@ def main(args):
 
             
             if args.using_retrieval == True:
+                print("Using retrieval")
                 retrieved_paths = db.flow_search(index_dir=index_dir, dataset_dir=question_dir, 
                                                                     image_index=int(sample_id), k=args.topk, 
                                                                     topk_rerank=args.topk_rerank)
@@ -119,6 +120,7 @@ def main(args):
                     acc += 1    
 
             else:   
+                print("Not using retrieval")
                 num_input_images = 1
                 full_question = f"{no_retrieved_prefix_question}{num_input_images * image_token}\n{question}\n{choice_join}"
                 output = lvlm.inference(full_question, [question_img])[0]
