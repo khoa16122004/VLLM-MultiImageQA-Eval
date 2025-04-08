@@ -103,7 +103,7 @@ def main(args):
             # retrieved output
             choice_join = "\n".join(choices)
 
-            
+            print("args.using_retrieval", args.using_retrieval)
             if args.using_retrieval == True:
                 print("Using retrieval")
                 retrieved_paths = db.flow_search(index_dir=index_dir, dataset_dir=question_dir, 
