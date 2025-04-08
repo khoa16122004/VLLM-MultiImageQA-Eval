@@ -45,6 +45,10 @@ class CreateDatabase:
 
         self.model = model
         self.model_name = model_name
+        if model_name == "ReT":
+            self.d = 4096
+        if model_name == "CLIP":
+            self.d = 512
         
         
     def extract(self, dir, output_dir):
@@ -66,7 +70,7 @@ class CreateDatabase:
             np.save(os.path.join(output_dir, f"{file_name}.npy"), vec)
                 
         
-    def create_database(self, database_dir, output_dir, d=512, csv_file='map.csv', batch_size=2000):
+    def create_database(self, database_dir, output_dir, csv_file='map.csv', batch_size=2000):
         '''
         Create the FAISS index by adding vectors from saved numpy files in batches and split into multiple index files.
         '''
@@ -77,7 +81,7 @@ class CreateDatabase:
             writer.writeheader()
 
             index_id = 0 
-            current_index = faiss.IndexFlatL2(d)
+            current_index = faiss.IndexFlatL2(self.d)
             print("Starting to create database...")
             # print("Estimated total index: ", 1 + self.number_vectors // batch_size)
             batch_retrieval_vectors = []
@@ -110,7 +114,7 @@ class CreateDatabase:
                     faiss.write_index(current_index, os.path.join(output_dir, f"{index_id}.index"))
 
                     index_id += 1
-                    current_index = faiss.IndexFlatL2(d)
+                    current_index = faiss.IndexFlatL2(self.d)
                     total_vectors_added += len(batch_vectors)
                     batch_retrieval_vectors = []
                     all_paths = []
@@ -132,8 +136,8 @@ class CreateDatabase:
 
             print(f"Database created successfully with multiple indexes with total {total_vectors_added} vectors")
                     
-    def search_with_reranking(self, index_dir, query_vector, k=10, top_rerank=50, d=512):
-        top_indices, top_batches, top_vectors, df = self.search(index_dir, query_vector, top_rerank, d) # 50 vector
+    def search_with_reranking(self, index_dir, query_vector, k=10, top_rerank=50):
+        top_indices, top_batches, top_vectors, df = self.search(index_dir, query_vector, top_rerank, self.d) # 50 vector
         expanded_query = np.mean(top_vectors, axis=0).astype('float32')
         all_distances = np.linalg.norm(top_vectors - expanded_query.reshape(1, -1), axis=1)  # Euclidean
 
@@ -151,7 +155,7 @@ class CreateDatabase:
         return sample_paths
             
     
-    def search(self, index_dir, query_vector, top_rerank=50, d=4096, k=5):
+    def search(self, index_dir, query_vector, top_rerank=50, k=5):
         query_vector = query_vector.astype('float32') 
         all_distances = []
         all_indices = []
@@ -193,56 +197,27 @@ class CreateDatabase:
 
         return top_indices, top_batches, top_vectors, df 
     
-    def flow_search(self, index_dir, dataset_dir, image_index, k=10, topk_rerank=10, d=512):
+    def flow_search(self, index_dir, dataset_dir, image_index, k=10, topk_rerank=10):
         img_path = os.path.join(dataset_dir, str(image_index), "question_img.png")
         if self.model_name == "CLIP":
             img_vector = self.model.visual_encode(img_path)
         elif self.model_name == "ReT":
             img_vector = self.model.encode_multimodal(img_path).flatten()
             
-        sample_indices = self.search_with_reranking(index_dir, img_vector, k, topk_rerank, d)
+        sample_indices = self.search(index_dir, img_vector, k, topk_rerank)
         
         return sample_indices
 
-    def combined_search(self, index_dir, dataset_dir, image_index, k=10, topk_rerank=10, d=512, image_weight=0.7, text_weight=0.3):
-        question, question_img, gt_files, choices, gt_ans = extract_question(os.path.join(dataset_dir, str(image_index)))
-        full_question = "".join([question, "".join(choices)])
+
+class MultiModelSearch:
+    def __init__(self, dbs): # list of db
+        self.dbs = dbs
+        self.weights = [1/len(dbs)] * len(dbs)
         
-        img_vector = self.model.visual_encode(question_img)
-        text_vector = self.model.text_encode(full_question)
-        
-        img_top_indices, img_top_batches, img_top_vectors, _ = self.search(index_dir, img_vector, top_rerank=topk_rerank, d=d, k=k)
-        txt_top_indices, txt_top_batches, txt_top_vectors, _ = self.search(index_dir, text_vector, top_rerank=topk_rerank, d=d, k=k)
-
-        combined = {}
-        for i, (idx, batch, vec) in enumerate(zip(img_top_indices, img_top_batches, img_top_vectors)):
-            combined[(idx, batch)] = {'img_vec': vec}
-
-        for i, (idx, batch, vec) in enumerate(zip(txt_top_indices, txt_top_batches, txt_top_vectors)):
-            if (idx, batch) not in combined:
-                combined[(idx, batch)] = {}
-            combined[(idx, batch)]['txt_vec'] = vec
-
-        rerank_list = []
-        for (idx, batch), vecs in combined.items():
-            img_vec = vecs.get('img_vec')
-            txt_vec = vecs.get('txt_vec')
-
-            img_dist = np.linalg.norm(img_vec - img_vector) if img_vec is not None else 1e6
-            txt_dist = np.linalg.norm(txt_vec - text_vector) if txt_vec is not None else 1e6
-            weighted_dist = image_weight * img_dist + text_weight * txt_dist
-            rerank_list.append((weighted_dist, idx, batch))
-
-        rerank_list.sort()
-        top_results = rerank_list[:k]
-
-        query_df = pd.DataFrame(top_results, columns=['dist', 'index', 'batch_idx'])
-
-        df = pd.read_csv(os.path.join(index_dir, 'map.csv'))
-        merged = pd.merge(query_df, df, on=['index', 'batch_idx'], how='inner')
-
-        sample_paths = merged['img_path'].to_numpy()
-        return sample_paths
+    def search_with_reranking(self, index_dir, query_vector, k=10, top_rerank=50):
+        for db in dbs:
+            sample_paths = db.search_with_reranking(index_dir, query_vector, k, top_rerank)
+            return sample_paths
 
 
     
@@ -256,13 +231,13 @@ if __name__ == "__main__":
     database_dir = "../database/MRAG_corpus_ReT"
     index_dir = "../database/MRAG_corpus_ReT/index"
     
-    # db.extract(dataset_dir, database_dir)       
+    db.extract(dataset_dir, database_dir)       
     # db.create_database(database_dir, output_dir=index_dir, d=4096)
-    while True:
-        image_index = int(input("Input sampe index: "))
+    # while True:
+    #     image_index = int(input("Input sampe index: "))
         
-        if image_index == -1:
-            break
+    #     if image_index == -1:
+    #         break
         
-        sample_indices = db.flow_search(index_dir, question_dir, image_index)
-        print("Results retreval: ", sample_indices)
+    #     sample_indices = db.flow_search(index_dir, question_dir, image_index)
+    #     print("Results retreval: ", sample_indices)
