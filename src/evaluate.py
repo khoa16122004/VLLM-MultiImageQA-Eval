@@ -91,7 +91,6 @@ def main(args):
     acc = 0
     num_samples = 0
     for sample_id in tqdm(os.listdir(question_dir)):
-
         if sample_id != "index" and not sample_id.endswith(".py"):
             if args.sample_id_eval >= 0:
                 if int(sample_id) != args.sample_id_eval:
@@ -103,7 +102,6 @@ def main(args):
             # retrieved output
             choice_join = "\n".join(choices)
 
-            print("args.using_retrieval", args.using_retrieval)
             if args.using_retrieval == 1:
                 print("Using retrieval")
                 retrieved_paths = db.flow_search(index_dir=index_dir, dataset_dir=question_dir, 
