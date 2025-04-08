@@ -204,7 +204,7 @@ class CreateDatabase:
         elif self.model_name == "ReT":
             img_vector = self.model.encode_multimodal(img_path).flatten()
             
-        sample_indices = self.search(index_dir, img_vector, k, topk_rerank)
+        sample_indices = self.search_with_reranking(index_dir, img_vector, k, topk_rerank)
         
         return sample_indices
 
