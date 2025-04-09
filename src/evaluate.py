@@ -107,29 +107,24 @@ def main(args):
             question, question_img, gt_files, choices, gt_ans = extract_question(sample_dir)
             # retrieved output
             choice_join = "\n".join(choices)
-            if args.using_retrieval == 1:
-                if not args.retrieved_path:                    
-                    retrieved_paths = db.flow_search(index_dir=index_dir, dataset_dir=question_dir, 
-                                                                        image_index=int(sample_id), k=args.topk, 
-                                                                        topk_rerank=args.topk_rerank)
-                else:
-                    print("Using path results")
-                    retrieved_paths = retrieved_data[str(sample_id)]
-                    print(retrieved_paths)
-                        
-                    print("Retrieval paths: ", retrieved_paths)
-                    retrieved_files = [Image.open(os.path.join(dataset_dir, path)).convert("RGB") for path in retrieved_paths]
-                    num_input_images = len(retrieved_files) + 1
-                    full_question = f"{retrieved_prefix_question}{num_input_images * image_token}\n{question}\n{choice_join}"
-                    print("Question: ", full_question)
-                    output = lvlm.inference(full_question, [question_img, *retrieved_files])[0]
-                    # print("Output: ", output)
-                    # output = extract_output(output, question)
-                    print("Output: ", output)
-                    print("Ground truth:", gt_ans)
+            if args.retrieved_path is not None:
+                print("Using path results")
+                retrieved_paths = retrieved_data[str(sample_id)]
+                print(retrieved_paths)
+                    
+                print("Retrieval paths: ", retrieved_paths)
+                retrieved_files = [Image.open(os.path.join(dataset_dir, path)).convert("RGB") for path in retrieved_paths]
+                num_input_images = len(retrieved_files) + 1
+                full_question = f"{retrieved_prefix_question}{num_input_images * image_token}\n{question}\n{choice_join}"
+                print("Question: ", full_question)
+                output = lvlm.inference(full_question, [question_img, *retrieved_files])[0]
+                # print("Output: ", output)
+                # output = extract_output(output, question)
+                print("Output: ", output)
+                print("Ground truth:", gt_ans)
 
-                    if gt_ans == output:
-                        acc += 1    
+                if gt_ans == output:
+                    acc += 1    
 
             else:   
                 print("Not using retrieval")
@@ -162,7 +157,6 @@ if __name__ == "__main__":
     parser.add_argument("--topk_rerank", type=int, default=10)
     parser.add_argument("--topk", type=int, default=5)
     parser.add_argument("--sample_id_eval", type=int, default=-1)
-    parser.add_argument("--using_retrieval", type=int, default=1)
     parser.add_argument("--retrieved_path", type=str, default=None)
     
     args = parser.parse_args()
