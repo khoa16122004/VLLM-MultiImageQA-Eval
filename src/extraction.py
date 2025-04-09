@@ -287,6 +287,7 @@ def main(args):
                         dataset_dir=args.dataset_dir,
                         model=model_encode,
                         model_name=args.model_name_encode,
+                        model_filter=None,
                         caption_model=caption_model)
     
     if args.action == "indexing":
