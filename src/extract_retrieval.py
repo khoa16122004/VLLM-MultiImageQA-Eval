@@ -59,11 +59,12 @@ def main(args):
             # retrieved output
             choice_join = "\n".join(choices)
             full_question = f"{question}\n{choice_join}"
-            retrieval_paths = db.flow_search(index_dir=args.index_dir, 
+            retrieval_paths = db.flow_search(
                                              image_index=int(sample_id),
                                              question=question,
                                              k=args.topk,
-                                             topk_rerank=args.topk_rerank)
+                                             topk_rerank=args.topk_rerank
+                                             )
             print("Id: ", sample_id)            
             print("question: ", question)
             print("retrieval paths: ", retrieval_paths)
