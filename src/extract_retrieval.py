@@ -41,7 +41,9 @@ def main(args):
         model_encode = MyCLIPWrapper()
     
     # db
-    db = CreateDatabase(model=model_encode, 
+    db = CreateDatabase(index_dir=args.database_dir,
+                        dataset_dir=args.dataset_dir,
+                        model=model_encode,
                         model_name=args.model_name_encode)
     
     results = {}
@@ -58,7 +60,6 @@ def main(args):
             choice_join = "\n".join(choices)
             full_question = f"{question}\n{choice_join}"
             retrieval_paths = db.flow_search(index_dir=args.index_dir, 
-                                             dataset_dir=args.question_dir,
                                              image_index=int(sample_id),
                                              question=question,
                                              k=args.topk,

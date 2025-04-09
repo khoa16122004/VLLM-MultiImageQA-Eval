@@ -32,7 +32,7 @@ def extract_question(sample_dir):
     return question, question_img, gt_files, choices, gt_ans
 
 class CreateDatabase:
-    def __init__(self, model, model_name, caption_model=None):
+    def __init__(self, index_dir, dataset_dir, model, model_name, caption_model=None):
         '''
             Args: 
                 dir: Folder dir of N samples
@@ -47,13 +47,16 @@ class CreateDatabase:
         self.model = model
         self.model_name = model_name
         self.caption_model = caption_model
+        self.index_dir = index_dir
+        self.dataset_dir = dataset_dir
+        
         if model_name == "ReT":
             self.d = 4096
         if model_name == "CLIP":
             self.d = 512
         
         
-    def extract(self, dir, output_dir):
+    def extract(self, output_dir):
         '''
             Extracts features from all N samples, and save in output_dir folder 
         '''
@@ -62,7 +65,7 @@ class CreateDatabase:
         for file_name in tqdm(os.listdir(dir)):
             if "input" in file_name:
                 continue
-            file_path = os.path.join(dir, file_name)
+            file_path = os.path.join(self.dataset_dir, file_name)
             caption = None
             caption_prompt = "Describe the image in great detail, mentioning every visible element, their appearance, location, and how they interact in the scene. <image>"
             if self.caption_model is not None:
@@ -143,8 +146,8 @@ class CreateDatabase:
 
             print(f"Database created successfully with multiple indexes with total {total_vectors_added} vectors")
                     
-    def search_with_reranking(self, index_dir, query_vector, k=10, top_rerank=50):
-        top_indices, top_batches, top_vectors, df = self.search(index_dir, query_vector, top_rerank, self.d) # 50 vector
+    def search_with_reranking(self, query_vector, k=10, top_rerank=50):
+        top_indices, top_batches, top_vectors, df = self.search(self.index_dir, query_vector, top_rerank, self.d) # 50 vector
         expanded_query = np.mean(top_vectors, axis=0).astype('float32')
         all_distances = np.linalg.norm(top_vectors - expanded_query.reshape(1, -1), axis=1)  # Euclidean
 
@@ -162,17 +165,17 @@ class CreateDatabase:
         return sample_paths
             
     
-    def search(self, index_dir, query_vector, top_rerank=50, k=5):
+    def search(self, query_vector, top_rerank=50, k=5):
         query_vector = query_vector.astype('float32') 
         all_distances = []
         all_indices = []
         all_batch_index = []
         all_vectors = []
 
-        df = pd.read_csv(os.path.join(index_dir, 'map.csv'))
+        df = pd.read_csv(os.path.join(self.index_dir, 'map.csv'))
 
-        for i in range(len(os.listdir(index_dir)) - 1):
-            index_path = os.path.join(index_dir, f"{i}.index")
+        for i in range(len(os.listdir(self.index_dir)) - 1):
+            index_path = os.path.join(self.index_dir, f"{i}.index")
             index = faiss.read_index(index_path)
             distances, indices = index.search(query_vector.reshape(1, -1), top_rerank)
 
@@ -204,21 +207,28 @@ class CreateDatabase:
 
         return top_indices, top_batches, top_vectors, df 
     
-    def flow_search(self, index_dir, dataset_dir, image_index, question=None, k=10, topk_rerank=10):
-        img_path = os.path.join(dataset_dir, str(image_index), "question_img.png")
+    def flow_search(self, image_index, question=None, k=10, topk_rerank=10):
+        img_path = os.path.join(self.dataset_dir, str(image_index), "question_img.png")
         if self.model_name == "CLIP":
             img_vector = self.model.visual_encode(img_path)
         elif self.model_name == "ReT":
             img_vector = self.model.encode_multimodal(img_path, question).flatten()
             
-        sample_indices = self.search_with_reranking(index_dir, img_vector, k, topk_rerank)
+        sample_indices = self.search_with_reranking(img_vector, k, topk_rerank)
         
         return sample_indices
 
 
-    # def filter(self, img_paths, main_object, question_img, lvlm):
-    #     prompt = f"We give a first image <image> and several provied images {"<image>"*len(img_paths)}. For each image in provied image, you must indify it and the first image is talk about the same kind of {main_object}. Your will return a list of item has the same len with the number of provied image: 0 if the same 1 else. its must me in format for examples [0, 1, 1, 1, 0]"
+    def filter(self, img_paths, main_object, question_img, lvlm):
+        prompt = f"We provide a reference image <image> followed by several candidate images {"<image>"*len(img_paths)}. For each candidate image, determine whether it depicts the same type of {main_object} as the reference image. Return a list with the same length as the number of candidate images: use 1 if it matches the reference image, and 0 otherwise. The output format should be like [1, 0, 1, 0]."
 
+        img_files = [question_img] + [Image.open(os.path.join(self.dataset_dir, img_path)).convert('RGB') for img_path in img_paths]
+        answer = lvlm.inference(prompt, img_files)[0]  # e.g., [1, 0, 1, 0]
+
+        filtered_paths = [path for path, keep in zip(img_paths, answer) if keep == 1]
+        return filtered_paths
+        
+        
 def init_caption_model(args):
     special_token = None
     if "llava" in args.model_name_caption:
@@ -255,12 +265,14 @@ def main(args):
         
     caption_model, image_token, special_token = init_caption_model(args)
     
-    db = CreateDatabase(model=model_encode, 
+    db = CreateDatabase(index_dir=args.database_dir,
+                        dataset_dir=args.dataset_dir,
+                        model=model_encode,
                         model_name=args.model_name_encode,
                         caption_model=caption_model)
     
     if args.action == "indexing":
-        db.extract(args.dataset_dir, args.database_dir)       
+        db.extract(args.database_dir)       
         db.create_database(args.database_dir, output_dir=args.index_dir)
     
     elif args.action == "search": 
@@ -270,7 +282,7 @@ def main(args):
             if image_index == -1:
                 break
             
-            sample_indices = db.flow_search(args.index_dir, args.question_dir, image_index)
+            sample_indices = db.flow_search(args.index_dir, args.dataset_dir, image_index)
             print("Results retreval: ", sample_indices)
             
 
