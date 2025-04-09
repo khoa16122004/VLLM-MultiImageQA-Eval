@@ -217,11 +217,14 @@ class CreateDatabase:
             # img_vector = self.model.encode_multimodal(img_path, question).flatten()
             img_vector = self.model.encode_multimodal(img_path) 
         
-        sample_paths = self.search_with_reranking(img_vector, k, topk_rerank).tolist() 
         if filter == 1:
+            sample_paths = self.search_with_reranking(img_vector, 20, topk_rerank).tolist() 
             print("Original_paths: ", sample_paths)
             sample_paths = self.filter(sample_paths, img_path, self.model, self.dataset_dir)[:k]
             print("Filter Paths: ", sample_paths)
+        else:
+            sample_paths = self.search_with_reranking(img_vector, k, topk_rerank).tolist() 
+
         return sample_paths
 
     def filter(self, img_paths, question_img, main_object="object", dataset_dir="../dataset/MRAG_corpus"):
@@ -230,8 +233,15 @@ class CreateDatabase:
 
         img_files = [Image.open(question_img).convert('RGB')] + [Image.open(os.path.join(dataset_dir, img_path)).convert('RGB') for img_path in img_paths]
         answer = self.model_filter.inference(prompt, img_files)[0]  # e.g., [1, 0, 1, 0]
-        filtered_paths = ast.literal_eval(answer)
-        return filtered_paths
+        takes = ast.literal_eval(answer)
+        
+        filter_paths = []
+        for file, take in zip(answer, takes):
+            if take == 1:
+                filter_paths.append(file)
+                
+
+        return filter_paths
         
     
 
