@@ -7,6 +7,7 @@ import csv
 import pandas as pd
 from PIL import Image
 import argparse
+import ast
 
 def extract_question(sample_dir):
     gt_files = []
@@ -215,11 +216,9 @@ class CreateDatabase:
         elif self.model_name == "ReT":
             # img_vector = self.model.encode_multimodal(img_path, question).flatten()
             img_vector = self.model.encode_multimodal(img_path) 
-            
-        if filter == 0:           
-            sample_paths = self.search_with_reranking(img_vector, k, topk_rerank)
-        else:
-            sample_paths = self.search_with_reranking(img_vector, 20, topk_rerank)
+        
+        sample_paths = self.search_with_reranking(img_vector, k, topk_rerank).tolist() 
+        if filter == 1:
             print("Original_paths: ", sample_paths)
             sample_paths = self.filter(sample_paths, img_path, self.model, self.dataset_dir)[:k]
             print("Filter Paths: ", sample_paths)
@@ -231,8 +230,7 @@ class CreateDatabase:
 
         img_files = [Image.open(question_img).convert('RGB')] + [Image.open(os.path.join(dataset_dir, img_path)).convert('RGB') for img_path in img_paths]
         answer = self.model_filter.inference(prompt, img_files)[0]  # e.g., [1, 0, 1, 0]
-        print("answer: ", answer)
-        filtered_paths = [path for path, keep in zip(img_paths, answer) if keep == 1]
+        filtered_paths = ast.literal_eval(answer)
         return filtered_paths
         
     
