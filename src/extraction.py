@@ -212,8 +212,8 @@ class CreateDatabase:
         if self.model_name == "CLIP":
             img_vector = self.model.visual_encode(img_path)
         elif self.model_name == "ReT":
-            img_vector = self.model.encode_multimodal(img_path, question).flatten()
-            
+            # img_vector = self.model.encode_multimodal(img_path, question).flatten()
+            img_vector = self.model.encode_multimodal(img_path)            
         sample_indices = self.search_with_reranking(img_vector, k, topk_rerank)
         
         return sample_indices
