@@ -231,7 +231,7 @@ class CreateDatabase:
 
         img_files = [Image.open(question_img).convert('RGB')] + [Image.open(os.path.join(dataset_dir, img_path)).convert('RGB') for img_path in img_paths]
         answer = self.model_filter.inference(prompt, img_files)[0]  # e.g., [1, 0, 1, 0]
-
+        print("answer: ", answer)
         filtered_paths = [path for path, keep in zip(img_paths, answer) if keep == 1]
         return filtered_paths
         
