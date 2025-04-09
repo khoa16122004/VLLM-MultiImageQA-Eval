@@ -76,8 +76,6 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--pretrained_caption", type=str, default="llava-onevision-qwen2-7b-ov")
-    parser.add_argument("--model_name_caption", type=str, default="llava_qwen")
     parser.add_argument("--model_name_encode", type=str, default="ReT")
     parser.add_argument("--topk_rerank", type=int, default=10)
     parser.add_argument("--topk", type=int, default=5)
@@ -87,5 +85,4 @@ if __name__ == "__main__":
     parser.add_argument("--dataset_dir", type=str, default="../dataset/MRAG_corpus")
     parser.add_argument("--database_dir", type=str, default="../database/MRAG_corpus_ReT_caption")
     parser.add_argument("--index_dir", type=str, default="../database/MRAG_corpus_ReT_caption/index")
-    parser.add_argument("--action", type=str)
     args = parser.parse_args()
