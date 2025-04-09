@@ -281,14 +281,14 @@ def main(args):
     elif args.model_name_encode == "CLIP":
         model_encode = MyCLIPWrapper()
         
-    caption_model, image_token, special_token = init_caption_model(args)
+    # caption_model, image_token, special_token = init_caption_model(args)
     
     db = CreateDatabase(index_dir=args.database_dir,
                         dataset_dir=args.dataset_dir,
                         model=model_encode,
                         model_name=args.model_name_encode,
                         model_filter=None,
-                        caption_model=caption_model)
+                        caption_model=None)
     
     if args.action == "indexing":
         db.extract(args.database_dir)       
