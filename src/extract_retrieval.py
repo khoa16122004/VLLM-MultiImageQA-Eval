@@ -86,3 +86,4 @@ if __name__ == "__main__":
     parser.add_argument("--database_dir", type=str, default="../database/MRAG_corpus_ReT_caption")
     parser.add_argument("--index_dir", type=str, default="../database/MRAG_corpus_ReT_caption/index")
     args = parser.parse_args()
+    main(args)
