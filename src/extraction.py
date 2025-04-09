@@ -207,8 +207,8 @@ class CreateDatabase:
 
         return top_indices, top_batches, top_vectors, df 
     
-    def flow_search(self, image_index, question=None, k=10, topk_rerank=10):
-        img_path = os.path.join(self.dataset_dir, str(image_index), "question_img.png")
+    def flow_search(self, question_dir, image_index, question=None, k=10, topk_rerank=10):
+        img_path = os.path.join(question_dir, str(image_index), "question_img.png")
         if self.model_name == "CLIP":
             img_vector = self.model.visual_encode(img_path)
         elif self.model_name == "ReT":
