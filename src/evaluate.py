@@ -76,13 +76,9 @@ def init_model(args):
 
 def main(args):
     seed_everything(22520691)
-    model_encode = ReTWrapper()
-    db = CreateDatabase(model=model_encode, model_name="ReT")
     
     question_dir = "../dataset/MRAG"
     dataset_dir = "../dataset/MRAG_corpus"
-    database_dir = "../database/MRAG_corpus_ReT"
-    index_dir = "../database/MRAG_corpus_ReT/index"
     
     if args.retrieved_path is not None:
         with open(args.retrieved_path, "r") as f:
