@@ -62,7 +62,7 @@ def main(args):
                                              question=question,
                                              k=args.topk,
                                              topk_rerank=args.topk_rerank)
-                                
+            print("Id: ", sample_id)            
             print("question: ", question)
             print("retrieval paths: ", retrieval_paths)
             print("--------------------")
