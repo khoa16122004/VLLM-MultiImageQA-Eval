@@ -32,7 +32,7 @@ def extract_question(sample_dir):
     return question, question_img, gt_files, choices, gt_ans
 
 class CreateDatabase:
-    def __init__(self, index_dir, dataset_dir, model, model_name, caption_model=None):
+    def __init__(self, index_dir, dataset_dir, model, model_name, model_filter, caption_model=None):
         '''
             Args: 
                 dir: Folder dir of N samples
@@ -49,6 +49,7 @@ class CreateDatabase:
         self.caption_model = caption_model
         self.index_dir = index_dir
         self.dataset_dir = dataset_dir
+        self.model_filter = model_filter
         
         if model_name == "ReT":
             self.d = 4096
@@ -207,28 +208,36 @@ class CreateDatabase:
 
         return top_indices, top_batches, top_vectors, df 
     
-    def flow_search(self, question_dir, image_index, question=None, k=10, topk_rerank=10):
+    def flow_search(self, question_dir, image_index, question=None, filter=0, k=10, topk_rerank=10):
         img_path = os.path.join(question_dir, str(image_index), "question_img.png")
         if self.model_name == "CLIP":
             img_vector = self.model.visual_encode(img_path)
         elif self.model_name == "ReT":
             # img_vector = self.model.encode_multimodal(img_path, question).flatten()
-            img_vector = self.model.encode_multimodal(img_path)            
-        sample_indices = self.search_with_reranking(img_vector, k, topk_rerank)
+            img_vector = self.model.encode_multimodal(img_path) 
+            
+        if filter == 0:           
+            sample_paths = self.search_with_reranking(img_vector, k, topk_rerank)
+        else:
+            sample_paths = self.search_with_reranking(img_vector, 20, topk_rerank)
+            print("Original_paths: ", sample_paths)
+            sample_paths = self.filter(sample_paths, img_path, self.model, self.dataset_dir)[:k]
+            print("Filter Paths: ", sample_paths)
+        return sample_paths
+
+    def filter(self, img_paths, question_img, main_object="object", dataset_dir="../dataset/MRAG_corpus"):
+        images_placeholder = "<image>" * len(img_paths)
+        prompt = f"We provide a reference image <image> followed by several candidate images {images_placeholder.strip()}. For each candidate image, determine whether it depicts the same type of {main_object} as the reference image. Return a list with the same length as the number of candidate images: use 1 if it matches the reference image, and 0 otherwise. The output format should be like [1, 0, 1, 0]."
+
+        img_files = [Image.open(question_img).convert('RGB')] + [Image.open(os.path.join(dataset_dir, img_path)).convert('RGB') for img_path in img_paths]
+        answer = self.model_filter.inference(prompt, img_files)[0]  # e.g., [1, 0, 1, 0]
+
+        filtered_paths = [path for path, keep in zip(img_paths, answer) if keep == 1]
+        return filtered_paths
         
-        return sample_indices
+    
 
-
-    # def filter(self, img_paths, main_object, question_img, lvlm):
-    #     prompt = f"We provide a reference image <image> followed by several candidate images {"<image>"*len(img_paths)}. For each candidate image, determine whether it depicts the same type of {main_object} as the reference image. Return a list with the same length as the number of candidate images: use 1 if it matches the reference image, and 0 otherwise. The output format should be like [1, 0, 1, 0]."
-
-    #     img_files = [question_img] + [Image.open(os.path.join(self.dataset_dir, img_path)).convert('RGB') for img_path in img_paths]
-    #     answer = lvlm.inference(prompt, img_files)[0]  # e.g., [1, 0, 1, 0]
-
-    #     filtered_paths = [path for path, keep in zip(img_paths, answer) if keep == 1]
-    #     return filtered_paths
-        
-        
+    
 def init_caption_model(args):
     special_token = None
     if "llava" in args.model_name_caption:

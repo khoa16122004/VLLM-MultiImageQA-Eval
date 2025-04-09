@@ -9,6 +9,7 @@ from PIL import Image
 import argparse
 from extraction import CreateDatabase
 import json
+from models.llava_ import LLava
 
 def extract_question(sample_dir):
     gt_files = []
@@ -40,10 +41,16 @@ def main(args):
     elif args.model_name_encode == "CLIP":
         model_encode = MyCLIPWrapper()
     
+    # fliter model
+    model_filter = None
+    if args.filter == 1:
+        model_filter = LLava(pretrained="llava-onevision-qwen2-7b-ov", model_name="llava_qwen")
+    
     # db
     db = CreateDatabase(index_dir=args.index_dir,
                         dataset_dir=args.dataset_dir,
                         model=model_encode,
+                        model_filter=model_filter,
                         model_name=args.model_name_encode)
     
     results = {}
@@ -62,6 +69,7 @@ def main(args):
             retrieval_paths = db.flow_search(question_dir=args.question_dir,
                                              image_index=int(sample_id),
                                              question=full_question,
+                                             filter=args.filter
                                              k=args.topk,
                                              topk_rerank=args.topk_rerank
                                              )
@@ -87,5 +95,6 @@ if __name__ == "__main__":
     parser.add_argument("--dataset_dir", type=str, default="../dataset/MRAG_corpus")
     parser.add_argument("--index_dir", type=str, default="../database/MRAG_corpus_ReT_caption/index")
     parser.add_argument("--prefix", type=str)
+    parser.add_argument("--filter", type=int, default=0)
     args = parser.parse_args()
     main(args)
