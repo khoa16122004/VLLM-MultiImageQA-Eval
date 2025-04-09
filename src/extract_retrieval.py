@@ -56,6 +56,7 @@ def main(args):
             question, question_img, gt_files, choices, gt_ans = extract_question(sample_dir)
             # retrieved output
             choice_join = "\n".join(choices)
+            full_question = f"{question}\n{choice_join}"
             retrieval_paths = db.flow_search(index_dir=args.index_dir, 
                                              dataset_dir=args.question_dir,
                                              image_index=int(sample_id),
