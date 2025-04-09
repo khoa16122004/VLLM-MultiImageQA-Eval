@@ -114,7 +114,7 @@ def main(args):
                 full_question = f"{retrieved_prefix_question}{num_input_images * image_token}\n{question}\n{choice_join}"
                 # print("Question: ", full_question)
                 output = lvlm.inference(full_question, [question_img, *retrieved_files])[0]
-                # print("Output: ", output)
+                print("Output: ", output)
                 # output = extract_output(output, question)
                 # print("Output: ", output)
                 # print("Ground truth:", gt_ans)
