@@ -78,7 +78,7 @@ def main(args):
             print("retrieval paths: ", retrieval_paths)
             print("--------------------")
             # write to json    
-            results[str(sample_id)] = retrieval_paths.tolist()     
+            results[str(sample_id)] = retrieval_paths    
 
     output_path = f"{args.prefix}_mrag_bench_top{args.topk}_modelencode={args.model_name_encode}_topkrerank={args.topk_rerank}.json"
     with open(output_path, "w") as f:
