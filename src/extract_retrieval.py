@@ -70,7 +70,7 @@ def main(args):
             # write to json    
             results[str(sample_id)] = retrieval_paths     
 
-    output_path = f"mrag_bench_top{args.topk}_modelencode={args.model_name_encode}_modelcaption={args.model_name_caption}_topk_rerank={args.topk_rerank}.json"
+    output_path = f"mrag_bench_top{args.topk}_modelencode={args.model_name_encode}_topkrerank={args.topk_rerank}.json"
     with open(output_path, "w") as f:
         json.dump(results, f, indent=4)
 
