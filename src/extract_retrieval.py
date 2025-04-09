@@ -69,7 +69,7 @@ def main(args):
             retrieval_paths = db.flow_search(question_dir=args.question_dir,
                                              image_index=int(sample_id),
                                              question=full_question,
-                                             filter=args.filter
+                                             filter=args.filter,
                                              k=args.topk,
                                              topk_rerank=args.topk_rerank
                                              )
