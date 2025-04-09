@@ -214,8 +214,8 @@ class CreateDatabase:
         if self.model_name == "CLIP":
             img_vector = self.model.visual_encode(img_path)
         elif self.model_name == "ReT":
-            # img_vector = self.model.encode_multimodal(img_path, question).flatten()
-            img_vector = self.model.encode_multimodal(img_path) 
+            img_vector = self.model.encode_multimodal(img_path, question).flatten()
+            # img_vector = self.model.encode_multimodal(img_path) 
         
         if filter == 1:
             sample_paths = self.search_with_reranking(img_vector, 20, topk_rerank).tolist() 
