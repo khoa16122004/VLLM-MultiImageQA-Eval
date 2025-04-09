@@ -204,12 +204,12 @@ class CreateDatabase:
 
         return top_indices, top_batches, top_vectors, df 
     
-    def flow_search(self, index_dir, dataset_dir, image_index, k=10, topk_rerank=10):
+    def flow_search(self, index_dir, dataset_dir, image_index, question=None, k=10, topk_rerank=10):
         img_path = os.path.join(dataset_dir, str(image_index), "question_img.png")
         if self.model_name == "CLIP":
             img_vector = self.model.visual_encode(img_path)
         elif self.model_name == "ReT":
-            img_vector = self.model.encode_multimodal(img_path).flatten()
+            img_vector = self.model.encode_multimodal(img_path, question).flatten()
             
         sample_indices = self.search_with_reranking(index_dir, img_vector, k, topk_rerank)
         
@@ -268,6 +268,7 @@ def main(args):
             
             sample_indices = db.flow_search(args.index_dir, args.question_dir, image_index)
             print("Results retreval: ", sample_indices)
+            
 
 
 if __name__ == "__main__":

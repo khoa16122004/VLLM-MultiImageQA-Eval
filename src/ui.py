@@ -16,6 +16,8 @@ def load_sample(sample_id, retrivels_names):
     gt_files = []
 
     retrivels_names = re.findall(r"'([^']+)'", retrivels_names)
+    # retrivels_names = re.findall(r'"([^"]+)"', retrivels_names)
+
     retrivels_files = []
     for file_name in retrivels_names:
         img_path = os.path.join(dataset_dir, file_name)
