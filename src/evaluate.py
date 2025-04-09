@@ -108,20 +108,19 @@ def main(args):
             # retrieved output
             choice_join = "\n".join(choices)
             if args.retrieved_path is not None:
-                print("Using path results")
+                # print("Using path results")
                 retrieved_paths = retrieved_data[str(sample_id)]
-                print(retrieved_paths)
                     
-                print("Retrieval paths: ", retrieved_paths)
+                # print("Retrieval paths: ", retrieved_paths)
                 retrieved_files = [Image.open(os.path.join(dataset_dir, path)).convert("RGB") for path in retrieved_paths]
                 num_input_images = len(retrieved_files) + 1
                 full_question = f"{retrieved_prefix_question}{num_input_images * image_token}\n{question}\n{choice_join}"
-                print("Question: ", full_question)
+                # print("Question: ", full_question)
                 output = lvlm.inference(full_question, [question_img, *retrieved_files])[0]
                 # print("Output: ", output)
                 # output = extract_output(output, question)
-                print("Output: ", output)
-                print("Ground truth:", gt_ans)
+                # print("Output: ", output)
+                # print("Ground truth:", gt_ans)
 
                 if gt_ans == output:
                     acc += 1    
