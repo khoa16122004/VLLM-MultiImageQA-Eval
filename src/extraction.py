@@ -216,8 +216,8 @@ class CreateDatabase:
         return sample_indices
 
 
-    def filter(self, img_paths, main_object, question_img, lvlm):
-        prompt = f"We give a first image <image> and several provied images {"<image>"*len(img_paths)}. For each image in provied image, you must indify it and the first image is talk about the same kind of {main_object}. Your will return a list of item has the same len with the number of provied image: 0 if the same 1 else. its must me in format for examples [0, 1, 1, 1, 0]"
+    # def filter(self, img_paths, main_object, question_img, lvlm):
+    #     prompt = f"We give a first image <image> and several provied images {"<image>"*len(img_paths)}. For each image in provied image, you must indify it and the first image is talk about the same kind of {main_object}. Your will return a list of item has the same len with the number of provied image: 0 if the same 1 else. its must me in format for examples [0, 1, 1, 1, 0]"
 
 def init_caption_model(args):
     special_token = None
