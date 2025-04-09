@@ -68,7 +68,7 @@ def main(args):
             full_question = f"{question}\n{choice_join}"
             retrieval_paths = db.flow_search(question_dir=args.question_dir,
                                              image_index=int(sample_id),
-                                             question=full_question,
+                                             question=question,
                                              filter=args.filter,
                                              k=args.topk,
                                              topk_rerank=args.topk_rerank

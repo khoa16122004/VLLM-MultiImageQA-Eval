@@ -214,8 +214,10 @@ class CreateDatabase:
         if self.model_name == "CLIP":
             img_vector = self.model.visual_encode(img_path)
         elif self.model_name == "ReT":
-            img_vector = self.model.encode_multimodal(img_path, question).flatten()
-            # img_vector = self.model.encode_multimodal(img_path) 
+            intruction = "Retrieve documents that provide an answer to the question alongside the image: "
+            full_question = intruction + question
+            img_vector = self.model.encode_multimodal(img_path, full_question).flatten()
+                # img_vector = self.model.encode_multimodal(img_path) 
         
         if filter == 1:
             sample_paths = self.search_with_reranking(img_vector, 20, topk_rerank).tolist() 
@@ -234,7 +236,6 @@ class CreateDatabase:
         img_files = [Image.open(question_img).convert('RGB')] + [Image.open(os.path.join(dataset_dir, img_path)).convert('RGB') for img_path in img_paths]
         answer = self.model_filter.inference(prompt, img_files)[0]  # e.g., [1, 0, 1, 0]
         takes = ast.literal_eval(answer)
-        print("Takes")
         filter_paths = []
         for file, take in zip(img_paths, takes):
             if take == 1:
