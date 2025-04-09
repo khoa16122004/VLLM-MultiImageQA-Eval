@@ -147,7 +147,7 @@ class CreateDatabase:
             print(f"Database created successfully with multiple indexes with total {total_vectors_added} vectors")
                     
     def search_with_reranking(self, query_vector, k=10, top_rerank=50):
-        top_indices, top_batches, top_vectors, df = self.search(self.index_dir, query_vector, top_rerank, self.d) # 50 vector
+        top_indices, top_batches, top_vectors, df = self.search(query_vector, top_rerank, self.d) # 50 vector
         expanded_query = np.mean(top_vectors, axis=0).astype('float32')
         all_distances = np.linalg.norm(top_vectors - expanded_query.reshape(1, -1), axis=1)  # Euclidean
 
