@@ -8,6 +8,7 @@ from tqdm import tqdm
 import random
 import torch
 from gpt_extract import extract_answer
+import json
 
 def extract_question(sample_dir):
     gt_files = []
@@ -83,6 +84,11 @@ def main(args):
     database_dir = "../database/MRAG_corpus_ReT"
     index_dir = "../database/MRAG_corpus_ReT/index"
     
+    if args.retrieved_path is not None:
+        with open(args.retrieved_path, "r") as f:
+            retrieved_data = json.load(f)
+    
+    
     lvlm, image_token, special_token = init_model(args)
     retrieved_prefix_question = "You will be given one question concerning several images. The first image is the input image, others are retrieved examples to help you. Answer with the option's letter from the given choices directly."
     no_retrieved_prefix_question = "You will be given one question concerning one image. Answer with the option's letter from the given choices directly."
@@ -101,26 +107,29 @@ def main(args):
             question, question_img, gt_files, choices, gt_ans = extract_question(sample_dir)
             # retrieved output
             choice_join = "\n".join(choices)
-
             if args.using_retrieval == 1:
-                print("Using retrieval")
-                retrieved_paths = db.flow_search(index_dir=index_dir, dataset_dir=question_dir, 
-                                                                    image_index=int(sample_id), k=args.topk, 
-                                                                    topk_rerank=args.topk_rerank)
-                
-                print("Retrieval paths: ", retrieved_paths)
-                retrieved_files = [Image.open(os.path.join(dataset_dir, path)).convert("RGB") for path in retrieved_paths]
-                num_input_images = len(retrieved_files) + 1
-                full_question = f"{retrieved_prefix_question}{num_input_images * image_token}\n{question}\n{choice_join}"
-                print("Question: ", full_question)
-                output = lvlm.inference(full_question, [question_img, *retrieved_files])[0]
-                # print("Output: ", output)
-                # output = extract_output(output, question)
-                print("Output: ", output)
-                print("Ground truth:", gt_ans)
+                if not args.retrieved_path:                    
+                    retrieved_paths = db.flow_search(index_dir=index_dir, dataset_dir=question_dir, 
+                                                                        image_index=int(sample_id), k=args.topk, 
+                                                                        topk_rerank=args.topk_rerank)
+                else:
+                    print("Using path results")
+                    retrieved_paths = retrieved_data[str(sample_id)]
+                    print(retrieved_paths)
+                        
+                    print("Retrieval paths: ", retrieved_paths)
+                    retrieved_files = [Image.open(os.path.join(dataset_dir, path)).convert("RGB") for path in retrieved_paths]
+                    num_input_images = len(retrieved_files) + 1
+                    full_question = f"{retrieved_prefix_question}{num_input_images * image_token}\n{question}\n{choice_join}"
+                    print("Question: ", full_question)
+                    output = lvlm.inference(full_question, [question_img, *retrieved_files])[0]
+                    # print("Output: ", output)
+                    # output = extract_output(output, question)
+                    print("Output: ", output)
+                    print("Ground truth:", gt_ans)
 
-                if gt_ans == output:
-                    acc += 1    
+                    if gt_ans == output:
+                        acc += 1    
 
             else:   
                 print("Not using retrieval")
