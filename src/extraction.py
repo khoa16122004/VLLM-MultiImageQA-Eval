@@ -234,7 +234,7 @@ class CreateDatabase:
         img_files = [Image.open(question_img).convert('RGB')] + [Image.open(os.path.join(dataset_dir, img_path)).convert('RGB') for img_path in img_paths]
         answer = self.model_filter.inference(prompt, img_files)[0]  # e.g., [1, 0, 1, 0]
         takes = ast.literal_eval(answer)
-        
+        print("Takes")
         filter_paths = []
         for file, take in zip(answer, takes):
             if take == 1:
