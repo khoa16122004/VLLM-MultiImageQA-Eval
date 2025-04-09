@@ -236,7 +236,7 @@ class CreateDatabase:
         takes = ast.literal_eval(answer)
         print("Takes")
         filter_paths = []
-        for file, take in zip(answer, takes):
+        for file, take in zip(img_files, takes):
             if take == 1:
                 filter_paths.append(file)
                 
