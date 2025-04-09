@@ -64,7 +64,7 @@ class CreateDatabase:
         '''
         os.makedirs(output_dir, exist_ok=True)
         
-        for file_name in tqdm(os.listdir(dir)):
+        for file_name in tqdm(os.listdir(self.dataset_dir)):
             if "input" in file_name:
                 continue
             file_path = os.path.join(self.dataset_dir, file_name)
