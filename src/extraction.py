@@ -219,14 +219,14 @@ class CreateDatabase:
         return sample_indices
 
 
-    def filter(self, img_paths, main_object, question_img, lvlm):
-        prompt = f"We provide a reference image <image> followed by several candidate images {"<image>"*len(img_paths)}. For each candidate image, determine whether it depicts the same type of {main_object} as the reference image. Return a list with the same length as the number of candidate images: use 1 if it matches the reference image, and 0 otherwise. The output format should be like [1, 0, 1, 0]."
+    # def filter(self, img_paths, main_object, question_img, lvlm):
+    #     prompt = f"We provide a reference image <image> followed by several candidate images {"<image>"*len(img_paths)}. For each candidate image, determine whether it depicts the same type of {main_object} as the reference image. Return a list with the same length as the number of candidate images: use 1 if it matches the reference image, and 0 otherwise. The output format should be like [1, 0, 1, 0]."
 
-        img_files = [question_img] + [Image.open(os.path.join(self.dataset_dir, img_path)).convert('RGB') for img_path in img_paths]
-        answer = lvlm.inference(prompt, img_files)[0]  # e.g., [1, 0, 1, 0]
+    #     img_files = [question_img] + [Image.open(os.path.join(self.dataset_dir, img_path)).convert('RGB') for img_path in img_paths]
+    #     answer = lvlm.inference(prompt, img_files)[0]  # e.g., [1, 0, 1, 0]
 
-        filtered_paths = [path for path, keep in zip(img_paths, answer) if keep == 1]
-        return filtered_paths
+    #     filtered_paths = [path for path, keep in zip(img_paths, answer) if keep == 1]
+    #     return filtered_paths
         
         
 def init_caption_model(args):
