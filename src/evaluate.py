@@ -139,7 +139,7 @@ def main(args):
 
 
     line = f"Accuracy: {acc / num_samples * 100}%, Total samples: {num_samples}\n"
-    with open(args.output_correct_answer.txt, "w") as f:
+    with open(args.output_correct_answer, "w") as f:
         for id in correct:
             f.write(f"{id}\n")
     
