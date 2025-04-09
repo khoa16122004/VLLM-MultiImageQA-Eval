@@ -85,5 +85,6 @@ if __name__ == "__main__":
     parser.add_argument("--dataset_dir", type=str, default="../dataset/MRAG_corpus")
     parser.add_argument("--database_dir", type=str, default="../database/MRAG_corpus_ReT_caption")
     parser.add_argument("--index_dir", type=str, default="../database/MRAG_corpus_ReT_caption/index")
+    parser.add_argument("--prefix", type=str)
     args = parser.parse_args()
     main(args)
