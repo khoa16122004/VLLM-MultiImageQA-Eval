@@ -241,7 +241,7 @@ class CreateDatabase:
             if take == 1:
                 filter_paths.append(file)
                 
-
+        print("Takes: ", takes)
         return filter_paths
         
     
