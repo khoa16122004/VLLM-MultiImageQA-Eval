@@ -41,7 +41,7 @@ def main(args):
         model_encode = MyCLIPWrapper()
     
     # db
-    db = CreateDatabase(index_dir=args.database_dir,
+    db = CreateDatabase(index_dir=args.index_dir,
                         dataset_dir=args.dataset_dir,
                         model=model_encode,
                         model_name=args.model_name_encode)
@@ -84,7 +84,6 @@ if __name__ == "__main__":
     parser.add_argument("--using_retrieval", type=int, default=1)
     parser.add_argument("--question_dir", type=str, default="../dataset/MRAG")
     parser.add_argument("--dataset_dir", type=str, default="../dataset/MRAG_corpus")
-    parser.add_argument("--database_dir", type=str, default="../database/MRAG_corpus_ReT_caption")
     parser.add_argument("--index_dir", type=str, default="../database/MRAG_corpus_ReT_caption/index")
     parser.add_argument("--prefix", type=str)
     args = parser.parse_args()
