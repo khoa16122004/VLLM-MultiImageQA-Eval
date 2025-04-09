@@ -140,15 +140,9 @@ def main(args):
 
 
 
-    with open(f"result_{args.model_name}_{args.pretrained}_{args.topk}_{args.topk_rerank}.txt", "a") as f:          
-        if args.using_retrieval == True:
-            line = f"Accuracy with retrieval: {acc / num_samples * 100}%, Total samples: {num_samples}\n"
-            print(line)
-        else:
-            line = f"Accuracy without retrieval: {acc / num_samples * 100}%, Total samples: {num_samples}\n"
-            print(line)
-        f.write(line)
-
+    line = f"Accuracy: {acc / num_samples * 100}%, Total samples: {num_samples}\n"
+    print(line)
+    
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--pretrained", type=str, default="llava-onevision-qwen2-7b-ov")
