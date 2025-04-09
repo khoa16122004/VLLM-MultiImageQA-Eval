@@ -92,6 +92,7 @@ def main(args):
     # is_contain_retrieval = 0
     acc = 0
     num_samples = 0
+    correct = []
     for sample_id in tqdm(os.listdir(question_dir)):
         if sample_id != "index" and not sample_id.endswith(".py"):
             if args.sample_id_eval >= 0:
@@ -115,10 +116,11 @@ def main(args):
                 output = lvlm.inference(full_question, [question_img, *retrieved_files])[0]
                 # print("Output: ", output)
                 # output = extract_output(output, question)
-                print("Output: ", output)
+                # print("Output: ", output)
                 # print("Ground truth:", gt_ans)
 
                 if gt_ans == output:
+                    correct.append(sample_id)
                     acc += 1    
 
             else:   
@@ -137,6 +139,11 @@ def main(args):
 
 
     line = f"Accuracy: {acc / num_samples * 100}%, Total samples: {num_samples}\n"
+    with open("output_correct_answer.txt", "w") as f:
+        for id in correct:
+            f.write(f"{id}\n")
+    
+        
     print(line)
     
 if __name__ == "__main__":
@@ -147,6 +154,7 @@ if __name__ == "__main__":
     parser.add_argument("--topk", type=int, default=5)
     parser.add_argument("--sample_id_eval", type=int, default=-1)
     parser.add_argument("--retrieved_path", type=str, default=None)
+    parser.add_argument("--output_correct_answer", type=str)
     
     args = parser.parse_args()
     
