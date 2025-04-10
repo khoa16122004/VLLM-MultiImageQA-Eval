@@ -1,6 +1,6 @@
 import os
 from tqdm import tqdm
-from numpy import np
+import numpy as np
 import faiss
 import pandas as pd
 import csv
