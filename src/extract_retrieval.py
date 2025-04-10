@@ -20,7 +20,8 @@ def main(args):
     encode_model, dim  = init_encode_model(args.model_name_encode)
     
     # vt database
-    db = Retriever(args.index_dir, encode_model, dim)
+    map_path = os.path.join(args.index_dir, "map.csv")
+    db = Retriever(args.index_dir, encode_model, dim, map_path)
 
     # extract retriever paths
     results = []
