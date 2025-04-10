@@ -21,7 +21,8 @@ def benchmark(pertubation_examples, fea_retri, retri_paths, db, clip_model):
     for pertubation_retri in pertbuation_retri_paths: # top_k
         intersection = set(pertubation_retri).intersection(retri_paths)
         retri_scores.append(len(intersection) / len(pertubation_retri) * 100) 
-    
+    retri_scores = np.array(retri_scores)
+    # print("retri_scores: ", retri_scores.mean())
     return 0.5 * retri_scores + 0.5 * sim_scores     
 
 def attack(img, retrived_paths, db, clip_model, args):
