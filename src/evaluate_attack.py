@@ -42,10 +42,7 @@ def main(args):
         model_encode = MyCLIPWrapper()
     
     # fliter model
-    model_filter = None
-    if args.filter == 1:
-        model_filter = LLava(pretrained="llava-onevision-qwen2-7b-ov", model_name="llava_qwen")
-    
+  
     # db
     db = CreateDatabase(index_dir=args.index_dir,
                         dataset_dir=args.dataset_dir,
