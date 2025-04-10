@@ -33,7 +33,7 @@ def attack(img, retrived_names, db, clip_model, args):
 
     retrived_imgs = [Image.open(os.path.join(args.dataset_dir, path)).convert("RGB") for path in retrived_names]
     fea_retrived = clip_model.visual_encode_batch(retrived_imgs)
-
+    benchmark(np.array([img_np]), fea_retrived, retrived_names, db, clip_model)
     perturbations = np.random.rand(args.pop_size, h, w, c) * 2 * args.epsilon - args.epsilon
 
     num_evaluations = 0
@@ -42,7 +42,7 @@ def attack(img, retrived_names, db, clip_model, args):
         adv_images = np.clip(img_np + perturbations, 0, 1)
 
         fitness = benchmark(adv_images, fea_retrived, retrived_names, db, clip_model)
-        num_evaluations += len(fitness)
+        num_evaluations += args.pop_size
         print("fitness list: ", fitness)
 
         elite_idxs = np.argsort(fitness)[:args.num_elites]
