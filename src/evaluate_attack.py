@@ -54,7 +54,7 @@ def main(args):
     results = {}
     # extract retrieval paths
             
-    sample_dir = os.path.join(args.question_dir, args.sample_id_eval)
+    sample_dir = os.path.join(args.question_dir, str(args.sample_id_eval))
     question, question_img, gt_files, choices, gt_ans = extract_question(sample_dir)
     # retrieved output
     choice_join = "\n".join(choices)
