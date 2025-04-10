@@ -20,7 +20,7 @@ def benchmark(pertubation_examples, fea_retri, retri_paths, db, clip_model):
     pertbuation_retri_paths = db.batch_search(pil_pertubation_examples, k=5, topk_rerank=10) # pop_size x top_k
     for pertubation_retri in pertbuation_retri_paths: # top_k
         intersection = set(pertubation_retri).intersection(retri_paths)
-        retri_scores.append(len(intersection) / len(pertubation_retri)) * 100
+        retri_scores.append(len(intersection) / len(pertubation_retri) * 100) 
     
     return 0.5 * retri_scores + 0.5 * sim_scores     
 
