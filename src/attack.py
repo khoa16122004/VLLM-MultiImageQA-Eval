@@ -23,7 +23,7 @@ def benchmark(pertubation_examples, fea_retri, retri_paths, db, clip_model):
         retri_scores.append(len(intersection) / len(pertubation_retri) * 100) 
     retri_scores = np.array(retri_scores)
     print("retri_scores: ", retri_scores.min())
-    print("sim: ", sim_scores.min())
+    # print("sim: ", sim_scores.min())
 
     return 0.5 * retri_scores + 0.5 * sim_scores     
 
@@ -43,7 +43,7 @@ def attack(img, retrived_names, db, clip_model, args):
 
         fitness = benchmark(adv_images, fea_retrived, retrived_names, db, clip_model)
         num_evaluations += args.pop_size
-        print("fitness list: ", fitness)
+        # print("fitness list: ", fitness)
 
         elite_idxs = np.argsort(fitness)[:args.num_elites]
         elites = perturbations[elite_idxs]
