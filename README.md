@@ -1,16 +1,29 @@
 # VLLM-MultiImage-RAG-VQA-Eval
 This repo contains the inference, evaluation code, retrieval and Python environment file for LVLMs that can process multiple images as input across various multi-image visual question-answering datasets.
 
-
 # Usage
 Move to the direct direcotry to the folder ```src```
+
 For extract feature and create vector database run the folowing script:
-```cmd
-    CUDA_VISIBLE_DEVICES=<id> python create_db.py --model_name_encode CLIP --dataset_dir ../dataset/MRAG_corpus --database_dir new_database/MRAG/CLIP --output_index_dir new_database/MRAG/CLIP/index
+```bash
+    CUDA_VISIBLE_DEVICES=<id> python create_db.py \
+    --model_name_encode CLIP \
+    --dataset_dir ../dataset/MRAG_corpus \
+    --database_dir new_database/MRAG/CLIP \
+    --output_index_dir new_database/MRAG/CLIP/index
 ```
 
 
-# [MSRAG BenchMark](https://github.com/mragbench/MRAG-Bench)  
+For extract the json containing the path results when retriev the question img, uisng the following script:
+
+```bash
+    CUDA_VISIBLE_DEVICES=3 python extract_retrieval.py \
+    --model_name_encode CLIP \
+    --index_dir ../new_database/MRAG/CLIP/index
+```
+
+
+<!-- # [MSRAG BenchMark](https://github.com/mragbench/MRAG-Bench)  
 This dataset contains the benchmark for multi-image retrived for visual questioning with multiple-choice questions.
 
 ## Accuracy Table
@@ -25,5 +38,5 @@ This dataset contains the benchmark for multi-image retrived for visual question
 | **LLaVA-NeXT-Interleave-7B**   | 44.20                  | 54.18                  | 
 | **LLaVA-OneVision**            | 53.07                  | 60.46                  | 47.8
 
-</p>
+</p> -->
 
