@@ -45,5 +45,6 @@ class MRAG:
     
     
     def loader(self):
-        for id in os.listdir(self.dataset_dir):
-            yield self.extract_question(id)
+        for sample_id in os.listdir(self.question_dir):
+            if sample_id != "index" and not sample_id.endswith(".py"):
+                yield self.extract_question(sample_id)
