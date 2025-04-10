@@ -67,11 +67,11 @@ def main(args):
                         model_filter=None,
                         caption_model=None)
     
-    img_path = os.path.join(args.dataset_dir, str(args.image_index), "question_img.png")
+    img_path = os.path.join(args.question_dir, str(args.image_index), "question_img.png")
     img = Image.open(img_path).convert("RGB")
     
     sample_paths = db.flow_search(img, args.question_dir, filter=0, k=args.topk, topk_rerank=args.topk_rerank)
-    sample_paths = [os.path.join(args.question_dir, path) for path in sample_paths]
+    sample_paths = [os.path.join(args.dataset_dir, path) for path in sample_paths]
     sample_adv_paths = attack(img, sample_paths, db, clip_model, args)
     print(sample_paths)
     
