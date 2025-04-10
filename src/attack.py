@@ -34,9 +34,8 @@ def benchmark(pertubation_examples, fea_retri, retri_paths, db, clip_model):
     print("Retri_scores: ", retri_scores)
     
 
-def attack(img_path, retrived_paths, db, clip_model, args):
-    img_np = Image.open(img_path).convert("RGB")
-    img_np = np.array(img_np)
+def attack(img, retrived_paths, db, clip_model, args):
+    img_np = np.array(img)
     img_np = img_np.astype('float32') / 255.0 # img_np: [0,1]
 
     fea_retrived = clip_model.visual_encode(retrived_paths)
@@ -44,7 +43,7 @@ def attack(img_path, retrived_paths, db, clip_model, args):
     
     pertubation_examples = img_np + np.random.rand(*img_np.shape) * args.epsilon
     fitness = benchmark(pertubation_examples, fea_retrived, retrived_paths, db, clip_model)
-    
+    return
     
 
 
@@ -66,6 +65,7 @@ def main(args):
     img = Image.open(img_path).convert("RGB")
     
     sample_paths = db.flow_search(img, args.question_dir, filter=0, k=args.topk, topk_rerank=args.topk_rerank)
+    sample_adv_paths = attack(img, sample_paths, db, model_encode, args)
     print(sample_paths)
     
 if __name__ == "__main__":
