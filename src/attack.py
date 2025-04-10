@@ -63,9 +63,9 @@ def main(args):
                         caption_model=None)
     
     img_path = os.path.join(args.question_dir, str(args.image_index), "question_img.png")
+    img = Image.open(img_path).convert("RGB")
     
-    
-    sample_paths = db.flow_search(args.image_index, args.question_dir, filter=0, k=args.topk, topk_rerank=args.topk_rerank)
+    sample_paths = db.flow_search(img, args.question_dir, filter=0, k=args.topk, topk_rerank=args.topk_rerank)
     print(sample_paths)
     
 if __name__ == "__main__":
