@@ -91,7 +91,7 @@ def main(args):
     img_path = os.path.join(args.question_dir, str(args.image_index), "question_img.png")
     img = Image.open(img_path).convert("RGB")
     
-    sample_names = db.flow_search(img, args.question_dir, filter=0, k=args.topk, topk_rerank=args.topk_rerank)
+    sample_names = db.flow_search(img, args.question_dir, filter=0, k=20, topk_rerank=30)
     # sample_paths = [os.path.join(args.dataset_dir, path) for path in sample_names]
     adv_img = attack(img, sample_names, db, clip_model, args)
     adv_img.save("test.png")
