@@ -119,9 +119,7 @@ def main(args):
                 # print("Output: ", output)
                 # print("Ground truth:", gt_ans)
 
-                if gt_ans == output:
-                    correct.append(sample_id)
-                    acc += 1    
+ 
 
             else:   
                 print("Not using retrieval")
@@ -132,8 +130,10 @@ def main(args):
                 output = extract_output(output, question)
                 print("Ground truth:", gt_ans)
 
-                if gt_ans == output:
-                    acc += 1    
+
+            if gt_ans == output:
+                correct.append(sample_id)
+                acc += 1   
 
 
 
