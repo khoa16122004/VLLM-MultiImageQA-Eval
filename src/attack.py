@@ -26,7 +26,6 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--image_index", type=int, default=0)
-    parser.add_argument("--pretrained_caption", type=str, default="llava-onevision-qwen2-7b-ov")
     parser.add_argument("--model_name_caption", type=str, default="llava_qwen")
     parser.add_argument("--model_name_encode", type=str, default="ReT")
     parser.add_argument("--topk_rerank", type=int, default=10)
