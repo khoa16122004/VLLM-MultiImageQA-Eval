@@ -18,12 +18,15 @@ def benchmark(pertubation_examples, fea_retri, retri_paths, db, clip_model):
     
     # CLIP sim
     fea_pertubation_examples = clip_model.visual_encode_batch(pil_pertubation_examples) # pop_size * dim
+    print("Feature perubtation shape: ", fea_pertubation_examples.shape)
     sim_matrix = fea_pertubation_examples @ fea_retri.T # pop_size x 5
-    sim_scores = sim_matrix.mean(dim=1).values # pop_size
+    print("Sim_matrix: ", sim_matrix.shape)
+    sim_scores = sim_matrix.mean(dim=1) # pop_size
+    print("Sim scores: ", sim_scores.shape)
     print("CLIP sim score: ", sim_scores)
     # retrieval score
     retri_scores = []
-    pertbuation_retri_paths = db.batch_search(pil_pertubation_examples, db, k=5, topk_rerank=10) # pop_size x top_k
+    pertbuation_retri_paths = db.batch_search(pil_pertubation_examples, k=5, topk_rerank=10) # pop_size x top_k
     for pertubation_retri in pertbuation_retri_paths: # top_k
         intersection = set(pertubation_retri).intersection(retri_paths)
         retri_scores.append(len(intersection) / len(pertubation_retri))
@@ -60,9 +63,9 @@ def main(args):
                         caption_model=None)
     
     img_path = os.path.join(args.question_dir, str(args.image_index), "question_img.png")
+    img = Image.open(img_path).convert("RGB")
     
-    
-    sample_paths = db.flow_search(args.image_index, args.question_dir, filter=0, k=args.topk, topk_rerank=args.topk_rerank)
+    sample_paths = db.flow_search(img, args.question_dir, filter=0, k=args.topk, topk_rerank=args.topk_rerank)
     print(sample_paths)
     
 if __name__ == "__main__":
