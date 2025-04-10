@@ -6,7 +6,7 @@ def main(args):
         question_only_correct = [line.strip() for line in qf.readlines()]
         retrieved_correct = [line.strip() for line in rf.readlines()]
         intersection = set(question_only_correct).intersection(retrieved_correct)
-        result = retrieved_correct.difference(intersection)
+        result = set(retrieved_correct).difference(intersection)
         print("Len that retrieved correct but question not: ", len(result))    
     
     
