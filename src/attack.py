@@ -15,7 +15,7 @@ def benchmark(pertubation_examples, fea_retri, retri_paths, db, clip_model):
     
     # convert to PIL Image
     pil_pertubation_examples = [Image.fromarray(np.uint8(pertubation_example * 255)) for pertubation_example in pertubation_examples]
-    
+    print(pil_pertubation_examples)
     # CLIP sim
     fea_pertubation_examples = clip_model.visual_encode_batch(pil_pertubation_examples) # pop_size * dim
     print("Feature perubtation shape: ", fea_pertubation_examples.shape)

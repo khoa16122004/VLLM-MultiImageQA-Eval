@@ -32,6 +32,7 @@ class MyCLIPWrapper:
             raise ValueError("All inputs must be PIL.Image.Image")
 
         inputs = self.processor(images=image_inputs, return_tensors="pt", padding=True).to(self.device)
+        
         with torch.no_grad():
             image_features = self.model.get_image_features(**inputs)
 
