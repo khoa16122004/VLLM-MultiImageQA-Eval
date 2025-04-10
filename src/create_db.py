@@ -3,7 +3,7 @@ from utils import init_encode_model
 from retriever import Retriever
 def main(args):
     encode_model, dim = init_encode_model(args.model_name_encode)
-    retriever = Retriever(args.output_index_dir, encode_model, dim)
+    retriever = Retriever(args.output_index_dir, encode_model, dim, args.map_path)
     
     # Extract feature
     # retriever.extract_db(args.dataset_dir, args.database_dir)
@@ -17,6 +17,7 @@ if __name__ == "__main__":
     parser.add_argument("--dataset_dir", type=str, default="../dataset/MRAG_corpus")
     parser.add_argument("--database_dir", type=str)
     parser.add_argument("--output_index_dir", type=str)
+    parser.add_argument("--map_path", type=str)
     args = parser.parse_args()
     
     main(args)
