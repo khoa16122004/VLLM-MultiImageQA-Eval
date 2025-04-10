@@ -21,6 +21,7 @@ class Retriever:
             Return:
                 None
         """
+        os.makedirs(output_dir, exist_ok=True)
         print("Extract Feature Proccess ...")
         for img_name in tqdm(os.listdir(dataset_dir)):
             img_path = os.path.join(dataset_dir, img_name)
