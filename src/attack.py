@@ -107,6 +107,7 @@ if __name__ == "__main__":
     parser.add_argument("--max_evaluations", type=int, default=1000)
     parser.add_argument("--pop_size", type=int, default=100)
     parser.add_argument("--mutation_std", type=float, default=0.01)
+    parser.add_argument("--num_elites", type=int, default=20)
     args = parser.parse_args()
     
     main(args)
