@@ -50,37 +50,28 @@ def main(args):
     db = CreateDatabase(index_dir=args.index_dir,
                         dataset_dir=args.dataset_dir,
                         model=model_encode,
-                        model_filter=model_filter,
-                        model_name=args.model_name_encode)
+                        model_name=args.model_name_encode,
+                        model_filter=None,
+                        caption_model=None)
     
     results = {}
     # extract retrieval paths
-    for sample_id in tqdm(os.listdir(args.question_dir)):
-        if sample_id != "index" and not sample_id.endswith(".py"):
-            if args.sample_id_eval >= 0:
-                if int(sample_id) != args.sample_id_eval:
-                    continue
             
-            sample_dir = os.path.join(args.question_dir, sample_id)
-            question, question_img, gt_files, choices, gt_ans = extract_question(sample_dir)
-            # retrieved output
-            choice_join = "\n".join(choices)
-            full_question = f"{question}\n{choice_join}"
-            retrieval_paths = db.flow_search(question_dir=args.question_dir,
-                                             image_index=int(sample_id),
-                                             question=question,
-                                             filter=args.filter,
-                                             k=args.topk,
-                                             topk_rerank=args.topk_rerank
-                                             )
-            print("Id: ", sample_id)            
-            print("question: ", question)
-            print("retrieval paths: ", retrieval_paths)
-            print("--------------------")
-            # write to json    
-            results[str(sample_id)] = retrieval_paths    
-
-    output_path = f"{args.prefix}_mrag_bench_top{args.topk}_modelencode={args.model_name_encode}_topkrerank={args.topk_rerank}.json"
+    sample_dir = os.path.join(args.question_dir, args.sample_id_retrieval)
+    question, question_img, gt_files, choices, gt_ans = extract_question(sample_dir)
+    # retrieved output
+    choice_join = "\n".join(choices)
+    full_question = f"{question}\n{choice_join}"
+    img = Image.open(args.input_path).convert("RGB")
+    retrieval_paths = db.flow_search(img, args.question_dir, filter=0, k=args.topk, topk_rerank=args.topk_rerank)
+    
+    print("Id: ", args.sample_id_retrieval)            
+    print("question: ", question)
+    print("retrieval paths: ", retrieval_paths)
+    print("--------------------")
+    # write to json    
+    results[str(args.sample_id_retrieval)] = retrieval_paths
+    output_path = f"test.json"
     with open(output_path, "w") as f:
         json.dump(results, f, indent=4)
 
@@ -94,8 +85,6 @@ if __name__ == "__main__":
     parser.add_argument("--question_dir", type=str, default="../dataset/MRAG")
     parser.add_argument("--dataset_dir", type=str, default="../dataset/MRAG_corpus")
     parser.add_argument("--index_dir", type=str, default="../database/MRAG_corpus_ReT_caption/index")
-    parser.add_argument("--prefix", type=str)
-    parser.add_argument("--filter", type=int, default=0)
     parser.add_argument("--input_path", type=str)
     args = parser.parse_args()
     main(args)

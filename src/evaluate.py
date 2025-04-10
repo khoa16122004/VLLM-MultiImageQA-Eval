@@ -99,6 +99,8 @@ def main(args):
                 if int(sample_id) != args.sample_id_eval:
                     continue
             
+            
+            
             num_samples += 1
             sample_dir = os.path.join(question_dir, sample_id)
             question, question_img, gt_files, choices, gt_ans = extract_question(sample_dir)
