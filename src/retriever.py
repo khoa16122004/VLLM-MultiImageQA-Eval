@@ -24,7 +24,7 @@ class Retriever:
         print("Extract Feature Proccess ...")
         for img_name in tqdm(os.listdir(dataset_dir)):
             img_path = os.path.join(dataset_dir, img_name)
-            vec = self.model.visual_encode(img_path, "")
+            vec = self.encode_model.visual_encode(img_path, "")
             np.save(os.path.join(output_dir, f"{img_name}.npy"), vec)
         print("Done Extract Feature")        
     
@@ -180,7 +180,7 @@ class Retriever:
                 image paths: List[List[img_path (str)]]
         """
         
-        query_vectors = self.model.visual_batch_encode(pil_pertubation_examples)
+        query_vectors = self.encode_model.visual_batch_encode(pil_pertubation_examples)
         
         final_paths = []
         for vector in query_vectors:
@@ -191,7 +191,7 @@ class Retriever:
     
     
     def flow_search(self, img, k=10, topk_rerank=10):
-        img_vector = self.model.visual_encode(img)
+        img_vector = self.encode_model.visual_encode(img)
         img_paths = self.search_with_reranking(img_vector, k, topk_rerank).tolist() 
         return img_paths
     
