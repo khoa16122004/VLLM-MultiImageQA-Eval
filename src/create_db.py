@@ -3,7 +3,7 @@ from utils import init_encode_model
 from retriever import Retriever
 def main(args):
     encode_model = init_encode_model(args.model_name_encode)
-    retriever = Retriever(args.index_dir, encode_model)
+    retriever = Retriever(args.output_index_dir, encode_model)
     
     # Extract feature
     retriever.extract(args.dataset_dir, args.database_dir)
