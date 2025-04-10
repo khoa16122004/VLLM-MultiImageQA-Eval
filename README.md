@@ -1,8 +1,17 @@
-# VLLM-MultiImageQA-Eval
-This repo contains the inference, evaluation code, and Python environment file for LVLMs that can process multiple images as input across various multi-image visual question-answering datasets.
+# VLLM-MultiImage-RAG-VQA-Eval
+This repo contains the inference, evaluation code, retrieval and Python environment file for LVLMs that can process multiple images as input across various multi-image visual question-answering datasets.
+
+
+# Usage
+Move to the direct direcotry to the folder ```src```
+For extract feature and create vector database run the folowing script:
+```cmd
+    
+```
+
 
 # [MSRAG BenchMark](https://github.com/mragbench/MRAG-Bench)  
-This dataset contains the benchmark for multi-image visual questioning with multiple-choice questions.
+This dataset contains the benchmark for multi-image retrived for visual questioning with multiple-choice questions.
 
 ## Accuracy Table
 

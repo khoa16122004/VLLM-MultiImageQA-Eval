@@ -59,10 +59,11 @@ def init_encode_model(model_name):
     if model_name == "ReT":
         from encode_model import ReTWrapper
         model =  ReTWrapper()
+        dim = 4096
     elif model_name == "CLIP":
         from encode_model import MyCLIPWrapper
         model =  MyCLIPWrapper()
-    
-    return model    
+        dim = 512
+    return model, dim   
 
         

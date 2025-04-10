@@ -17,10 +17,10 @@ def main(args):
     dataset = init_dataset(args.dataset_name)
 
     # init encode model
-    encode_model = init_encode_model(args.model_name_encode)
+    encode_model, dim  = init_encode_model(args.model_name_encode)
     
     # vt database
-    db = Retriever(args.index_dir, encode_model)
+    db = Retriever(args.index_dir, encode_model, dim)
 
     # extract retriever paths
     results = []

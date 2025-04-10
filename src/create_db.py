@@ -2,8 +2,8 @@ import argparse
 from utils import init_encode_model
 from retriever import Retriever
 def main(args):
-    encode_model = init_encode_model(args.model_name_encode)
-    retriever = Retriever(args.output_index_dir, encode_model)
+    encode_model, dim = init_encode_model(args.model_name_encode)
+    retriever = Retriever(args.output_index_dir, encode_model, dim)
     
     # Extract feature
     retriever.extract_db(args.dataset_dir, args.database_dir)
