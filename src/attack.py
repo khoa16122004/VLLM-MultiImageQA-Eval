@@ -31,6 +31,7 @@ if __name__ == "__main__":
     parser.add_argument("--topk_rerank", type=int, default=10)
     parser.add_argument("--topk", type=int, default=5)
     parser.add_argument("--dataset_dir", type=str, default="../dataset/MRAG_corpus")
+    parser.add_argument("--question_dir", type=str, default="../dataset/MRAG")
     parser.add_argument("--index_dir", type=str, default="../database/MRAG_corpus_ReT_caption/index")
     
     args = parser.parse_args()
