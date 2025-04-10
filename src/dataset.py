@@ -41,7 +41,7 @@ class MRAG:
                     
                     f.readline()
                     gt_ans = f.readline().strip().split("Anwers: ")[1]
-        return question, question_img, gt_files, choices, gt_ans
+        return id, question, question_img, gt_files, choices, gt_ans
     
     
     def loader(self):

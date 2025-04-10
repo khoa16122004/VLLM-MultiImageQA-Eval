@@ -24,10 +24,10 @@ def main(args):
     db = Retriever(args.index_dir, encode_model, dim, map_path)
 
     # extract retriever paths
-    results = []
-    for (question, question_img, gt_files, choices, gt_ans) in tqdm(dataset.loader()):
+    results = {}
+    for (id, question, question_img, gt_files, choices, gt_ans) in tqdm(dataset.loader()):
         retrieval_paths = db.flow_search(question_img, k=args.topk, topk_rerank=args.topk_rerank)
-        results.append(retrieval_paths)
+        results[id] = retrieval_paths
     
     # save results
     output_path = os.path.join(args.results_dir, f"{args.dataset_name}_encoder={args.model_name_encode}_topk={args.topk}_topk_rerank={args.topk_rerank}.json")
