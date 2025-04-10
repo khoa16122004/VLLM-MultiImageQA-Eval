@@ -27,11 +27,11 @@ def benchmark(pertubation_examples, fea_retri, retri_paths, db, clip_model):
 
     return 0.5 * retri_scores + 0.5 * sim_scores     
 
-def attack(img, retrived_paths, db, clip_model, args):
+def attack(img, retrived_names, db, clip_model, args):
     img_np = np.array(img).astype('float32') / 255.0  # [H, W, C]
     h, w, c = img_np.shape
 
-    retrived_imgs = [Image.open(path).convert("RGB") for path in retrived_paths]
+    retrived_imgs = [Image.open(os.path.join(args.dataset_dir, path)).convert("RGB") for path in retrived_names]
     fea_retrived = clip_model.visual_encode_batch(retrived_imgs)
 
     perturbations = np.random.rand(args.pop_size, h, w, c) * 2 * args.epsilon - args.epsilon
@@ -41,7 +41,7 @@ def attack(img, retrived_paths, db, clip_model, args):
     while num_evaluations < args.max_evaluations:
         adv_images = np.clip(img_np + perturbations, 0, 1)
 
-        fitness = benchmark(adv_images, fea_retrived, retrived_paths, db, clip_model)
+        fitness = benchmark(adv_images, fea_retrived, retrived_names, db, clip_model)
         num_evaluations += len(fitness)
         print("fitness list: ", fitness)
 
@@ -89,8 +89,8 @@ def main(args):
     img_path = os.path.join(args.question_dir, str(args.image_index), "question_img.png")
     img = Image.open(img_path).convert("RGB")
     
-    sample_paths = db.flow_search(img, args.question_dir, filter=0, k=args.topk, topk_rerank=args.topk_rerank)
-    sample_paths = [os.path.join(args.dataset_dir, path) for path in sample_paths]
+    sample_names = db.flow_search(img, args.question_dir, filter=0, k=args.topk, topk_rerank=args.topk_rerank)
+    sample_paths = [os.path.join(args.dataset_dir, path) for path in sample_names]
     sample_adv_paths = attack(img, sample_paths, db, clip_model, args)
     # print(sample_paths)
     
