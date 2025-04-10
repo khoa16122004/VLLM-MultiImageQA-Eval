@@ -9,7 +9,7 @@ mrag_bench = load_dataset("uclanlp/MRAG-Bench", split="test")
 
 id_to_index = {int(item["id"]): idx for idx, item in enumerate(mrag_bench)}
 
-def load_sample(sample_id, retrievals_json):
+def load_sample(sample_id, retrievals_json, gt_json):
     dataset_dir = os.path.join(r"C:\Users\hokha\OneDrive\Desktop\workplaces\captioning\mrag_bench_image_corpus\image_corpus")
 
     sample = mrag_bench[id_to_index[int(sample_id)]]
@@ -22,19 +22,26 @@ def load_sample(sample_id, retrievals_json):
     retrievals_images = [Image.open(os.path.join(dataset_dir, image)).convert("RGB") for image in retrievals[str(sample['id'])]]
     retrievals_path = [image.replace('_', ' ').replace('-', ' ') for image in retrievals[str(sample['id'])]]
 
-    return question, question_img, gt_images, retrievals_images, retrievals_path
+    with open(gt_json, "r", encoding="utf-8") as f:
+        gt = json.load(f)
+    
+    gt_path_images = [os.path.basename(image["found_path"]).replace('_', ' ').replace('-', ' ') for image in gt[str(sample['id'])]]
+
+    return question, question_img, gt_images, gt_path_images, retrievals_images, retrievals_path
     
 
 demo = gr.Interface(
     fn=load_sample,
     inputs=[
         gr.Textbox(label="Nhập Sample ID (VD: 0, 1, 2...)"),
-        gr.Textbox(label="json chứa ảnh retrieved (VD: {0: ['img1.png', 'img2.png']})")
+        gr.Textbox(label="json chứa ảnh retrieved (VD: {0: ['img1.png', 'img2.png']})"),
+        gr.Textbox(label="json chứa path gt (VD: {0: [{ closest_corpus_path: 'img1.png'}, { closest_corpus_path: 'img2.png'}]})")
     ],
     outputs=[
         gr.Textbox(label="Câu hỏi"),
         gr.Image(label="question_img", scale=0.5),
         gr.Gallery(label="Ground Truth Images", columns=5, height=200),
+        gr.Textbox(label="gt_images"),
         gr.Gallery(label="Retrieved Images", columns=5, height=200),
         gr.Textbox(label="retrievals_path")
     ],
