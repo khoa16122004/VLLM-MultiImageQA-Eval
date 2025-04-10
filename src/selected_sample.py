@@ -5,7 +5,7 @@ def main(args):
     with open(args.question_only_path, "r") as qf, open(args.retrieved_path, "r") as rf:
         question_only_correct = [line.strip() for line in qf.readlines()]
         retrieved_correct = [line.strip() for line in rf.readlines()]
-        intersection = question_only_correct.intersection(retrieved_correct)
+        intersection = set(question_only_correct).intersection(retrieved_correct)
         result = retrieved_correct.difference(intersection)
         print("Len that retrieved correct but question not: ", len(result))    
     
