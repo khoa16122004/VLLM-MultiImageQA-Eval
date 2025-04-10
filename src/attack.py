@@ -31,7 +31,7 @@ def attack(img, retrived_paths, db, clip_model, args):
     retrived_imgs = [Image.open(path).convert("RGB") for path in retrived_paths]
     fea_retrived = clip_model.visual_encode_batch(retrived_imgs)
 
-    perturbations = np.random.normal(args.pop_size, h, w, c) * 2 * args.epsilon - args.epsilon
+    perturbations = np.random.rand(args.pop_size, h, w, c) * 2 * args.epsilon - args.epsilon
 
     num_evaluations = 0
 
