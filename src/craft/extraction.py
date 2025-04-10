@@ -94,7 +94,7 @@ class CreateDatabase:
 
             index_id = 0 
             current_index = faiss.IndexFlatL2(self.d)
-            print("Starting to create database...")
+            print("Starting to create indexing...")
             # print("Estimated total index: ", 1 + self.number_vectors // batch_size)
             batch_retrieval_vectors = []
             all_paths = []
@@ -208,14 +208,7 @@ class CreateDatabase:
         top_indices = all_indices[sorted_idx]
         top_batches = all_batch_index[sorted_idx]
         top_vectors = all_vectors[sorted_idx]
-
-        # query_df = pd.DataFrame({
-        #     'index': top_indices,
-        #     'batch_idx': top_batches
-        # })
-
-        # merged = pd.merge(query_df, df, on=['index', 'batch_idx'], how='inner')
-
+        
         return top_indices, top_batches, top_vectors, df 
     
     def flow_search(self, img, question_dir, question=None, filter=0, k=10, topk_rerank=10):

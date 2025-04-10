@@ -13,7 +13,7 @@ class MyCLIPWrapper:
         self.model = HFCLIPModel.from_pretrained(model_name).to(self.device)
         self.processor = CLIPProcessor.from_pretrained(model_name)
 
-    def visual_encode(self, image_input):
+    def visual_encode(self, image_input, txt=""):
         if isinstance(image_input, str):
             image = Image.open(image_input).convert('RGB')
         elif isinstance(image_input, Image.Image):
@@ -57,7 +57,7 @@ class ReTWrapper:
         self.query: RetModel = retrieval.get_passage_model().cuda()
         self.query.init_tokenizer_and_image_processor()
     
-    def encode_multimodal(self, img, txt=""): # img: img_pil, txt: str
+    def visual_encode(self, img, txt=""): # img: img_pil, txt: str
         if txt:
             ret_feats = self.query.get_ret_features([[txt, img]]).squeeze(0)
         else: # txt = ""
@@ -65,8 +65,8 @@ class ReTWrapper:
         
         return ret_feats.cpu().numpy()
     
-    def visual_batch_encode(self, imgs): # pul_img
-        ret_feats = self.encode.get_ret_features([["", img] for img in imgs])
+    def visual_batch_encode(self, imgs, txt=""): # pul_img
+        ret_feats = self.encode.get_ret_features([[txt, img] for img in imgs])
         return ret_feats.cpu().numpy()
     
     
