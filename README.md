@@ -4,7 +4,8 @@ This repo contains the inference, evaluation code, retrieval and Python environm
 # Usage
 Move to the direct direcotry to the folder ```src```
 
-For extract feature and create vector database run the folowing script:
+## 🔍 Step 1: Extract Features & Create Vector Database
+- For extract feature and create vector database run the folowing script:
 ```bash
     CUDA_VISIBLE_DEVICES=<id> python create_db.py \
     --model_name_encode CLIP \
@@ -13,8 +14,9 @@ For extract feature and create vector database run the folowing script:
     --output_index_dir new_database/MRAG/CLIP/index
 ```
 
+## 📁 Step 2: Extract Retrieval Paths
 
-For extract the json containing the path results when retriev the question img, uisng the following script:
+- For extract the json containing the path results when retriev the question img, uisng the following script:
 
 ```bash
     CUDA_VISIBLE_DEVICES=3 python extract_retrieval.py \
