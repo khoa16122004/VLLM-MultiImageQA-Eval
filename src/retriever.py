@@ -23,7 +23,7 @@ class Retriever:
         """
         print("Extract Feature Proccess ...")
         for img_name in tqdm(os.listdir(dataset_dir)):
-            img_path = os.path.join(self.dataset_dir, img_name)
+            img_path = os.path.join(dataset_dir, img_name)
             vec = self.model.visual_encode(img_path, "")
             np.save(os.path.join(output_dir, f"{img_name}.npy"), vec)
         print("Done Extract Feature")        
