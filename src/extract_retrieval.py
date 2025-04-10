@@ -11,7 +11,7 @@ from retriever import Retriever
 
 def main(args):
     
-    os.makedirs(args.retrieval_dir, exist_ok=True)
+    os.makedirs(args.results_dir, exist_ok=True)
     
     # init dataset
     dataset = init_dataset(args.dataset_name)
@@ -38,7 +38,7 @@ if __name__ == "__main__":
     parser.add_argument("--model_name_encode", type=str, default="ReT")
     parser.add_argument("--topk_rerank", type=int, default=10)
     parser.add_argument("--topk", type=int, default=5)
-    parser.add_argument("--index_dir", type=str, default="../database/MRAG_corpus_ReT_caption/index")
+    parser.add_argument("--index_dir", type=str)
     parser.add_argument("--dataset_name", type=str, default="MRAG")
     parser.add_argument("--results_dir", type=str, default="results_retriever")
     args = parser.parse_args()
