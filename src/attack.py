@@ -59,11 +59,13 @@ def attack(img, retrived_names, db, clip_model, args):
         perturbations = np.array(new_perturbations)
 
     final_adv_images = np.clip(img_np + perturbations, 0, 1)
-    final_fitness = benchmark(final_adv_images, fea_retrived, retrived_paths, db, clip_model)
+    final_fitness = benchmark(final_adv_images, fea_retrived, retrived_names, db, clip_model)
     best_idx = np.argmin(final_fitness)
     best_perturbation = perturbations[best_idx]
 
-    return (np.clip(img_np + best_perturbation, 0, 1) * 255).astype(np.uint8)
+    img_np_adv = (np.clip(img_np + best_perturbation, 0, 1) * 255).astype(np.uint8)
+    pil_img = Image.fromarray(img_np_adv)
+    return pil_img
 
 
 
@@ -91,7 +93,8 @@ def main(args):
     
     sample_names = db.flow_search(img, args.question_dir, filter=0, k=args.topk, topk_rerank=args.topk_rerank)
     # sample_paths = [os.path.join(args.dataset_dir, path) for path in sample_names]
-    sample_adv_paths = attack(img, sample_names, db, clip_model, args)
+    adv_img = attack(img, sample_names, db, clip_model, args)
+    adv_img.save("test.png")
     # print(sample_paths)
     
 if __name__ == "__main__":
