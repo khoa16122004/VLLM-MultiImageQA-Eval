@@ -24,7 +24,7 @@ def benchmark(pertubation_examples, fea_retri, retri_paths, db, clip_model):
     print("Feature perubtation shape: ", fea_pertubation_examples.shape)
     sim_matrix = fea_pertubation_examples @ fea_retri.T # pop_size x 5
     print("Sim_matrix: ", sim_matrix.shape)
-    sim_scores = sim_matrix.mean(dim=1) # pop_size
+    sim_scores = sim_matrix.mean(axis=1) # pop_size
     print("Sim scores: ", sim_scores.shape)
     print("CLIP sim score: ", sim_scores)
     # retrieval score
