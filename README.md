@@ -6,7 +6,7 @@ This repo contains the inference, evaluation code, retrieval and Python environm
 Move to the direct direcotry to the folder ```src```
 For extract feature and create vector database run the folowing script:
 ```cmd
-    
+    CUDA_VISIBLE_DEVICES=<id> python create_db.py --model_name_encode CLIP --dataset_dir ../dataset/MRAG_corpus --database_dir new_database/MRAG/CLIP --output_index_dir new_database/MRAG/CLIP/index
 ```
 
 

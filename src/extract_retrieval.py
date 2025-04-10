@@ -25,7 +25,7 @@ def main(args):
     # extract retriever paths
     results = []
     for (question, question_img, gt_files, choices, gt_ans) in tqdm(dataset.loader()):
-        retrieval_paths = db.flow_search(question_img, args.question_dir, filter=0, k=args.topk, topk_rerank=args.topk_rerank)
+        retrieval_paths = db.flow_search(question_img, k=args.topk, topk_rerank=args.topk_rerank)
         results.append(retrieval_paths)
     
     # save results
@@ -38,8 +38,6 @@ if __name__ == "__main__":
     parser.add_argument("--model_name_encode", type=str, default="ReT")
     parser.add_argument("--topk_rerank", type=int, default=10)
     parser.add_argument("--topk", type=int, default=5)
-    parser.add_argument("--question_dir", type=str, default="../dataset/MRAG")
-    parser.add_argument("--dataset_dir", type=str, default="../dataset/MRAG_corpus")
     parser.add_argument("--index_dir", type=str, default="../database/MRAG_corpus_ReT_caption/index")
     parser.add_argument("--dataset_name", type=str, default="MRAG")
     parser.add_argument("--results_dir", type=str, default="results_retriever")
