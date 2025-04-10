@@ -96,6 +96,5 @@ if __name__ == "__main__":
     parser.add_argument("--index_dir", type=str, default="../database/MRAG_corpus_ReT_caption/index")
     parser.add_argument("--prefix", type=str)
     parser.add_argument("--filter", type=int, default=0)
-    parser.add_argument("--input_path", type=str)
     args = parser.parse_args()
     main(args)
