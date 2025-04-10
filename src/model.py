@@ -26,6 +26,17 @@ class MyCLIPWrapper:
             image_features = self.model.get_image_features(**inputs)
         return image_features.squeeze().cpu().numpy()
 
+
+    def visual_encode_batch(self, image_inputs):
+        if not all(isinstance(img, Image.Image) for img in image_inputs):
+            raise ValueError("All inputs must be PIL.Image.Image")
+
+        inputs = self.processor(images=image_inputs, return_tensors="pt", padding=True).to(self.device)
+        with torch.no_grad():
+            image_features = self.model.get_image_features(**inputs)
+
+        return image_features.cpu().numpy()
+
     def text_encode(self, text):
         # Giới hạn số lượng token
         max_length = 77  # Giới hạn chiều dài chuỗi
@@ -54,6 +65,7 @@ class ReTWrapper:
             ret_feats = self.encode.get_ret_features([[txt, img]]).squeeze(0)
         
         return ret_feats.cpu().numpy()
+    
     
     def sim(self, q1, q2): # q1: ret_feats, q2: ret_feats
         # q1: 32 x d
