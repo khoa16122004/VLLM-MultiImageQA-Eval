@@ -45,7 +45,8 @@ def attack(img, retrived_paths, db, clip_model, args):
     fea_retrived = clip_model.visual_encode_batch(retrived_imgs)
 
     
-    pertubation_examples = img_np + np.random.rand(*img_np.shape) * args.epsilon
+    pertubation_examples = img_np + np.random.rand(args.pop_size, *img_np.shape) * args.epsilon
+    print("Pertunation examples shape: ", pertubation_examples.shape)
     fitness = benchmark(pertubation_examples, fea_retrived, retrived_paths, db, clip_model)
     return
     
