@@ -209,15 +209,15 @@ class CreateDatabase:
 
         return top_indices, top_batches, top_vectors, df 
     
-    def flow_search(self, question_dir, image_index, question=None, filter=0, k=10, topk_rerank=10):
+    def flow_search(self, image_index, question_dir, question=None, filter=0, k=10, topk_rerank=10):
         img_path = os.path.join(question_dir, str(image_index), "question_img.png")
         if self.model_name == "CLIP":
             img_vector = self.model.visual_encode(img_path)
         elif self.model_name == "ReT":
-            intruction = "Retrieve documents that provide an answer to the question alongside the image: "
-            full_question = intruction + question
-            img_vector = self.model.encode_multimodal(img_path, full_question).flatten()
-                # img_vector = self.model.encode_multimodal(img_path) 
+            # intruction = "Retrieve documents that provide an answer to the question alongside the image: "
+            # full_question = intruction + question
+            # img_vector = self.model.encode_multimodal(img_path, full_question).flatten()
+            img_vector = self.model.encode_multimodal(img_path) 
         
         if filter == 1:
             sample_paths = self.search_with_reranking(img_vector, 20, topk_rerank).tolist() 

@@ -174,4 +174,4 @@ cython_debug/
 .pypirc
 database/MRAG/*
 dataset/*
-
+database/caption_corpus
