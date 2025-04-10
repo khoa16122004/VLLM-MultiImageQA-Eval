@@ -18,7 +18,7 @@ def benchmark(pertubation_examples, fea_retri, retri_paths, db, clip_model):
     # convert to PIL Image
     pil_pertubation_examples = [Image.fromarray(np.uint8(pertubation_example * 255)) for pertubation_example in pertubation_examples]
     print(pil_pertubation_examples)
-    input()
+    # input()
     # CLIP sim
     fea_pertubation_examples = clip_model.visual_encode_batch(pil_pertubation_examples) # pop_size * dim
     print("Feature perubtation shape: ", fea_pertubation_examples.shape)
@@ -41,7 +41,8 @@ def attack(img, retrived_paths, db, clip_model, args):
     img_np = np.array(img)
     img_np = img_np.astype('float32') / 255.0 # img_np: [0,1]
 
-    fea_retrived = clip_model.visual_encode_batch(retrived_paths)
+    retrived_imgs = [Image.open(path).convert("RGB") for path in retrived_paths]
+    fea_retrived = clip_model.visual_encode_batch(retrived_imgs)
 
     
     pertubation_examples = img_np + np.random.rand(*img_np.shape) * args.epsilon
