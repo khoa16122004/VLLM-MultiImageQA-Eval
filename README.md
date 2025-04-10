@@ -2,7 +2,7 @@
 This repo contains the inference, evaluation code, retrieval and Python environment file for LVLMs that can process multiple images as input across various multi-image visual question-answering datasets.
 
 # Usage
-Move to the direct direcotry to the folder ```src```
+Move to the repo directory to the folder ```src```
 
 ## 🔍 Step 1: Extract Features & Create Vector Database
 - For extract feature and create vector database run the folowing script:

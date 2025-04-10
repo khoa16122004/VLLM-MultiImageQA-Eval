@@ -30,9 +30,9 @@ def main(args):
         results.append(retrieval_paths)
     
     # save results
-    output_path = os.path.join(args.results_dir, f"{args.dataset_name}_encoder={args.model_name_encode}_topk={args.topk}_topk_rerank={args.topk_rerank}.json")
+    output_path = os.path.join(args.results_dir, f"{args.dataset_name}_encoder={args.x}_topk={args.topk}_topk_rerank={args.topk_rerank}.json")
     with open(output_path, "w") as f:    
-        json.dump(results, f)
+        json.dump(results, f, indent=4)
         
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
