@@ -3,8 +3,8 @@ import os
 
 # --- Tên file ---
 file1_path = '../gt_image_paths.json'  # File chứa danh sách gốc (để kiểm tra sự tồn tại)
-file2_path = '../test_mrag_bench_top5_modelencode=ReT_topkrerank=10.json'  # File chứa danh sách cần kiểm tra (đáp án)
-output_txt_path = '../ReT_no-caption.txt' # File lưu kết quả các key có trùng khớp
+file2_path = '../database\ReT_retrieval\mrag_bench_top5_results_CLIP_ReT-caption_0.5-0.5.json'  # File chứa danh sách cần kiểm tra (đáp án)
+output_txt_path = '../ReT-caption.txt' # File lưu kết quả các key có trùng khớp
 
 # --- Hàm thực hiện so sánh và ghi file ---
 def find_matching_keys(file1_path, file2_path, output_txt_path):
