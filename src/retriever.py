@@ -55,7 +55,7 @@ class Retriever:
                 if not npy_file.endswith(".npy"):
                     continue
                 retrieval_vectors = np.load(os.path.join(vectors_dir, npy_file))
-                if self.model_name == "ReT":
+                if self.encode_model.name == "ReT":
                     retrieval_vectors = retrieval_vectors.flatten()
                 
                 all_paths.append(npy_file.split(".npy")[0])

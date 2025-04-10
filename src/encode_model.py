@@ -12,7 +12,7 @@ class MyCLIPWrapper:
         self.device = device or ('cuda' if torch.cuda.is_available() else 'cpu')
         self.model = HFCLIPModel.from_pretrained(model_name).to(self.device)
         self.processor = CLIPProcessor.from_pretrained(model_name)
-
+        self.name = "CLIP"
     def visual_encode(self, image_input, txt=""):
         if isinstance(image_input, str):
             image = Image.open(image_input).convert('RGB')
@@ -56,7 +56,8 @@ class ReTWrapper:
         
         self.query: RetModel = retrieval.get_passage_model().cuda()
         self.query.init_tokenizer_and_image_processor()
-    
+
+        self.name = "ReT"
     def visual_encode(self, img, txt=""): # img: img_pil, txt: str
         if txt:
             ret_feats = self.query.get_ret_features([[txt, img]]).squeeze(0)
