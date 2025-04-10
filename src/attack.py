@@ -38,7 +38,7 @@ def attack(img, retrived_paths, db, clip_model, args):
     img_np = np.array(img)
     img_np = img_np.astype('float32') / 255.0 # img_np: [0,1]
 
-    fea_retrived = clip_model.visual_encode(retrived_paths)
+    fea_retrived = clip_model.visual_encode_batch(retrived_paths)
 
     
     pertubation_examples = img_np + np.random.rand(*img_np.shape) * args.epsilon
