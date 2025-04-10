@@ -73,7 +73,7 @@ def main(args):
     sample_paths = db.flow_search(img, args.question_dir, filter=0, k=args.topk, topk_rerank=args.topk_rerank)
     sample_paths = [os.path.join(args.dataset_dir, path) for path in sample_paths]
     sample_adv_paths = attack(img, sample_paths, db, clip_model, args)
-    print(sample_paths)
+    # print(sample_paths)
     
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
