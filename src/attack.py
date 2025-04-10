@@ -43,6 +43,7 @@ def attack(img, retrived_paths, db, clip_model, args):
 
         fitness = benchmark(adv_images, fea_retrived, retrived_paths, db, clip_model)
         num_evaluations += len(fitness)
+        print("fitness list: ", fitness)
 
         elite_idxs = np.argsort(fitness)[args.num_elites:]
         elites = perturbations[elite_idxs]
