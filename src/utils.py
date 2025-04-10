@@ -57,10 +57,10 @@ def init_encode_model(model_name):
     """
     
     if model_name == "ReT":
-        from models import ReTWrapper
+        from encode_model import ReTWrapper
         model =  ReTWrapper()
     elif model_name == "CLIP":
-        from models import MyCLIPWrapper
+        from encode_model import MyCLIPWrapper
         model =  MyCLIPWrapper()
     
     return model    
