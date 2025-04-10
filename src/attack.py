@@ -11,44 +11,58 @@ import warnings
 warnings.simplefilter("ignore")
 
 
-def benchmark(pertubation_examples, fea_retri, retri_paths, db, clip_model):
-    
-    # fea_retri: 5 * dim
-    
-    # convert to PIL Image
+def benchmark(pertubation_examples, fea_retri, retri_paths, db, clip_model):    
     pil_pertubation_examples = [Image.fromarray(np.uint8(pertubation_example * 255)) for pertubation_example in pertubation_examples]
-    # print(pil_pertubation_examples)
-    # input()
-    # CLIP sim
     fea_pertubation_examples = clip_model.visual_encode_batch(pil_pertubation_examples) # pop_size * dim
-    print("Feature perubtation shape: ", fea_pertubation_examples.shape)
     sim_matrix = fea_pertubation_examples @ fea_retri.T # pop_size x 5
-    print("Sim_matrix: ", sim_matrix.shape)
     sim_scores = sim_matrix.mean(axis=1) # pop_size
-    print("Sim scores: ", sim_scores.shape)
-    print("CLIP sim score: ", sim_scores)
-    # retrieval score
     retri_scores = []
     pertbuation_retri_paths = db.batch_search(pil_pertubation_examples, k=5, topk_rerank=10) # pop_size x top_k
     for pertubation_retri in pertbuation_retri_paths: # top_k
         intersection = set(pertubation_retri).intersection(retri_paths)
-        retri_scores.append(len(intersection) / len(pertubation_retri))
+        retri_scores.append(len(intersection) / len(pertubation_retri)) * 100
     
-    print("Retri_scores: ", retri_scores)
-    
+    return 0.5 * retri_scores + 0.5 * sim_scores     
 
 def attack(img, retrived_paths, db, clip_model, args):
-    img_np = np.array(img)
-    img_np = img_np.astype('float32') / 255.0 # img_np: [0,1]
+    img_np = np.array(img).astype('float32') / 255.0  # [H, W, C]
+    h, w, c = img_np.shape
 
     retrived_imgs = [Image.open(path).convert("RGB") for path in retrived_paths]
     fea_retrived = clip_model.visual_encode_batch(retrived_imgs)
 
-    
-    pertubation_examples = img_np + np.random.rand(args.pop_size, *img_np.shape) * args.epsilon
-    print("Pertunation examples shape: ", pertubation_examples.shape)
-    fitness = benchmark(pertubation_examples, fea_retrived, retrived_paths, db, clip_model)
-    return
+    perturbations = np.random.rand(args.pop_size, h, w, c) * 2 * args.epsilon - args.epsilon
+
+    num_evaluations = 0
+
+    while num_evaluations < args.max_evaluations:
+        adv_images = np.clip(img_np + perturbations, 0, 1)
+
+        fitness = benchmark(adv_images, fea_retrived, retrived_paths, db, clip_model)
+        num_evaluations += len(fitness)
+
+        elite_idxs = np.argsort(fitness)[args.num_elites:]
+        elites = perturbations[elite_idxs]
+        print("Fintess: ", fitness[elite_idxs[0]])
+
+        new_perturbations = []
+        for _ in range(args.pop_size):
+            parent = elites[np.random.randint(len(elites))]
+            noise = np.random.normal(scale=args.mutation_std, size=(h, w, c))
+            child = np.clip(parent + noise, -args.epsilon, args.epsilon)
+            new_perturbations.append(child)
+
+        perturbations = np.array(new_perturbations)
+
+    final_adv_images = np.clip(img_np + perturbations, 0, 1)
+    final_fitness = benchmark(final_adv_images, fea_retrived, retrived_paths, db, clip_model)
+    best_idx = np.argmin(final_fitness)
+    best_perturbation = perturbations[best_idx]
+
+    return (np.clip(img_np + best_perturbation, 0, 1) * 255).astype(np.uint8)
+
+
+
     
 
 

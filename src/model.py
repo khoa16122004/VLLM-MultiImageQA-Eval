@@ -39,10 +39,8 @@ class MyCLIPWrapper:
         return image_features.cpu().numpy()
 
     def text_encode(self, text):
-        # Giới hạn số lượng token
-        max_length = 77  # Giới hạn chiều dài chuỗi
+        max_length = 77 
 
-        # Cắt ngắn văn bản nếu cần
         inputs = self.processor(text=text, return_tensors="pt", padding=True, truncation=True, max_length=max_length).to(self.device)
 
         with torch.no_grad():
