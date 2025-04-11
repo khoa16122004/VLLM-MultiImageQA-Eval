@@ -17,7 +17,7 @@ if __name__ == "__main__":
     parser.add_argument("--dataset_dir", type=str, default="../dataset/MRAG_corpus")
     parser.add_argument("--database_dir", type=str)
     parser.add_argument("--output_index_dir", type=str)
-    parser.add_argument("--caption_dir", typp=str, default=None)
+    parser.add_argument("--caption_dir", type=str, default=None)
     
     args = parser.parse_args()
     
