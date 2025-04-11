@@ -237,7 +237,7 @@ class Retriever:
         scores = [(path ,paths_distance_dict[path] / paths_count_dict[path]) for path in paths_count_dict]
         scores = sorted(scores, key=lambda x: x[1])[:k]
         
-        return img_paths, top_distance
+        return scores
                 
     
     def batch_search(self, pil_pertubation_examples, k=5, topk_rerank=10):
