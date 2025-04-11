@@ -245,11 +245,11 @@ class MultiModal_Retriever:
     def __init__(self, retriever_list, weights):
         self.retriever_list = retriever_list
         
-    def multimodel_search(self, img, question=None, k=10, topk_rerank=10):
+    def flow_search(self, img, question=None, k=10, topk_rerank=10, topk_each_model=100):
         results = {}
         all_paths = set()
         for retriever in self.retriever_list:
-            img_paths, distances = retriever.flow_search(img, question, k, topk_rerank)
+            img_paths, distances = retriever.flow_search(img, question, topk_each_model, 100)
             results[retriever.__class__.__name__] = {
                 path: distance for path, distance in zip(img_paths, distances)
             }
@@ -263,5 +263,5 @@ class MultiModal_Retriever:
             final_results.append((path, avg_score))
             
         final_results = sorted(final_results, key=lambda x: x[1])
-        paths = [final_result[0] for final_result in final_results]
+        paths = [final_result[0] for final_result in final_results][:k]
         return paths
