@@ -36,7 +36,7 @@ class Retriever:
                     
                 
             vec = self.encode_model.visual_encode(img_path, caption)
-            print("Vector shape: ", vec)
+            print("Vector shape: ", vec.shape)
             for i in range(len(vec)):
                 np.save(os.path.join(output_dir, f"{img_name}_{i}.npy"), vec[i])
         print("Done Extract Feature")        
