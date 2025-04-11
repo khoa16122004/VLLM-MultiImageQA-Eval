@@ -140,7 +140,7 @@ class Retriever:
             'batch_idx': final_batches
         })
         merged = pd.merge(query_df, df, on=['index', 'batch_idx'], how='inner')
-        img_paths = merged['img_path'].to_numpy()
+        img_paths = merged['img_path'].to_numpy().tolist()
         return img_paths, final_distances
     
     
@@ -234,7 +234,7 @@ class Retriever:
             img_paths = [result[0] for result in results]
             distances = [result[1] for result in results]
         elif self.encode_model.name == "CLIP":
-            img_paths, distances = self.search_with_reranking(img_vector, k, topk_rerank).tolist()
+            img_paths, distances = self.search_with_reranking(img_vector, k, topk_rerank)
         
         
         return img_paths, distances
