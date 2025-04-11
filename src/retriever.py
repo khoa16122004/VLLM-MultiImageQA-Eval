@@ -75,7 +75,6 @@ class Retriever:
                 
                 
                 original_name = "_".join(npy_file.split("_")[:-1])
-                print(original_name)
                 all_paths.append(original_name)
                 batch_retrieval_vectors.append(retrieval_vectors)
                 
