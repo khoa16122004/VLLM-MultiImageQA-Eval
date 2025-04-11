@@ -57,7 +57,7 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--model_name_encode", type=str, default="ReT")
-    parser.add_argument("--topk_rerank", type=int, default=10)
+    parser.add_argument("--topk_rerank", type=int, default=1000)
     parser.add_argument("--topk", type=int, default=5)
     parser.add_argument("--index_dir", type=str)
     parser.add_argument("--dataset_name", type=str, default="MRAG")
