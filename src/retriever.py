@@ -73,6 +73,7 @@ class Retriever:
                 
                 
                 original_name = "_".join(npy_file.split("_")[:-1])
+                print(original_name)
                 all_paths.append(original_name)
                 batch_retrieval_vectors.append(retrieval_vectors)
                 
@@ -184,7 +185,7 @@ class Retriever:
         top_indices = all_indices[sorted_idx]
         top_batches = all_batch_index[sorted_idx]
         top_vectors = all_vectors[sorted_idx]
-        top_distance = distances[sorted_idx]
+        top_distance = all_distances[sorted_idx]
         
         return top_distance, top_indices, top_batches, top_vectors, df 
     
