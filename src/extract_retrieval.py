@@ -19,6 +19,7 @@ def main(args):
     if args.multimodel_retrieval == 0:
         # init encode model
         encode_model, dim  = init_encode_model(args.model_name_encode)
+        map_path = os.path.join(args.index_dir, "map.csv")
         db = Retriever(args.index_dir, encode_model, dim, map_path)
 
     else:
@@ -31,6 +32,8 @@ def main(args):
             
             encode_model, dim = init_encode_model(model_name)
             index_dir = input("Input the index dir: ")
+            map_path = os.path.join(args.index_dir, "map.csv")
+
             retriever = Retriever(index_dir, encode_model, dim, map_path)
             retrievers.append(retriever)
             w = input(f"Input the weight of {model_name}")
@@ -39,7 +42,6 @@ def main(args):
         db = MultiModal_Retriever(retrievers, weights)
     
     # vt database
-    map_path = os.path.join(args.index_dir, "map.csv")
 
     # extract retriever paths
     results = {}
