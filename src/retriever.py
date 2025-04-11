@@ -36,7 +36,6 @@ class Retriever:
                     
                 
             vec = self.encode_model.visual_encode(img_path, caption)
-            print("Vector shape: ", vec.shape)
             if self.encode_model.name == "CLIP":
                     np.save(os.path.join(output_dir, f"{img_name}_0.npy"), vec)
             
