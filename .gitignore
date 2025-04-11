@@ -175,3 +175,4 @@ cython_debug/
 database/MRAG/*
 dataset/*
 database/caption_corpus
+results_retriever

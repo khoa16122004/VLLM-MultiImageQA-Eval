@@ -12,7 +12,7 @@ class Retriever:
         self.map_path = map_path
         self.d = dim
         
-    def extract_db(self, dataset_dir, output_dir):
+    def extract_db(self, dataset_dir, output_dir, caption_dir=None):
         
         """
             Args:
@@ -26,8 +26,18 @@ class Retriever:
         print("Extract Feature Proccess ...")
         for img_name in tqdm(os.listdir(dataset_dir)):
             img_path = os.path.join(dataset_dir, img_name)
-            vec = self.encode_model.visual_encode(img_path, "")
-            np.save(os.path.join(output_dir, f"{img_name}.npy"), vec)
+            
+            # if caption
+            caption = ""
+            if caption_dir:
+                caption_path = os.path.join(caption_dir, img_name + ".txt")
+                with open(caption_path, "r") as f:
+                    caption = f.readline().strip()
+                    
+                
+            vec = self.encode_model.visual_encode(img_path, caption)
+            for i in range(len(vec)):
+                np.save(os.path.join(output_dir, f"{img_name}_{i}.npy"), vec[i])
         print("Done Extract Feature")        
     
     
@@ -54,11 +64,11 @@ class Retriever:
             for npy_file in tqdm(sorted(os.listdir(vectors_dir))):
                 if not npy_file.endswith(".npy"):
                     continue
-                retrieval_vectors = np.load(os.path.join(vectors_dir, npy_file))
-                if self.encode_model.name == "ReT":
-                    retrieval_vectors = retrieval_vectors.flatten()
+                retrieval_vectors = np.load(os.path.join(vectors_dir, npy_file)) # 1 x dim
                 
-                all_paths.append(npy_file.split(".npy")[0])
+                
+                original_name = "_".join(npy_file.split("_")[:-1])
+                all_paths.append(original_name)
                 batch_retrieval_vectors.append(retrieval_vectors)
                 
                 if len(np.vstack(batch_retrieval_vectors)) >= batch_size:
@@ -109,7 +119,7 @@ class Retriever:
         
         '''
         
-        top_indices, top_batches, top_vectors, df = self.search(query_vector, top_rerank, self.d) # 50 vector
+        top_distances, top_indices, top_batches, top_vectors, df = self.search(query_vector, top_rerank, self.d) # 50 vector
         expanded_query = np.mean(top_vectors, axis=0).astype('float32')
         all_distances = np.linalg.norm(top_vectors - expanded_query.reshape(1, -1), axis=1)  # Euclidean
 
@@ -117,6 +127,7 @@ class Retriever:
 
         final_indices = top_indices[reranked_idx]
         final_batches = top_batches[reranked_idx]
+        final_distances = top_distances[reranked_idx]
 
         query_df = pd.DataFrame({
             'index': final_indices,
@@ -124,7 +135,7 @@ class Retriever:
         })
         merged = pd.merge(query_df, df, on=['index', 'batch_idx'], how='inner')
         img_paths = merged['img_path'].to_numpy()
-        return img_paths
+        return img_paths, final_distances
     
     
     def search(self, query_vector, top_rerank=50, k=5):
@@ -168,9 +179,27 @@ class Retriever:
         top_indices = all_indices[sorted_idx]
         top_batches = all_batch_index[sorted_idx]
         top_vectors = all_vectors[sorted_idx]
+        top_distance = distances[sorted_idx]
         
-        return top_indices, top_batches, top_vectors, df 
+        return top_distance, top_indices, top_batches, top_vectors, df 
     
+    
+    def ReT_search(self, query_matrix, k=10, topk_rerank=10):
+        paths_count_dict = {}
+        paths_distance_dict = {}
+        
+        
+        for v in query_matrix:
+            top_distance, paths = self.search_with_reranking(v, k, topk_rerank)
+            for path, dis in zip(paths, top_distance):
+                paths_count_dict[path] = paths_count_dict.get(path, 0) + 1
+                paths_distance_dict[path] = paths_distance_dict.get(path, 0) + dis
+        
+        scores = [(path ,paths_distance_dict[path] / paths_count_dict[path]) for path in paths_count_dict]
+        scores = sorted(scores, key=lambda x: x[1])
+        
+        return scores
+        
     
     def batch_search(self, pil_pertubation_examples, k=5, topk_rerank=10):
         
@@ -192,10 +221,39 @@ class Retriever:
         return final_paths
     
     
-    def flow_search(self, img, k=10, topk_rerank=10):
-        img_vector = self.encode_model.visual_encode(img)
-        img_paths = self.search_with_reranking(img_vector, k, topk_rerank).tolist() 
-        return img_paths
-    
-    
+    def flow_search(self, img, question=None, k=10, topk_rerank=10):
+        img_vector = self.encode_model.visual_encode(img, question) # 32 x d
+        if self.encode_model.name == "ReT":
+            results = self.ReT_search(img_vector, k, topk_rerank)
+            img_paths = [result[0] for result in results]
+            distances = [result[1] for result in results]
+        elif self.encode_model.name == "CLIP":
+            img_paths, distances = self.search_with_reranking(img_vector, k, topk_rerank).tolist()
         
+        
+        return img_paths, distances
+
+class MultiModal_Retriever:
+    def __init__(self, retriever_list, weights):
+        self.retriever_list = retriever_list
+        
+    def multimodel_search(self, img, question=None, k=10, topk_rerank=10):
+        results = {}
+        all_paths = set()
+        for retriever in self.retriever_list:
+            img_paths, distances = retriever.flow_search(img, question, k, topk_rerank)
+            results[retriever.__class__.__name__] = {
+                path: distance for path, distance in zip(img_paths, distances)
+            }
+            all_paths.update(img_paths)
+        
+        final_results = []   
+        for path in all_paths:
+            avg_score = 0.0
+            for w, retri_name in zip(w, results):
+                avg_score += w * results[retri_name].get(path, 0.0)
+            final_results.append((path, avg_score))
+            
+        final_results = sorted(final_results, key=lambda x: x[1])
+        paths = [final_result[0] for final_result in final_results]
+        return paths

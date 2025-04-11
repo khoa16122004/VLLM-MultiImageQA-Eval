@@ -51,18 +51,18 @@ class MyCLIPWrapper:
 class ReTWrapper:
     def __init__(self):
         retrieval = RetrieverModel.from_pretrained('aimagelab/ReT-CLIP-ViT-L-14') # E_Qs
-        self.encode: RetModel = retrieval.get_query_model().cuda()
+        self.encode: RetModel = retrieval.get_passage_model().cuda()
         self.encode.init_tokenizer_and_image_processor()
         
-        self.query: RetModel = retrieval.get_passage_model().cuda()
+        self.query: RetModel = retrieval.get_query_model().cuda()
         self.query.init_tokenizer_and_image_processor()
 
         self.name = "ReT"
-    def visual_encode(self, img, txt=""): # img: img_pil, txt: str
-        if txt:
-            ret_feats = self.query.get_ret_features([[txt, img]]).squeeze(0)
-        else: # txt = ""
+    def visual_encode(self, img, txt, mode="encode"): # img: img_pil, txt: str
+        if mode == "encode":
             ret_feats = self.encode.get_ret_features([[txt, img]]).squeeze(0)
+        elif mode == "query":
+            ret_feats = self.query.get_ret_features([[txt, img]]).squeeze(0)
         
         return ret_feats.cpu().numpy()
     
