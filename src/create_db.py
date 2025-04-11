@@ -6,7 +6,7 @@ def main(args):
     retriever = Retriever(args.output_index_dir, encode_model, dim)
     
     # Extract feature
-    # retriever.extract_db(args.dataset_dir, args.database_dir)
+    retriever.extract_db(args.dataset_dir, args.database_dir)
     # Indexing
     retriever.create_database(args.database_dir, args.output_index_dir)
 
