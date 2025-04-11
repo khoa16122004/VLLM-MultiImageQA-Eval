@@ -197,8 +197,8 @@ class Retriever:
         
         
         for v in query_matrix:
-            paths, top_distance = self.search_with_reranking(v, k, topk_rerank)
-            for path, dis in zip(paths, top_distance):
+            paths, top_distances = self.search_with_reranking(v, k, topk_rerank)
+            for path, dis in zip(paths, top_distances):
                 paths_count_dict[path] = paths_count_dict.get(path, 0) + 1
                 paths_distance_dict[path] = paths_distance_dict.get(path, 0) + dis
         
