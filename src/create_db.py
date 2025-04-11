@@ -6,7 +6,7 @@ def main(args):
     retriever = Retriever(args.output_index_dir, encode_model, dim)
     
     # Extract feature
-    retriever.extract_db(args.dataset_dir, args.database_dir)
+    retriever.extract_db(args.dataset_dir, args.database_dir, args.caption_dir)
     # Indexing
     retriever.create_database(args.database_dir, args.output_index_dir)
 
@@ -17,6 +17,7 @@ if __name__ == "__main__":
     parser.add_argument("--dataset_dir", type=str, default="../dataset/MRAG_corpus")
     parser.add_argument("--database_dir", type=str)
     parser.add_argument("--output_index_dir", type=str)
+    parser.add_argument("--caption_dir", typp=str, default=None)
     
     args = parser.parse_args()
     

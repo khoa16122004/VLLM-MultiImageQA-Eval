@@ -26,7 +26,7 @@ def main(args):
     # extract retriever paths
     results = {}
     for (id, question, question_img, gt_files, choices, gt_ans) in tqdm(dataset.loader()):
-        retrieval_paths, distances = db.flow_search(question_img, k=args.topk, topk_rerank=args.topk_rerank)
+        retrieval_paths, distances = db.flow_search(img=question_img, question=question, k=args.topk, topk_rerank=args.topk_rerank)
         results[id] = retrieval_paths
     
     # save results
