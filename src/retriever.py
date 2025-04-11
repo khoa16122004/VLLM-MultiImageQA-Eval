@@ -191,22 +191,54 @@ class Retriever:
         return top_distance, top_indices, top_batches, top_vectors, df 
     
     
-    def ReT_search(self, query_matrix, k=10, topk_rerank=10):
+    def ReT_search(self, query_matrix, k=5, topk_rerank=100):
         paths_count_dict = {}
         paths_distance_dict = {}
+
+        all_distances = []
+        all_indices = []
+        all_batch_index = []
+
+        df = pd.read_csv(self.map_path)
+
+        for i in range(len(os.listdir(self.index_dir)) - 1):
+            index_path = os.path.join(self.index_dir, f"{i}.index")
+            index = faiss.read_index(index_path)
+
+            distances, indices = index.search(query_matrix, topk_rerank)  # [batch_size, topk_rerank]
+
+            # Flatten và lưu lại
+            all_distances.extend(distances.flatten())
+            all_indices.extend(indices.flatten())
+            all_batch_index.extend([i] * (distances.shape[0] * distances.shape[1]))
         
         
-        for v in query_matrix:
-            paths, top_distances = self.search_with_reranking(v, k, topk_rerank)
-            for path, dis in zip(paths, top_distances):
-                paths_count_dict[path] = paths_count_dict.get(path, 0) + 1
-                paths_distance_dict[path] = paths_distance_dict.get(path, 0) + dis
+        all_distances = np.array(all_distances)
+        all_indices = np.array(all_indices)
+        all_batch_index = np.array(all_batch_index)
+        sorted_idx = np.argsort(all_distances)
+        sorted_idx = sorted_idx[:topk_rerank]
+
+        top_indices = all_indices[sorted_idx]
+        top_batches = all_batch_index[sorted_idx]
+        top_distance = all_distances[sorted_idx]        
+        
+        query_df = pd.DataFrame({
+            'index': top_indices,
+            'batch_idx': top_batches
+        })
+        merged = pd.merge(query_df, df, on=['index', 'batch_idx'], how='inner')
+        img_paths = merged['img_path'].to_numpy().tolist()
+        
+        for path, dis in zip(img_paths, top_distance):
+            paths_count_dict[path] = paths_count_dict.get(path, 0) + 1
+            paths_distance_dict[path] = paths_distance_dict.get(path, 0) + dis
         
         scores = [(path ,paths_distance_dict[path] / paths_count_dict[path]) for path in paths_count_dict]
-        scores = sorted(scores, key=lambda x: x[1])
+        scores = sorted(scores, key=lambda x: x[1])[:k]
         
-        return scores
-        
+        return img_paths, top_distance
+                
     
     def batch_search(self, pil_pertubation_examples, k=5, topk_rerank=10):
         
