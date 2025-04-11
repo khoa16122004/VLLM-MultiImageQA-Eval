@@ -4,6 +4,7 @@ import numpy as np
 import faiss
 import pandas as pd
 import csv
+from PIL import Image
 
 class Retriever:
     def __init__(self, index_dir, encode_model, dim, map_path=None):
@@ -26,6 +27,7 @@ class Retriever:
         print("Extract Feature Proccess ...")
         for img_name in tqdm(os.listdir(dataset_dir)):
             img_path = os.path.join(dataset_dir, img_name)
+            img = Image.open(img_path).convert("RGB")
             
             # if caption
             caption = ""
@@ -35,7 +37,7 @@ class Retriever:
                     caption = f.readline().strip()
                     
                 
-            vec = self.encode_model.visual_encode(img_path, caption)
+            vec = self.encode_model.visual_encode(img, caption)
             if self.encode_model.name == "CLIP":
                     np.save(os.path.join(output_dir, f"{img_name}_0.npy"), vec)
             
