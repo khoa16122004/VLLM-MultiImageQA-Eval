@@ -48,7 +48,7 @@ class Retriever:
         print("Done Extract Feature")        
     
     
-    def create_database(self, vectors_dir, output_dir, csv_file='map.csv', batch_size=2000):
+    def create_database(self, vectors_dir, output_dir, csv_file='map.csv', batch_size=9000):
         '''
         Create the FAISS index by adding vectors from saved numpy files in batches and split into multiple index files.
         '''
