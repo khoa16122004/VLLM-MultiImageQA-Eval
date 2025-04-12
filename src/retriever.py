@@ -180,7 +180,6 @@ class Retriever:
         all_distances = np.array(all_distances)
         all_indices = np.array(all_indices)
         all_batch_index = np.array(all_batch_index)
-        all_vectors = np.array(all_vectors)
 
         sorted_idx = np.argsort(all_distances, axis=0)
         print("Sorted idx: ", sorted_idx.shape)
