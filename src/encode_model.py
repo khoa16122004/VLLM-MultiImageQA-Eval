@@ -28,8 +28,8 @@ class MyCLIPWrapper:
 
 
     def visual_encode_batch(self, image_inputs, txt=""):
-        if not all(isinstance(img, Image.Image) for img in image_inputs):
-            raise ValueError("All inputs must be PIL.Image.Image")
+        # if not all(isinstance(img, Image.Image) for img in image_inputs):
+            # raise ValueError("All inputs must be PIL.Image.Image")
 
         inputs = self.processor(images=image_inputs, return_tensors="pt", padding=True).to(self.device)
         
