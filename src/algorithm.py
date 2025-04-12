@@ -16,7 +16,7 @@ class GA:
         self.max_iteration = max_iteration
         self.pop_size = pop_size
         self.question_img = question_img
-        self.np_question_img = np.array(question_img)
+        self.np_question_img = np.array(question_img) / 255
         self.epsilon = epsilon
         self.mutation_rate = mutation_rate
         self.retriever = retriever
