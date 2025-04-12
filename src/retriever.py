@@ -152,7 +152,7 @@ class Retriever:
             index_path = os.path.join(self.index_dir, f"{i}.index")
             res = faiss.StandardGpuResources()
             index = faiss.read_index(index_path)
-            index = faiss.index_cpu_to_gpus(res, 0, index)
+            index = faiss.index_cpu_to_gpu(res, 0, index)
             distances, indices = index.search(query_vector, top_rerank) # B x top_rerank
 
             for j in range(len(query_vector)):
