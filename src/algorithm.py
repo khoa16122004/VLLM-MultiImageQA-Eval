@@ -15,6 +15,7 @@ class GA:
         self.max_iteration = max_iteration
         self.pop_size = pop_size
         self.question_img = question_img
+        self.np_question_img = np.array(question_img)
         self.epsilon = epsilon
         self.mutation_rate = mutation_rate
         self.retriever = retriever
@@ -36,10 +37,10 @@ class GA:
 
     def tournament_selection(self, fitness_scores, k=4):
         indices = np.random.choice(len(fitness_scores), k, replace=False)
-        return indices[np.argmax(fitness_scores[indices])]
+        return indices[np.argmin(fitness_scores[indices])]
 
     def solve(self):
-        w, h, c = self.question_img.shape
+        w, h, c = self.np_question_img.shape
         P = np.random.uniform(-self.epsilon, self.epsilon, size=(self.pop_size, w, h, c))
         P_fitness = self.fitness(P)
 
@@ -67,5 +68,5 @@ class GA:
             P = np.stack(selected_P)
             P_fitness = np.array(selected_fitness)
 
-        best_idx = np.argmax(P_fitness)
+        best_idx = np.argmin(P_fitness)
         return P[best_idx], P_fitness[best_idx]

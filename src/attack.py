@@ -61,7 +61,6 @@ if __name__ == "__main__":
     parser.add_argument("--topk", type=int, default=5)
     parser.add_argument("--index_dir", type=str)
     parser.add_argument("--dataset_name", type=str, default="MRAG")
-    parser.add_argument("--results_dir", type=str, default="results_retriever")
     parser.add_argument("--multimodel_retrieval", type=int, default=0)
     
     # attack argument
