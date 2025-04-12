@@ -218,11 +218,12 @@ class Retriever:
         all_batch_index = np.array(all_batch_index)
         sorted_idx = np.argsort(all_distances)
         sorted_idx = sorted_idx[:topk_rerank]
-
+        
         top_indices = all_indices[sorted_idx]
         top_batches = all_batch_index[sorted_idx]
         top_distance = all_distances[sorted_idx]        
-        print("Len index:  ", len(top_indices))
+        print("index:  ", top_indices)
+        print("batch:  ", top_batches)
         query_df = pd.DataFrame({
             'index': top_indices,
             'batch_idx': top_batches
