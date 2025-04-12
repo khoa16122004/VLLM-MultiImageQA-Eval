@@ -40,8 +40,9 @@ def main(args):
         
         db = MultiModal_Retriever(retrievers, weights)
     
+    db.read_index()
     
-    # 
+    # attack 
     for (id, question, question_img, gt_files, choices, gt_ans) in tqdm(dataset.loader()):
         retrieval_paths, _ = db.flow_search(img=question_img, question=question, k=args.topk, topk_rerank=args.topk_rerank)
         print(f"{id}, retrieval paths: ", retrieval_paths)
