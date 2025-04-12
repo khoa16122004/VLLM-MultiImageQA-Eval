@@ -60,7 +60,7 @@ class GA:
             pool = np.concatenate((P, O), axis=0)
             pool_fitness = np.concatenate((P_fitness, O_fitness), axis=0)
             pool_batch_paths = np.concatenate((P_batch_paths, O_batch_paths), axis=0)
-            pool_pil_imgs = np.concatenate((P_pil_imgs, O_pil_imgs), axis=0)
+            pool_pil_imgs = P_pil_imgs + O_pil_imgs
             
             selected_P = []
             selected_fitness = []
@@ -76,7 +76,7 @@ class GA:
             P = np.stack(selected_P)
             P_fitness = np.array(selected_fitness)
             P_batch_paths = np.stack(selected_batch_paths)
-            P_pil_imgs = np.stack(selected_pil_imgs)
+            P_pil_imgs = selected_pil_imgs
             
             print("Best Fitness: ", np.min(P_fitness))
             print("Best Path: ", P_batch_paths[np.argmin(P_fitness)])
