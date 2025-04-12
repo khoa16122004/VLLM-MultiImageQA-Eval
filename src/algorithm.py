@@ -9,6 +9,8 @@ class GA:
                  epsilon,
                  retriever,
                  gt_paths,
+                 k=5,
+                 topk_rerank=10,
                  mutation_rate=0.1,
                  max_iteration=1000,
                  pop_size=100):
@@ -23,9 +25,11 @@ class GA:
         self.gt_paths = gt_paths  # dictionary: path -> True/False
         self.question_img = question_img  # assuming retriever.flow_search uses this
         self.question = question
+        self.k = k
+        self.topk_rerank = topk_rerank
     def fitness(self, P):
         pil_imgs = [Image.fromarray(np.uint8(np.clip((self.np_question_img + p) * 255, 0, 255))) for p in P]
-        batch_paths, distances = self.retriever.flow_search(pil_imgs, self.question, 10, 20)
+        batch_paths, distances = self.retriever.flow_search(pil_imgs, self.question, self.k, self.topk_rerank)
 
         # retrieved encode
         fitness_scores = []

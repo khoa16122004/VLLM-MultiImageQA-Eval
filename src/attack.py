@@ -53,6 +53,8 @@ def main(args):
                        epsilon=args.epsilon,
                        retriever=db,
                        gt_paths=gt_paths,
+                       k=args.topk,
+                       topk_rerank=args.topk_rerank,
                        mutation_rate=args.mutation_rate,
                        max_iteration=args.max_iterations,
                        pop_size=args.pop_size)
