@@ -39,11 +39,10 @@ class Retriever:
                 
             vec = self.encode_model.visual_encode(img, caption)
             if self.encode_model.name == "CLIP":
-                    np.save(os.path.join(output_dir, f"{img_name}_0.npy"), vec)
+                np.save(os.path.join(output_dir, f"{img_name}_0.npy"), vec)
             
             elif self.encode_model.name == "ReT":
-                for i in range(len(vec)):
-                    np.save(os.path.join(output_dir, f"{img_name}_{i}.npy"), vec[i])
+                np.save(os.path.join(output_dir, f"{img_name}_0.npy"), vec[0])
 
         print("Done Extract Feature")        
     
@@ -156,32 +155,33 @@ class Retriever:
         '''
         
         query_vector = query_vector.astype('float32') 
-        all_distances = []
-        all_indices = []
-        all_batch_index = []
-        all_vectors = []
+        all_distances = [[] * len(query_vector)]
+        all_indices = [[] * len(query_vector)]
+        all_batch_index = [[] * len(query_vector)]
+        # all_vectors = [[] * len(query_vector)]
 
         df = pd.read_csv(self.map_path)
 
         for i in range(len(os.listdir(self.index_dir)) - 1):
             index_path = os.path.join(self.index_dir, f"{i}.index")
             index = faiss.read_index(index_path)
-            distances, indices = index.search(query_vector.reshape(1, -1), top_rerank)
+            distances, indices = index.search(query_vector, top_rerank) # B x top_rerank
 
-            for j in range(len(indices[0])):
-                vector = index.reconstruct(int(indices[0][j]))
-                all_distances.append(distances[0][j])
-                all_indices.append(indices[0][j])
-                all_batch_index.append(i)
-                all_vectors.append(vector)
-
+            for j in range(len(query_vector)):
+                all_distances[j].extend(distances[0])
+                all_indices[j].extend(indices[0])
+                all_batch_index[j].extend([i] * len(indices[0]))
+                # all_vectors[j].extend([query_vector[j]] * len(indices[0]))
+            
         all_distances = np.array(all_distances)
         all_indices = np.array(all_indices)
         all_batch_index = np.array(all_batch_index)
         all_vectors = np.array(all_vectors)
 
-        sorted_idx = np.argsort(all_distances)
-        sorted_idx = sorted_idx[:k]
+        sorted_idx = np.argsort(all_distances, axis=0)
+        print("Sorted idx: ", sorted_idx.shape)
+        input("Wait")
+        sorted_idx = sorted_idx[:, :k]
 
         top_indices = all_indices[sorted_idx]
         top_batches = all_batch_index[sorted_idx]
@@ -191,52 +191,52 @@ class Retriever:
         return top_distance, top_indices, top_batches, top_vectors, df 
     
     
-    def ReT_search(self, query_matrix, k=5, topk_rerank=100):
-        paths_count_dict = {}
-        paths_distance_dict = {}
+    # def ReT_search(self, query_matrix, k=5, topk_rerank=100):
+    #     paths_count_dict = {}
+    #     paths_distance_dict = {}
 
-        all_distances = []
-        all_indices = []
-        all_batch_index = []
+    #     all_distances = []
+    #     all_indices = []
+    #     all_batch_index = []
 
-        df = pd.read_csv(self.map_path)
+    #     df = pd.read_csv(self.map_path)
 
-        for i in range(len(os.listdir(self.index_dir)) - 1):
-            index_path = os.path.join(self.index_dir, f"{i}.index")
-            index = faiss.read_index(index_path)
+    #     for i in range(len(os.listdir(self.index_dir)) - 1):
+    #         index_path = os.path.join(self.index_dir, f"{i}.index")
+    #         index = faiss.read_index(index_path)
 
-            distances, indices = index.search(query_matrix, topk_rerank)  # [batch_size, topk_rerank]
+    #         distances, indices = index.search(query_matrix, topk_rerank)  # [batch_size, topk_rerank]
 
-            all_distances.extend(distances.flatten())
-            all_indices.extend(indices.flatten())
-            all_batch_index.extend([i] * (distances.shape[0] * distances.shape[1]))
+    #         all_distances.extend(distances.flatten())
+    #         all_indices.extend(indices.flatten())
+    #         all_batch_index.extend([i] * (distances.shape[0] * distances.shape[1]))
         
         
-        all_distances = np.array(all_distances)
-        all_indices = np.array(all_indices)
-        all_batch_index = np.array(all_batch_index)
-        sorted_idx = np.argsort(all_distances)
-        sorted_idx = sorted_idx[:topk_rerank]
+    #     all_distances = np.array(all_distances)
+    #     all_indices = np.array(all_indices)
+    #     all_batch_index = np.array(all_batch_index)
+    #     sorted_idx = np.argsort(all_distances)
+    #     sorted_idx = sorted_idx[:topk_rerank]
         
-        top_indices = all_indices[sorted_idx]
-        top_batches = all_batch_index[sorted_idx]
-        top_distance = all_distances[sorted_idx]        
-        # print("index:  ", top_indices)
-        # print("batch:  ", top_batches)
-        query_df = pd.DataFrame({
-            'index': top_indices,
-            'batch_idx': top_batches
-        })
-        merged = pd.merge(query_df, df, on=['index', 'batch_idx'], how='inner')
-        img_paths = merged['img_path'].to_numpy().tolist()
+    #     top_indices = all_indices[sorted_idx]
+    #     top_batches = all_batch_index[sorted_idx]
+    #     top_distance = all_distances[sorted_idx]        
+    #     # print("index:  ", top_indices)
+    #     # print("batch:  ", top_batches)
+    #     query_df = pd.DataFrame({
+    #         'index': top_indices,
+    #         'batch_idx': top_batches
+    #     })
+    #     merged = pd.merge(query_df, df, on=['index', 'batch_idx'], how='inner')
+    #     img_paths = merged['img_path'].to_numpy().tolist()
         
-        for path, dis in zip(img_paths, top_distance):
-            paths_count_dict[path] = paths_count_dict.get(path, 0) + 1
-            paths_distance_dict[path] = paths_distance_dict.get(path, 0) + dis
+    #     for path, dis in zip(img_paths, top_distance):
+    #         paths_count_dict[path] = paths_count_dict.get(path, 0) + 1
+    #         paths_distance_dict[path] = paths_distance_dict.get(path, 0) + dis
         
-        scores = [(path ,paths_distance_dict[path] / paths_count_dict[path]) for path in paths_count_dict]
-        scores = sorted(scores, key=lambda x: x[1])[-k:]
-        return scores
+    #     scores = [(path ,paths_distance_dict[path] / paths_count_dict[path]) for path in paths_count_dict]
+    #     scores = sorted(scores, key=lambda x: x[1])[-k:]
+    #     return scores
                 
     
     def batch_search(self, pil_pertubation_examples, k=5, topk_rerank=10):
