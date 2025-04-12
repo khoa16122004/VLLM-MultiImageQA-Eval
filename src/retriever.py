@@ -48,6 +48,14 @@ class Retriever:
 
         print("Done Extract Feature")        
     
+    def read_index(self):
+        self.indexs = []
+        for i in range(len(os.listdir(self.index_dir)) - 1):
+            index_path = os.path.join(self.index_dir, f"{i}.index")
+            res = faiss.StandardGpuResources()
+            index = faiss.read_index(index_path)
+            index = faiss.index_cpu_to_gpu(res, 0, index)
+            self.indexs.append(index)
     
     def create_database(self, vectors_dir, output_dir, csv_file='map.csv', batch_size=9000):
         '''
@@ -149,11 +157,7 @@ class Retriever:
         all_batch_index = [[] for _ in range(len(query_vector))]
 
         for i in range(len(os.listdir(self.index_dir)) - 1):
-            index_path = os.path.join(self.index_dir, f"{i}.index")
-            res = faiss.StandardGpuResources()
-            index = faiss.read_index(index_path)
-            index = faiss.index_cpu_to_gpu(res, 0, index)
-            distances, indices = index.search(query_vector, top_rerank) # B x top_rerank
+            distances, indices = self.indexs[i].search(query_vector, top_rerank) # B x top_rerank
 
             for j in range(len(query_vector)):
                 all_distances[j].extend(distances[0])
