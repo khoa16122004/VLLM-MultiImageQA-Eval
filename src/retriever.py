@@ -11,6 +11,7 @@ class Retriever:
         self.index_dir = index_dir
         self.encode_model = encode_model
         self.map_path = map_path
+        self.df = pd.read_csv(self.map_path)
         self.d = dim
         
     def extract_db(self, dataset_dir, output_dir, caption_dir=None):
@@ -113,14 +114,19 @@ class Retriever:
 
             print(f"Database created successfully with multiple indexes with total {total_vectors_added} vectors")
     
-    def map(self, top_indies, top_batchs):
-        df = pd.read_csv(self.map_path)
-        merged = pd.merge(pd.DataFrame({'index': top_indies, 'batch_idx': top_batchs}), 
-                          df, on=['index', 'batch_idx'], 
-                          how='inner')
-        
-        img_paths = merged['img_path'].to_numpy().tolist()
-        return img_paths
+    def map(self, top_indies, top_batchs):  # top_indies, top_batchs: B x K
+        B, K = top_indies.shape
+
+        indices_flat = top_indies.flatten()
+        batchs_flat = top_batchs.flatten()
+
+        df_query = pd.DataFrame({'index': indices_flat, 'batch_idx': batchs_flat})
+
+        merged = pd.merge(df_query, self.df, on=['index', 'batch_idx'], how='inner')
+
+        img_paths = merged['img_path'].to_numpy()
+
+        return img_paths.reshape(B, K).tolist()
     
     def search(self, query_vector, top_rerank=50, k=5):
         '''
@@ -154,19 +160,13 @@ class Retriever:
         all_distances = np.array(all_distances)
         all_indices = np.array(all_indices)
         all_batch_index = np.array(all_batch_index)
-        print("All distances shape: ", all_distances.shape)
         sorted_idx = np.argsort(all_distances, axis=1) # B x 
-        print(k)
         sorted_idx = sorted_idx[:, :k]
-        print("sorted index: ", sorted_idx.shape)
-
-        top_indices = all_indices[sorted_idx]
-        top_batches = all_batch_index[sorted_idx]
-        top_distance = all_distances[sorted_idx]
         
-        print("top indies: ", top_indices.shape)
-        print(top_indices.shape)
-        
+        top_indices = np.take_alone_axis(all_indices, sorted_idx, axis=1) # B x K
+        top_batches = np.take_alone_axis(all_batch_index, sorted_idx, axis=1) # B x K
+        top_distance = np.take_alone_axis(all_distances, sorted_idx, axis=1) # B x K
+                
         return top_distance, top_indices, top_batches
     
     def flow_search(self, img, question=None, k=10, topk_rerank=10):
