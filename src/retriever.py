@@ -207,7 +207,6 @@ class Retriever:
 
             distances, indices = index.search(query_matrix, topk_rerank)  # [batch_size, topk_rerank]
 
-            # Flatten và lưu lại
             all_distances.extend(distances.flatten())
             all_indices.extend(indices.flatten())
             all_batch_index.extend([i] * (distances.shape[0] * distances.shape[1]))
@@ -222,8 +221,8 @@ class Retriever:
         top_indices = all_indices[sorted_idx]
         top_batches = all_batch_index[sorted_idx]
         top_distance = all_distances[sorted_idx]        
-        print("index:  ", top_indices)
-        print("batch:  ", top_batches)
+        # print("index:  ", top_indices)
+        # print("batch:  ", top_batches)
         query_df = pd.DataFrame({
             'index': top_indices,
             'batch_idx': top_batches
