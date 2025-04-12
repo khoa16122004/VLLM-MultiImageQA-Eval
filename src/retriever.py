@@ -222,7 +222,7 @@ class Retriever:
         top_indices = all_indices[sorted_idx]
         top_batches = all_batch_index[sorted_idx]
         top_distance = all_distances[sorted_idx]        
-        
+        print(len(top_indices))
         query_df = pd.DataFrame({
             'index': top_indices,
             'batch_idx': top_batches
@@ -235,7 +235,7 @@ class Retriever:
             paths_distance_dict[path] = paths_distance_dict.get(path, 0) + dis
         
         scores = [(path ,paths_distance_dict[path] / paths_count_dict[path]) for path in paths_count_dict]
-        scores = sorted(scores, key=lambda x: x[1])[:k]
+        scores = sorted(scores, key=lambda x: x[1])[-k:]
         print(scores)
         return scores
                 
