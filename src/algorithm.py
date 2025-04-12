@@ -9,7 +9,6 @@ class GA:
                  epsilon,
                  retriever,
                  gt_paths,
-                 image_encoder,
                  mutation_rate=0.1,
                  max_iteration=1000,
                  pop_size=100):
