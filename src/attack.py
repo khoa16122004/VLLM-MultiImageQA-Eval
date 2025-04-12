@@ -17,7 +17,7 @@ def main(args):
     # init retriever
     if args.multimodel_retrieval == 0:
         # init encode model
-        encode_model, dim  = init_encode_model(args.model_name_encode)
+        encode_model, dim  = inixt_encode_model(args.model_name_encode)
         map_path = os.path.join(args.index_dir, "map.csv")
         db = Retriever(args.index_dir, encode_model, dim, map_path)
 

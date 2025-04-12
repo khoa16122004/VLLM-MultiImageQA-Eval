@@ -29,7 +29,15 @@ class GA:
         self.topk_rerank = topk_rerank
     def fitness(self, P):
         pil_imgs = [Image.fromarray(np.uint8(np.clip((self.np_question_img + p) * 255, 0, 255))) for p in P]
-        batch_paths, distances = self.retriever.flow_search(pil_imgs, self.question, self.k * 2, self.topk_rerank)
+        batch_paths, distances = self.retriever.flow_search(pil_imgs, self.question, self.k, self.topk_rerank)
+        
+        for paths in batch_paths:
+            img_paths = paths[0]
+            img = [Image.open(path).resize((256, 256)).convert("RGB") for path in img_paths]
+            current_batch_paths, current_distances = self.retriever.flow_search(img, self.question, self.k, self.topk_rerank)
+            
+            # if 
+            
         # retrieved encode
         fitness_scores = []
         for paths, dis in zip(batch_paths, distances):
