@@ -58,7 +58,7 @@ class ReTWrapper:
         self.query.init_tokenizer_and_image_processor()
 
         self.name = "ReT"
-    def visual_encode(self, img, txt, mode="encode"): # img: img_pil, txt: str
+    def visual_encode_batch(self, img, txt, mode="encode"): # img: img_pil, txt: str
         if mode == "encode":
             ret_feats = self.encode.get_ret_features([[txt, img]]).squeeze(0)
         elif mode == "query":
@@ -66,7 +66,7 @@ class ReTWrapper:
         
         return ret_feats.cpu().numpy()
     
-    def visual_encode_batch(self, imgs, txt=""): # pul_img
+    def visual_batch_encode(self, imgs, txt=""): # pul_img
         ret_feats = self.encode.get_ret_features([[txt, img] for img in imgs])
         return ret_feats.cpu().numpy()
     
