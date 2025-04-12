@@ -154,6 +154,10 @@ class Retriever:
         
         '''
         
+        # if 1D vector
+        if len(query_vector.shape) == 1:
+            query_vector = query_vector.reshape(1, -1)
+        
         query_vector = query_vector.astype('float32') 
         all_distances = [[] * len(query_vector)]
         all_indices = [[] * len(query_vector)]
