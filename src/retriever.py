@@ -171,7 +171,7 @@ class Retriever:
     
     def flow_search(self, img, question=None, k=10, topk_rerank=10):
         img_vector = self.encode_model.visual_encode(img, question) # 32 x d            
-        top_distance, top_indices, top_batches = self.search(img_vector, k, topk_rerank)
+        top_distance, top_indices, top_batches = self.search(img_vector, topk_rerank, k)
         img_paths = self.map(top_indices, top_batches)
         return img_paths, top_distance
 
