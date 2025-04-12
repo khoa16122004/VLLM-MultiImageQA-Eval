@@ -78,6 +78,7 @@ if __name__ == "__main__":
     parser.add_argument("--retrieved_path", type=str, default=None)
     parser.add_argument("--log_output_path", type=str)
     parser.add_argument("--dataset_name", type=str, default="MRAG")    
+    parser.add_argument("--dataset_dir", type=str, default="../dataset/MRAG_corpus")
     args = parser.parse_args()
     
     main(args)
