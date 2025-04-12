@@ -44,7 +44,7 @@ def main(args):
     # 
     for (id, question, question_img, gt_files, choices, gt_ans) in tqdm(dataset.loader()):
         retrieval_paths, _ = db.flow_search(img=question_img, question=question, k=args.topk, topk_rerank=args.topk_rerank)
-        
+        print(f"{id}, retrieval paths: ", retrieval_paths)
         gt_paths = {path: True for path in retrieval_paths[0]}
         
         algorithm = GA(question_img=question_img,
@@ -55,8 +55,9 @@ def main(args):
                        mutation_rate=args.mutation_rate,
                        max_iteration=args.max_iterations,
                        pop_size=args.pop_size)
-        adv_paths, fitness = algorithm.solve()
+        adv_paths, fitness, batch_paths = algorithm.solve()
         adv_paths.save("adv.png")
+        print("adv paths: ", batch_paths)
         break
 
 if __name__ == "__main__":

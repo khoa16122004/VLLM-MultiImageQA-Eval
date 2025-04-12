@@ -31,7 +31,7 @@ class GA:
         for paths in batch_paths:
             scores = [1 / i if self.is_gt(paths[i - 1]) else 0 for i in range(1, 21)]
             fitness_scores.append(np.sum(scores))
-        return np.array(fitness_scores)
+        return np.array(fitness_scores), batch_paths
 
     def is_gt(self, path):
         return self.gt_paths.get(path, False)
@@ -43,7 +43,7 @@ class GA:
     def solve(self):
         w, h, c = self.np_question_img.shape
         P = np.random.uniform(-self.epsilon, self.epsilon, size=(self.pop_size, w, h, c))
-        P_fitness = self.fitness(P)
+        P_fitness, P_batch_paths = self.fitness(P)
         
         for _ in tqdm(range(self.max_iteration)):
             print("Parrent shape: ", P.shape)
@@ -55,21 +55,26 @@ class GA:
             O = np.where(mutation_mask, mutation_values, O)
             O = np.clip(O, -self.epsilon, self.epsilon)
 
-            O_fitness = self.fitness(O)
+            O_fitness, O_batch_paths = self.fitness(O)
 
             pool = np.concatenate((P, O), axis=0)
             pool_fitness = np.concatenate((P_fitness, O_fitness), axis=0)
-
+            pool_batch_paths = np.concatenate((P_batch_paths, O_batch_paths), axis=0)
+            
             selected_P = []
             selected_fitness = []
+            selected_batch_paths = []
             for _ in range(self.pop_size):
                 idx = self.tournament_selection(pool_fitness)
                 selected_P.append(pool[idx])
                 selected_fitness.append(pool_fitness[idx])
-
+                selected_batch_paths.append(pool_batch_paths[idx])
+                
             P = np.stack(selected_P)
             P_fitness = np.array(selected_fitness)
+            P_batch_paths = np.stack(selected_batch_paths)
             print("Best Fitness: ", np.min(P_fitness))
+            print("Best Path: ", P_batch_paths[np.argmin(P_fitness)])
 
         best_idx = np.argmin(P_fitness)
-        return P[best_idx], P_fitness[best_idx]
+        return P[best_idx], P_fitness[best_idx], P_batch_paths[best_idx]
