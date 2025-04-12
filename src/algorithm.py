@@ -33,7 +33,7 @@ class GA:
         # retrieved encode
         fitness_scores = []
         for paths, dis in zip(batch_paths, distances):
-            scores = [1 / (dis[i] * (i + 1)) if self.is_gt(paths[i]) else 1 / dis[i] for i in range(self.k * 2)]
+            scores = [1 / (dis[i] * (i + 1)) if self.is_gt(paths[i]) else i / dis[i] for i in range(self.k * 2)]
             fitness_scores.append(np.sum(scores))
             
             
@@ -56,7 +56,7 @@ class GA:
         
         for _ in tqdm(range(self.max_iteration)):
             parent_indices = np.random.randint(0, self.pop_size, size=(self.pop_size, 2))
-            O = (P[parent_indices[:, 0]] + P[parent_indices[:, 1]]) / 2
+            O = (P[parent_indices[:, 0]] + P[parent_indices[:, 1]])
             mutation_mask = np.random.rand(self.pop_size, 1, 1, 1) < self.mutation_rate
             mutation_values = np.random.uniform(-self.epsilon, self.epsilon, size=(self.pop_size, w, h, c))
             O = np.where(mutation_mask, mutation_values, O)
