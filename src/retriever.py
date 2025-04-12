@@ -14,6 +14,7 @@ class Retriever:
         if map_path:
             self.df = pd.read_csv(self.map_path)
         self.d = dim
+        self.indexs = []
         
     def extract_db(self, dataset_dir, output_dir, caption_dir=None):
         
@@ -49,7 +50,6 @@ class Retriever:
         print("Done Extract Feature")        
     
     def read_index(self):
-        self.indexs = []
         for i in range(len(os.listdir(self.index_dir)) - 1):
             index_path = os.path.join(self.index_dir, f"{i}.index")
             res = faiss.StandardGpuResources()
