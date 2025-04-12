@@ -45,7 +45,7 @@ def main(args):
     for (id, question, question_img, gt_files, choices, gt_ans) in tqdm(dataset.loader()):
         retrieval_paths, _ = db.flow_search(img=question_img, question=question, k=args.topk, topk_rerank=args.topk_rerank)
         
-        gt_paths = {path: True for path in gt_files}
+        gt_paths = {path: True for path in retrieval_paths}
         
         algorithm = GA(question_img=question_img,
                        question=question,

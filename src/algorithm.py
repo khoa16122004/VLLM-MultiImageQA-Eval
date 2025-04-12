@@ -22,7 +22,7 @@ class GA:
         self.retriever = retriever
         self.gt_paths = gt_paths  # dictionary: path -> True/False
         self.question_img = question_img  # assuming retriever.flow_search uses this
-
+        self.question = question
     def fitness(self, P):
         pil_imgs = [Image.fromarray(np.uint8(np.clip((self.question_img + p) * 255, 0, 255))) for p in P]
         batch_paths, _ = self.retriever.flow_search(pil_imgs, self.question, 20, 100)
