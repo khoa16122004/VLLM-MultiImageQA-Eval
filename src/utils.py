@@ -1,4 +1,4 @@
-from gpt_extract import extract_answer
+# from gpt_extract import extract_answer
 import random
 import os
 import torch
