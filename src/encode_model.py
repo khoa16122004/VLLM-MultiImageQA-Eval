@@ -66,7 +66,7 @@ class ReTWrapper:
         
         return ret_feats.cpu().numpy()
     
-    def visual_batch_encode(self, imgs, txt=""): # pul_img
+    def visual_encode_batch(self, imgs, txt=""): # pul_img
         ret_feats = self.encode.get_ret_features([[txt, img] for img in imgs])
         return ret_feats.cpu().numpy()
     
