@@ -35,6 +35,7 @@ def main(args):
             map_path = os.path.join(args.index_dir, "map.csv")
 
             retriever = Retriever(index_dir, encode_model, dim, map_path)
+            retriever.read_index()
             retrievers.append(retriever)
             w = input(f"Input the weight of {model_name}")
             weights.append(w)

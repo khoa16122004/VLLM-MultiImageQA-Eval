@@ -1,5 +1,3 @@
-from extraction import CreateDatabase
-from model import MyCLIPWrapper, ReTWrapper
 from PIL import Image
 import os
 import argparse
