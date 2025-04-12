@@ -56,7 +56,11 @@ class GA:
         
         for _ in tqdm(range(self.max_iteration)):
             parent_indices = np.random.randint(0, self.pop_size, size=(self.pop_size, 2))
-            O = (P[parent_indices[:, 0]] + P[parent_indices[:, 1]])
+            
+            
+            
+            O = (P[parent_indices[:, 0]] + P[parent_indices[:, 1]]) / 2
+            print("Diff: ", (O - P).mean())
             mutation_mask = np.random.rand(self.pop_size, 1, 1, 1) < self.mutation_rate
             mutation_values = np.random.uniform(-self.epsilon, self.epsilon, size=(self.pop_size, w, h, c))
             O = np.where(mutation_mask, mutation_values, O)
