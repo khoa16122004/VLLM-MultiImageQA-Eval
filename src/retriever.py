@@ -163,10 +163,10 @@ class Retriever:
         sorted_idx = np.argsort(all_distances, axis=1) # B x 
         sorted_idx = sorted_idx[:, :k]
         
-        top_indices = np.take_alone_axis(all_indices, sorted_idx, axis=1) # B x K
-        top_batches = np.take_alone_axis(all_batch_index, sorted_idx, axis=1) # B x K
-        top_distance = np.take_alone_axis(all_distances, sorted_idx, axis=1) # B x K
-                
+        top_indices = np.take_along_axis(all_indices, sorted_idx, axis=1) # B x K
+        top_batches = np.take_along_axis(all_batch_index, sorted_idx, axis=1) # B x K
+        top_distance = np.take_along_axis(all_distances, sorted_idx, axis=1) # B x K
+            
         return top_distance, top_indices, top_batches
     
     def flow_search(self, img, question=None, k=10, topk_rerank=10):
