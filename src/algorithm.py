@@ -47,7 +47,6 @@ class GA:
         fitness_scores = []
         for paths, dis in zip(batch_paths, distances):
             weights = self.softmax(dis, tau=tau)
-            print(weights)
             gt_weight = sum([weights[i] for i in range(len(paths)) if self.is_gt(paths[i])])
             # mục tiêu là GT càng ít được focus → fitness càng thấp
             fitness_scores.append(gt_weight)
