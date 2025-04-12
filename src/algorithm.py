@@ -50,7 +50,8 @@ class GA:
 
     def solve(self):
         w, h, c = self.np_question_img.shape
-        P = np.random.uniform(-self.epsilon, self.epsilon, size=(self.pop_size, w, h, c))
+        P = np.random.normal(loc=0.0, scale=self.epsilon, size=(self.pop_size, w, h, c))
+        P = np.clip(P, -self.epsilon, self.epsilon)
         P_fitness, P_batch_paths, P_pil_imgs = self.fitness(P)
         print("P fitness: ", P_fitness)
         
@@ -61,8 +62,9 @@ class GA:
             
             O = (P[parent_indices[:, 0]] + P[parent_indices[:, 1]]) / 2
             print("Diff: ", (O - P).mean())
-            mutation_mask = np.random.rand(self.pop_size, 1, 1, 1) < self.mutation_rate
-            mutation_values = np.random.uniform(-self.epsilon, self.epsilon, size=(self.pop_size, w, h, c))
+            mutation_mask = np.random.rand(self.pop_size, 1, 1, 1) < self.mutation_rate            
+            mutation_values = np.random.normal(loc=0.0, scale=self.epsilon, size=(self.pop_size, w, h, c))
+            mutation_values = np.clip(P, -self.epsilon, self.epsilon)
             O = np.where(mutation_mask, mutation_values, O)
             O = np.clip(O, -self.epsilon, self.epsilon)
 
