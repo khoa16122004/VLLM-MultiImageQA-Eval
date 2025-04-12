@@ -88,6 +88,7 @@ def main(args):
                         model_filter=None,
                         caption_model=None)
     db.read_index()
+    print("Index: ", db.indexs)
     
     img_path = os.path.join(args.question_dir, str(args.image_index), "question_img.png")
     img = Image.open(img_path).convert("RGB")
