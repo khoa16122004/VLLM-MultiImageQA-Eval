@@ -56,6 +56,7 @@ class GA:
     def softmax(self, x, tau=1.0):
         x = np.array(x)
         e_x = np.exp(-x / tau)  # khoảng cách càng nhỏ → trọng số càng cao (nên dùng dấu -)
+        print(e_x)
         return e_x / e_x.sum()
 
     def is_gt(self, path):
