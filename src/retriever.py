@@ -190,7 +190,7 @@ class Retriever:
         top_batches = all_batch_index[sorted_idx]
         top_distance = all_distances[sorted_idx]
         
-        return top_distance, top_indices, top_batches, top_vectors, df 
+        return top_distance, top_indices, top_batches, df 
     
     
     # def ReT_search(self, query_matrix, k=5, topk_rerank=100):
