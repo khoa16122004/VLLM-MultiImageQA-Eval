@@ -53,9 +53,9 @@ class GA:
         return np.array(fitness_scores), batch_paths, pil_imgs
 
     def softmax(self, x, tau=1.0):
+        print(x)
         x = np.array(x)
         e_x = np.exp(-x / tau)  # khoảng cách càng nhỏ → trọng số càng cao (nên dùng dấu -)
-        print(e_x)
         return e_x / e_x.sum()
 
     def is_gt(self, path):
