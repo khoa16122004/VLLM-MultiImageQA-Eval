@@ -60,8 +60,7 @@ class GA:
             
             
             
-            O = (P[parent_indices[:, 0]] + P[parent_indices[:, 1]]) / 2
-            print("Diff: ", (O - P).mean())
+            O = (P[parent_indices[:, 0]] + P[parent_indices[:, 1]])
             mutation_mask = np.random.rand(self.pop_size, 1, 1, 1) < self.mutation_rate            
             mutation_values = np.random.normal(loc=0.0, scale=self.epsilon, size=(self.pop_size, w, h, c))
             mutation_values = np.clip(P, -self.epsilon, self.epsilon)
