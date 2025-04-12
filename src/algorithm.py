@@ -43,7 +43,7 @@ class GA:
     
     def fitness(self, P, tau=0.1):
         pil_imgs = [Image.fromarray(np.uint8(np.clip((self.np_question_img + p) * 255, 0, 255))) for p in P]
-        batch_paths, distances = self.retriever.flow_search(pil_imgs, self.question, self.k * 2, self.topk_rerank)
+        batch_paths, distances = self.retriever.flow_search(pil_imgs, self.question, self.k, self.topk_rerank)
         fitness_scores = []
         for paths, dis in zip(batch_paths, distances):
             weights = self.softmax(dis, tau=tau)
