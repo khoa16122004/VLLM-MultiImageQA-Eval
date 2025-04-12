@@ -27,39 +27,19 @@ class GA:
         self.question = question
         self.k = k
         self.topk_rerank = topk_rerank
-    # def fitness(self, P):
-    #     pil_imgs = [Image.fromarray(np.uint8(np.clip((self.np_question_img + p) * 255, 0, 255))) for p in P]
-    #     batch_paths, distances = self.retriever.flow_search(pil_imgs, self.question, self.k * 2, self.topk_rerank)
-    #     # retrieved encode
-    #     fitness_scores = []
-    #     for paths, dis in zip(batch_paths, distances):
-    #         scores = [1 / (dis[i] * (i + 1)) if self.is_gt(paths[i]) else 1 / dis[i] for i in range(self.k * 2)]
-    #         fitness_scores.append(np.sum(scores))
-            
-            
-    #     # clip sim score
-        
-    #     return np.array(fitness_scores), batch_paths, pil_imgs
-    
-    def fitness(self, P, tau=0.1):
+    def fitness(self, P):
         pil_imgs = [Image.fromarray(np.uint8(np.clip((self.np_question_img + p) * 255, 0, 255))) for p in P]
         batch_paths, distances = self.retriever.flow_search(pil_imgs, self.question, self.k * 2, self.topk_rerank)
+        # retrieved encode
         fitness_scores = []
         for paths, dis in zip(batch_paths, distances):
-            weights = self.softmax(dis, tau=tau)
-            gt_weight = sum([weights[i] for i in range(len(paths)) if self.is_gt(paths[i])])
-            # mục tiêu là GT càng ít được focus → fitness càng thấp
-            fitness_scores.append(gt_weight)
-        return np.array(fitness_scores), batch_paths, pil_imgs
-
-
-    def softmax(self, x, tau=1.0):
-        x = np.array(x)
-        x = (x - np.min(x)) / (np.max(x) - np.min(x) + 1e-8)
-        e_x = np.exp(-x / tau)  
+            scores = [1 / (dis[i] * (i + 1)) if self.is_gt(paths[i]) else 1 / dis[i] for i in range(self.k * 2)]
+            fitness_scores.append(np.sum(scores))
+            
+            
+        # clip sim score
         
-        return e_x / np.sum(e_x)
-
+        return np.array(fitness_scores), batch_paths, pil_imgs
 
     def is_gt(self, path):
         return self.gt_paths.get(path, False)
