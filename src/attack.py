@@ -55,8 +55,8 @@ def main(args):
                        mutation_rate=args.mutation_rate,
                        max_iteration=args.max_iterations,
                        pop_size=args.pop_size)
-        adv_paths = algorithm.solve()
-        print(adv_paths)
+        adv_paths, fitness = algorithm.solve()
+        adv_paths.save("adv.png")
         break
 
 if __name__ == "__main__":
