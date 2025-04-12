@@ -27,7 +27,7 @@ class MyCLIPWrapper:
         return image_features.squeeze().cpu().numpy()
 
 
-    def visual_encode_batch(self, image_inputs):
+    def visual_encode_batch(self, image_inputs, txt=""):
         if not all(isinstance(img, Image.Image) for img in image_inputs):
             raise ValueError("All inputs must be PIL.Image.Image")
 
