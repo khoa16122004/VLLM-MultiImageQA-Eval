@@ -1,7 +1,7 @@
 import os
 from tqdm import tqdm
 import numpy as np
-import faiss.contrib.torch_utils as faiss
+import faiss
 import pandas as pd
 import csv
 from PIL import Image
@@ -150,8 +150,9 @@ class Retriever:
 
         for i in range(len(os.listdir(self.index_dir)) - 1):
             index_path = os.path.join(self.index_dir, f"{i}.index")
+            res = faiss.StandardGpuResources()
             index = faiss.read_index(index_path)
-            index = faiss.index_cpu_to_gpus(index)
+            index = faiss.index_cpu_to_gpus(res, 0, index)
             distances, indices = index.search(query_vector, top_rerank) # B x top_rerank
 
             for j in range(len(query_vector)):
