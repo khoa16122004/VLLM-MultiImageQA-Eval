@@ -45,7 +45,7 @@ def main(args):
     # attack 
     # for (id, question, question_img, gt_files, choices, gt_ans) in tqdm(dataset.loader()):
     id, question, question_img, gt_files, choices, gt_ans = dataset.take_sample(args.sample_id)
-    retrieval_paths, _ = db.flow_search(img=question_img, question=question, k=args.topk, topk_rerank=args.topk_rerank)
+    retrieval_paths, _ = db.flow_search(img=question_img, question=question, k=50, topk_rerank=20)
     print(f"{id}, retrieval paths: ", retrieval_paths)
     gt_paths = {path: True for path in retrieval_paths[0]}
     
