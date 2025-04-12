@@ -34,7 +34,7 @@ class GA:
         # retrieved encode
         fitness_scores = []
         for paths, dis in zip(batch_paths, distances):
-            scores = [dis[i - 1] / i if self.is_gt(paths[i - 1]) else 0 for i in range(1, self.k + 1)]
+            scores = [dis[i] / (i + 1) if self.is_gt(paths[i]) else 0 for i in range(self.k)]
             fitness_scores.append(np.mean(scores))
             
             
