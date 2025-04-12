@@ -188,7 +188,6 @@ class Retriever:
 
         top_indices = all_indices[sorted_idx]
         top_batches = all_batch_index[sorted_idx]
-        top_vectors = all_vectors[sorted_idx]
         top_distance = all_distances[sorted_idx]
         
         return top_distance, top_indices, top_batches, top_vectors, df 
