@@ -144,9 +144,9 @@ class Retriever:
             query_vector = query_vector.reshape(1, -1)
         
         query_vector = query_vector.astype('float32') 
-        all_distances = [[] * len(query_vector)]
-        all_indices = [[] * len(query_vector)]
-        all_batch_index = [[] * len(query_vector)]
+        all_distances = [[] for _ in len(query_vector)]
+        all_indices = [[] for _ in len(query_vector)]
+        all_batch_index = [[] for _ in len(query_vector)]
 
         for i in range(len(os.listdir(self.index_dir)) - 1):
             index_path = os.path.join(self.index_dir, f"{i}.index")
