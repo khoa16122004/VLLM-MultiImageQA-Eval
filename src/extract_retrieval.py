@@ -48,7 +48,7 @@ def main(args):
     for (id, question, question_img, gt_files, choices, gt_ans) in tqdm(dataset.loader()):
         retrieval_paths, distances = db.flow_search(img=question_img, question=question, k=args.topk, topk_rerank=args.topk_rerank)
         results[id] = retrieval_paths
-        break
+        # break
     # save results
     output_path = os.path.join(args.results_dir, f"{args.dataset_name}_encoder={args.model_name_encode}_topk={args.topk}_topk_rerank={args.topk_rerank}.json")
     with open(output_path, "w") as f:    

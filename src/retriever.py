@@ -236,7 +236,6 @@ class Retriever:
         
         scores = [(path ,paths_distance_dict[path] / paths_count_dict[path]) for path in paths_count_dict]
         scores = sorted(scores, key=lambda x: x[1])[-k:]
-        print(scores)
         return scores
                 
     
