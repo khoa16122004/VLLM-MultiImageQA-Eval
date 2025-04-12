@@ -5,6 +5,7 @@ from PIL import Image
 class GA:
     def __init__(self,
                  question_img,
+                 question, 
                  epsilon,
                  retriever,
                  gt_paths,

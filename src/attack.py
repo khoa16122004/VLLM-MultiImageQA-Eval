@@ -48,6 +48,7 @@ def main(args):
         gt_paths = {path: True for path in gt_files}
         
         algorithm = GA(question_img=question_img,
+                       question=question,
                        epsilon=args.epsilon,
                        retriever=db,
                        gt_paths=gt_paths,
