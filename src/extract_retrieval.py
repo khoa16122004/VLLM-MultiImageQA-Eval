@@ -41,7 +41,7 @@ def main(args):
         
         db = MultiModal_Retriever(retrievers, weights)
     
-
+    db.read_index()
     # extract retriever paths
     results = {}
     for (id, question, question_img, gt_files, choices, gt_ans) in tqdm(dataset.loader()):
