@@ -222,7 +222,7 @@ class Retriever:
         top_indices = all_indices[sorted_idx]
         top_batches = all_batch_index[sorted_idx]
         top_distance = all_distances[sorted_idx]        
-        print("Len index: ", len(top_indices))
+        print("Len index:  ", len(top_indices))
         query_df = pd.DataFrame({
             'index': top_indices,
             'batch_idx': top_batches
