@@ -151,6 +151,7 @@ class Retriever:
         for i in range(len(os.listdir(self.index_dir)) - 1):
             index_path = os.path.join(self.index_dir, f"{i}.index")
             index = faiss.read_index(index_path)
+            index = faiss.index_cpu_to_gpu(['6'], index)
             distances, indices = index.search(query_vector, top_rerank) # B x top_rerank
 
             for j in range(len(query_vector)):
