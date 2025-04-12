@@ -83,6 +83,7 @@ class GA:
                 
             P = np.stack(selected_P)
             P_fitness = np.array(selected_fitness)
+            print("Fitness p: ", P_fitness)
             P_batch_paths = np.stack(selected_batch_paths)
             P_pil_imgs = selected_pil_imgs
             
