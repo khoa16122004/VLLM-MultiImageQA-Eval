@@ -43,27 +43,28 @@ def main(args):
     db.read_index()
     
     # attack 
-    for (id, question, question_img, gt_files, choices, gt_ans) in tqdm(dataset.loader()):
-        retrieval_paths, _ = db.flow_search(img=question_img, question=question, k=args.topk, topk_rerank=args.topk_rerank)
-        print(f"{id}, retrieval paths: ", retrieval_paths)
-        gt_paths = {path: True for path in retrieval_paths[0]}
-        
-        algorithm = GA(question_img=question_img,
-                       question=question,
-                       epsilon=args.epsilon,
-                       retriever=db,
-                       gt_paths=gt_paths,
-                       k=args.topk,
-                       topk_rerank=args.topk_rerank,
-                       mutation_rate=args.mutation_rate,
-                       max_iteration=args.max_iterations,
-                       pop_size=args.pop_size)
-        
-        adv_pertubation, fitness, batch_paths, pil_img = algorithm.solve()
-        pil_img.save("adv.png")
-        question_img.save("ori.png")
-        print("adv paths: ", batch_paths)
-        break
+    # for (id, question, question_img, gt_files, choices, gt_ans) in tqdm(dataset.loader()):
+    id, question, question_img, gt_files, choices, gt_ans = dataset.take_sample(args.sample_id)
+    retrieval_paths, _ = db.flow_search(img=question_img, question=question, k=args.topk, topk_rerank=args.topk_rerank)
+    print(f"{id}, retrieval paths: ", retrieval_paths)
+    gt_paths = {path: True for path in retrieval_paths[0]}
+    
+    algorithm = GA(question_img=question_img,
+                    question=question,
+                    epsilon=args.epsilon,
+                    retriever=db,
+                    gt_paths=gt_paths,
+                    k=args.topk,
+                    topk_rerank=args.topk_rerank,
+                    mutation_rate=args.mutation_rate,
+                    max_iteration=args.max_iterations,
+                    pop_size=args.pop_size)
+    
+    adv_pertubation, fitness, batch_paths, pil_img = algorithm.solve()
+    pil_img.save("adv.png")
+    question_img.save("ori.png")
+    print("adv paths: ", batch_paths)
+    # break
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -73,7 +74,7 @@ if __name__ == "__main__":
     parser.add_argument("--index_dir", type=str)
     parser.add_argument("--dataset_name", type=str, default="MRAG")
     parser.add_argument("--multimodel_retrieval", type=int, default=0)
-    
+    parser.add_argument("--sample_id", type=str)
     # attack argument
     parser.add_argument("--epsilon", type=float, default=0.05)
     parser.add_argument("--max_iterations", type=int, default=1000)
