@@ -25,6 +25,7 @@ class GA:
         self.question = question
     def fitness(self, P):
         pil_imgs = [Image.fromarray(np.uint8(np.clip((self.question_img + p) * 255, 0, 255))) for p in P]
+        print("Pil imgs", pil_imgs)
         batch_paths, _ = self.retriever.flow_search(pil_imgs, self.question, 20, 100)
 
         fitness_scores = []
