@@ -9,6 +9,7 @@ class GA:
                  epsilon,
                  retriever,
                  gt_paths,
+                 image_encoder,
                  mutation_rate=0.1,
                  max_iteration=1000,
                  pop_size=100):
@@ -25,12 +26,17 @@ class GA:
         self.question = question
     def fitness(self, P):
         pil_imgs = [Image.fromarray(np.uint8(np.clip((self.np_question_img + p) * 255, 0, 255))) for p in P]
-        batch_paths, _ = self.retriever.flow_search(pil_imgs, self.question, 10, 20)
+        batch_paths, distances = self.retriever.flow_search(pil_imgs, self.question, 10, 20)
 
+        # retrieved encode
         fitness_scores = []
-        for paths in batch_paths:
-            scores = [1 / i if self.is_gt(paths[i - 1]) else 0 for i in range(1, 11)]
-            fitness_scores.append(np.sum(scores))
+        for paths, dis in zip(batch_paths, distances):
+            scores = [dis[i] / i if self.is_gt(paths[i - 1]) else 0 for i in range(1, 11)]
+            fitness_scores.append(np.mean(scores))
+            
+            
+        # clip sim score
+        
         return np.array(fitness_scores), batch_paths, pil_imgs
 
     def is_gt(self, path):
@@ -78,7 +84,7 @@ class GA:
             P_pil_imgs = selected_pil_imgs
             
             print("Best Fitness: ", np.min(P_fitness))
-            print("Best Path: ", P_batch_paths[np.argmin(P_fitness)])
+            # print("Best Path: ", P_batch_paths[np.argmin(P_fitness)])
 
         best_idx = np.argmin(P_fitness)
         return P[best_idx], P_fitness[best_idx], P_batch_paths[best_idx], P_pil_imgs[best_idx]
