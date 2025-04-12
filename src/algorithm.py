@@ -44,6 +44,7 @@ class GA:
         w, h, c = self.np_question_img.shape
         P = np.random.uniform(-self.epsilon, self.epsilon, size=(self.pop_size, w, h, c))
         P_fitness, P_batch_paths, P_pil_imgs = self.fitness(P)
+        print("P fitness: ", P_fitness)
         
         for _ in tqdm(range(self.max_iteration)):
             parent_indices = np.random.randint(0, self.pop_size, size=(self.pop_size, 2))

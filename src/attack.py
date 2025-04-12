@@ -57,7 +57,7 @@ def main(args):
                        max_iteration=args.max_iterations,
                        pop_size=args.pop_size)
         
-        adv_paths, fitness, batch_paths, pil_img = algorithm.solve()
+        adv_pertubation, fitness, batch_paths, pil_img = algorithm.solve()
         pil_img.save("adv.png")
         question_img.save("ori.png")
         print("adv paths: ", batch_paths)
