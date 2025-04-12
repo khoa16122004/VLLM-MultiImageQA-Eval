@@ -11,7 +11,8 @@ class Retriever:
         self.index_dir = index_dir
         self.encode_model = encode_model
         self.map_path = map_path
-        self.df = pd.read_csv(self.map_path)
+        if map_path:
+            self.df = pd.read_csv(self.map_path)
         self.d = dim
         
     def extract_db(self, dataset_dir, output_dir, caption_dir=None):
