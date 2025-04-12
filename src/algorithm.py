@@ -29,7 +29,7 @@ class GA:
 
         fitness_scores = []
         for paths in batch_paths:
-            scores = [1 / i if self.is_gt(paths[i - 1]) else 0 for i in range(1, 21)]
+            scores = [1 / i if self.is_gt(paths[i - 1]) else 0 for i in range(1, 11)]
             fitness_scores.append(np.sum(scores))
         return np.array(fitness_scores), batch_paths, pil_imgs
 
