@@ -41,16 +41,13 @@ def main(args):
         
         db = MultiModal_Retriever(retrievers, weights)
     
-    # vt database
 
     # extract retriever paths
     results = {}
     for (id, question, question_img, gt_files, choices, gt_ans) in tqdm(dataset.loader()):
         retrieval_paths, distances = db.flow_search(img=question_img, question=question, k=args.topk, topk_rerank=args.topk_rerank)
-        results[id] = retrieval_paths
-        print("Id: ", id)
-        print("retrieval_paths: ", retrieval_paths)
-        break
+        results[id] = retrieval_paths[0]
+        
     # save results
     output_path = os.path.join(args.results_dir, f"{args.dataset_name}_encoder={args.model_name_encode}_topk={args.topk}_topk_rerank={args.topk_rerank}.json")
     with open(output_path, "w") as f:    
