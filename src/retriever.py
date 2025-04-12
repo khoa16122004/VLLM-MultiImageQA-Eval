@@ -205,7 +205,7 @@ class Retriever:
             index_path = os.path.join(self.index_dir, f"{i}.index")
             index = faiss.read_index(index_path)
 
-            distances, indices = index.search(query_matrix, topk_rerank * 32)  # [batch_size, topk_rerank]
+            distances, indices = index.search(query_matrix, topk_rerank)  # [batch_size, topk_rerank]
 
             # Flatten và lưu lại
             all_distances.extend(distances.flatten())
