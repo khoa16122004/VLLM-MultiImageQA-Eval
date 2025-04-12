@@ -15,8 +15,8 @@ def load_sample(sample_id, retrivels_names):
     question_img = None
     gt_files = []
 
-    retrivels_names = re.findall(r"'([^']+)'", retrivels_names)
-    # retrivels_names = re.findall(r'"([^"]+)"', retrivels_names)
+    # retrivels_names = re.findall(r"'([^']+)'", retrivels_names)
+    retrivels_names = re.findall(r'"([^"]+)"', retrivels_names)
 
     retrivels_files = []
     for file_name in retrivels_names:
