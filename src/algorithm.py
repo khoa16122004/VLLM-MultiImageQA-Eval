@@ -63,7 +63,7 @@ class GA:
             O = P[parent_indices[:, 0]] + P[parent_indices[:, 1]]
             mutation_mask = np.random.rand(self.pop_size, 1, 1, 1) < self.mutation_rate            
             mutation_values = np.random.normal(loc=0.0, scale=self.epsilon, size=(self.pop_size, w, h, c))
-            mutation_values = np.clip(P, -self.epsilon, self.epsilon)
+            mutation_values = np.clip(mutation_values, -self.epsilon, self.epsilon)
             O = np.where(mutation_mask, mutation_values, O)
             O = np.clip(O, -self.epsilon, self.epsilon)
 
