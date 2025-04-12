@@ -138,7 +138,6 @@ class Retriever:
         
         query_vector = query_vector.astype('float32') 
         all_distances = [[] * len(query_vector)]
-        print(len(all_distances))
         all_indices = [[] * len(query_vector)]
         all_batch_index = [[] * len(query_vector)]
 
@@ -155,15 +154,16 @@ class Retriever:
         all_distances = np.array(all_distances)
         all_indices = np.array(all_indices)
         all_batch_index = np.array(all_batch_index)
-
+        print("All distances shape: ", all_distances.shape)
         sorted_idx = np.argsort(all_distances, axis=0)
-        print(sorted_idx.shape)
         sorted_idx = sorted_idx[:, :k]
+        print("sorted index: ", sorted_idx.shape)
 
         top_indices = all_indices[sorted_idx]
         top_batches = all_batch_index[sorted_idx]
         top_distance = all_distances[sorted_idx]
         
+        print("top indies: ", top_indices.shape)
         print(top_indices.shape)
         
         return top_distance, top_indices, top_batches
