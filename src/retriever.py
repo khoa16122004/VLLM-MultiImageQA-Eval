@@ -1,7 +1,7 @@
 import os
 from tqdm import tqdm
 import numpy as np
-import faiss
+import faiss.contrib.torch_utils as faiss
 import pandas as pd
 import csv
 from PIL import Image
