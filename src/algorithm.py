@@ -42,21 +42,27 @@ class GA:
     def solve(self):
         w, h, c = self.np_question_img.shape
         P = np.random.uniform(-self.epsilon, self.epsilon, size=(self.pop_size, w, h, c))
+        print("P shape: ", P.shape)
         P_fitness = self.fitness(P)
-
+        print("P_fitness shape: ", P_fitness.shape)
+        
         for _ in tqdm(range(self.max_iteration)):
             parent_indices = np.random.randint(0, self.pop_size, size=(self.pop_size, 2))
             O = (P[parent_indices[:, 0]] + P[parent_indices[:, 1]]) / 2
-
+            print("Ofstring shape: ", O.shape)
             mutation_mask = np.random.rand(self.pop_size, 1, 1, 1) < self.mutation_rate
             mutation_values = np.random.uniform(-self.epsilon, self.epsilon, size=(self.pop_size, w, h, c))
             O = np.where(mutation_mask, mutation_values, O)
             O = np.clip(O, -self.epsilon, self.epsilon)
 
             O_fitness = self.fitness(O)
+            print("P_fitness shape: ", O_fitness.shape)
 
             pool = np.concatenate((P, O), axis=0)
             pool_fitness = np.concatenate((P_fitness, O_fitness), axis=0)
+
+            print("pool shape: ", pool.shape)
+            print("pool_fitness shape: ", pool_fitness.shape)
 
             selected_P = []
             selected_fitness = []

@@ -53,6 +53,7 @@ def main(args):
                        pop_size=args.pop_size)
         adv_paths = algorithm.solve()
         print(adv_paths)
+        break
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
