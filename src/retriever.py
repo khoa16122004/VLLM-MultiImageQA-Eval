@@ -157,6 +157,7 @@ class Retriever:
         all_batch_index = np.array(all_batch_index)
 
         sorted_idx = np.argsort(all_distances, axis=0)
+        print(sorted_idx.shape)
         sorted_idx = sorted_idx[:, :k]
 
         top_indices = all_indices[sorted_idx]
