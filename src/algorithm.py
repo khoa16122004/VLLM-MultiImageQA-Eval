@@ -46,10 +46,8 @@ class GA:
         P_fitness, P_batch_paths, P_pil_imgs = self.fitness(P)
         
         for _ in tqdm(range(self.max_iteration)):
-            print("Parrent shape: ", P.shape)
             parent_indices = np.random.randint(0, self.pop_size, size=(self.pop_size, 2))
             O = (P[parent_indices[:, 0]] + P[parent_indices[:, 1]]) / 2
-            print("Ofstring shape: ", O.shape)
             mutation_mask = np.random.rand(self.pop_size, 1, 1, 1) < self.mutation_rate
             mutation_values = np.random.uniform(-self.epsilon, self.epsilon, size=(self.pop_size, w, h, c))
             O = np.where(mutation_mask, mutation_values, O)
