@@ -51,5 +51,5 @@ class MRAG:
                 
     def take_sample(self, sample_id):
         sample_dir = os.path.join(self.question_dir, sample_id)
-        question, question_img, gt_files, choices, gt_ans = self.extract_question(sample_id)
+        sample_id, question, question_img, gt_files, choices, gt_ans = self.extract_question(sample_id)
         return sample_id, question, question_img, gt_files, choices, gt_ans
