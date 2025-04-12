@@ -30,7 +30,7 @@ def main(args):
     num_samples = 0
     results = {
         'accuracy': None,
-        'log_answer': [],
+        'log_answer': {},
     }
     for (id, question, question_img, gt_files, choices, gt_ans) in tqdm(dataset.loader()):
             num_samples += 1
